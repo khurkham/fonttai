@@ -1,12 +1,10 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "font-tai-cloudflare",
   "main": "src/worker.ts",
-  "compatibility_date": "2026-04-14",
+  "compatibility_date": "2026-04-15",
   "assets": {
     "directory": "./dist",
-    "binding": "ASSETS",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS"
   },
   "d1_databases": [
     {
@@ -20,8 +18,5 @@
       "binding": "FONT_BUCKET",
       "bucket_name": "font-tai-files"
     }
-  ],
-  "observability": {
-    "enabled": true
-  }
+  ]
 }
