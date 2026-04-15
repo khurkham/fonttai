@@ -108,8 +108,9 @@ app.get("/api/fonts", async (c) => {
 
 app.get("/api/font-file/:key", async (c) => {
   try {
-    if (!c.env.FONT_BUCKET)
+    if (!c.env.FONT_BUCKET) {
       return errJson("Font bucket is not configured", 500);
+    }
 
     const key = c.req.param("key");
     const obj = await c.env.FONT_BUCKET.get(key);
@@ -169,7 +170,7 @@ app.post("/api/admin/login", async (c) => {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return okJson({ ok: true, authenticated: true });
+    return c.json({ ok: true, authenticated: true });
   } catch (error) {
     console.error("/api/admin/login error", error);
     return errJson("Login failed", 500);
@@ -179,7 +180,7 @@ app.post("/api/admin/login", async (c) => {
 app.post("/api/admin/logout", (c) => {
   deleteCookie(c, "admin_user", { path: "/" });
   deleteCookie(c, "admin_token", { path: "/" });
-  return okJson({ ok: true });
+  return c.json({ ok: true });
 });
 
 app.get("/api/admin/me", async (c) => {
@@ -192,8 +193,7 @@ app.use("/api/admin/fonts", requireAuth);
 app.post("/api/admin/fonts", async (c) => {
   try {
     if (!c.env.DB) return errJson("Database is not configured", 500);
-    if (!c.env.FONT_BUCKET)
-      return errJson("Font bucket is not configured", 500);
+    if (!c.env.FONT_BUCKET) return errJson("Font bucket is not configured", 500);
 
     const form = await c.req.formData();
     const name = String(form.get("name") || "");
@@ -227,7 +227,7 @@ app.post("/api/admin/fonts", async (c) => {
     return okJson({ ok: true, id });
   } catch (error) {
     console.error("/api/admin/fonts POST error", error);
-    return errJson("Failed to create font", 500);
+    return errJson(`Failed to create font: ${String(error)}`, 500);
   }
 });
 
