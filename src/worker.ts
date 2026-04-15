@@ -7,6 +7,7 @@ type Bindings = {
   DB?: D1Database;
   FONT_BUCKET?: R2Bucket;
   ASSETS?: Fetcher;
+  APP_NAME?: string;
   ADMIN_USERNAME?: string;
   ADMIN_PASSWORD_HASH?: string;
   SESSION_SECRET?: string;
@@ -127,6 +128,17 @@ app.get("/api/font-file/:key", async (c) => {
     console.error("/api/font-file error", error);
     return errJson("Failed to load font file", 500);
   }
+});
+
+app.get("/api/check-secrets", (c) => {
+  return c.json({
+    hasAdminUsername: !!c.env.ADMIN_USERNAME,
+    hasAdminPasswordHash: !!c.env.ADMIN_PASSWORD_HASH,
+    hasSessionSecret: !!c.env.SESSION_SECRET,
+    adminUsernameValue: c.env.ADMIN_USERNAME ?? null,
+    hashLength: c.env.ADMIN_PASSWORD_HASH?.length ?? 0,
+    secretLength: c.env.SESSION_SECRET?.length ?? 0
+  });
 });
 
 app.post("/api/admin/login", async (c) => {
