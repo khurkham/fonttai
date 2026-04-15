@@ -11,7 +11,10 @@
   },
 
   "vars": {
-    "APP_NAME": "font-tai-cloudflare"
+    "APP_NAME": "font-tai-cloudflare",
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD_HASH": "วางค่าแฮชที่ได้จากคำสั่งด้านบน",
+    "SESSION_SECRET": "fonttai_secret_2026_super_long_random_key"
   },
 
   "d1_databases": [
