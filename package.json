@@ -25,11 +25,4 @@
     "vite": "^7.1.0",
     "wrangler": "^4.13.2"
   }
-  "scripts": {
-  "dev": "vite dev",
-  "build": "vite build",
-  "preview": "npm run build && vite preview",
-  "deploy": "npm run build && wrangler deploy",
-  "cf-typegen": "wrangler types"
-}
 }
