@@ -1,272 +1,656 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Code, LogOut, Palette, Plus, Search, Settings, SlidersHorizontal, Trash2, Type, X } from 'lucide-react';
-import { api } from './api';
-import { GOOGLE_FONT_LINKS } from './lib';
-import type { FontItem } from './types';
-import { FontCard } from './components/FontCard';
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Settings, LogOut, Trash2, X } from "lucide-react";
+import { api } from "./api";
+import { FontCard } from "./components/FontCard";
+import { getFamily } from "./lib";
+import type { FontItem } from "./types";
 
-type View = 'user' | 'login' | 'admin';
+type ViewMode = "home" | "admin";
 
-function CodeModal({ font, onClose }: { font: FontItem; onClose: () => void }) {
-  const googleFontName = font.name.replace(/\s+/g, '+');
-  const htmlCode = font.isCustom
-    ? `<!-- เปลี่ยน URL ให้ตรงกับโดเมนคุณ -->\n<style>\n@font-face {\n  font-family: '${font.name}';\n  src: url('${font.fileUrl ?? 'https://yourdomain.com/fonts/font-file.woff2'}');\n}\n</style>`
-    : `<link href="https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap" rel="stylesheet">`;
-  const cssCode = font.isCustom
-    ? `body {\n  font-family: '${font.name}';\n}`
-    : `body {\n  font-family: '${font.name}', sans-serif;\n}`;
+const DEFAULT_PREVIEW =
+  "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
+
+const GOOGLE_FONTS: FontItem[] = [
+  {
+    id: "g1",
+    name: "Tai Heritage Pro",
+    style: "Regular",
+    owner: "SIL International",
+    characteristics: "Serif",
+    details: "ฟอนต์ไต (ไทใหญ่) มาตรฐาน รองรับอักขระครบถ้วน",
+    isCustom: false,
+    sourceUrl: "https://fonts.google.com/specimen/Tai+Heritage+Pro",
+    fileKey: "",
+    mimeType: "",
+    createdAt: "",
+    fileUrl: "",
+  },
+  {
+    id: "g2",
+    name: "Prompt",
+    style: "Regular",
+    owner: "Cadson Demak",
+    characteristics: "Sans Serif",
+    details: "ฟอนต์ยอดนิยม ทันสมัย",
+    isCustom: false,
+    sourceUrl: "https://fonts.google.com/specimen/Prompt",
+    fileKey: "",
+    mimeType: "",
+    createdAt: "",
+    fileUrl: "",
+  },
+  {
+    id: "g3",
+    name: "Sarabun",
+    style: "Regular",
+    owner: "Suppon Srisawat",
+    characteristics: "Serif",
+    details: "เหมาะกับเอกสารและงานราชการ",
+    isCustom: false,
+    sourceUrl: "https://fonts.google.com/specimen/Sarabun",
+    fileKey: "",
+    mimeType: "",
+    createdAt: "",
+    fileUrl: "",
+  },
+  {
+    id: "g4",
+    name: "Mali",
+    style: "Regular",
+    owner: "Cadson Demak",
+    characteristics: "Script",
+    details: "เป็นกันเอง อ่านง่าย",
+    isCustom: false,
+    sourceUrl: "https://fonts.google.com/specimen/Mali",
+    fileKey: "",
+    mimeType: "",
+    createdAt: "",
+    fileUrl: "",
+  },
+  {
+    id: "g5",
+    name: "Kanit",
+    style: "Bold",
+    owner: "Cadson Demak",
+    characteristics: "Sans Serif",
+    details: "หนา ชัด เหมาะกับหัวเรื่อง",
+    isCustom: false,
+    sourceUrl: "https://fonts.google.com/specimen/Kanit",
+    fileKey: "",
+    mimeType: "",
+    createdAt: "",
+    fileUrl: "",
+  },
+  {
+    id: "g6",
+    name: "Chakra Petch",
+    style: "Regular",
+    owner: "Cadson Demak",
+    characteristics: "Display",
+    details: "โดดเด่นสำหรับงานดีไซน์",
+    isCustom: false,
+    sourceUrl: "https://fonts.google.com/specimen/Chakra+Petch",
+    fileKey: "",
+    mimeType: "",
+    createdAt: "",
+    fileUrl: "",
+  },
+];
+
+function CodeModal({
+  font,
+  onClose,
+}: {
+  font: FontItem | null;
+  onClose: () => void;
+}) {
+  if (!font) return null;
+
+  const fontFamily = getFamily(font.name, font.isCustom);
+  const css = font.isCustom
+    ? `@font-face {
+  font-family: "${fontFamily}";
+  src: url("${font.fileUrl}") format("truetype");
+  font-display: swap;
+}
+
+.your-class {
+  font-family: "${fontFamily}", sans-serif;
+}`
+    : `<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="${font.sourceUrl.replace(
+        "https://fonts.google.com/specimen/",
+        "https://fonts.googleapis.com/css2?family="
+      )}&display=swap" rel="stylesheet">
+
+.your-class {
+  font-family: "${fontFamily}", sans-serif;
+}`;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <div className="space-between" style={{ alignItems: 'center' }}>
-          <h3 style={{ margin: 0 }}>โค้ดสำหรับใช้งาน: {font.name}</h3>
-          <button className="btn" onClick={onClose}><X size={16} /></button>
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-3xl shadow-xl border border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b">
+          <h3 className="text-xl font-bold text-gray-900">
+            โค้ดใช้งาน: {font.name}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-100"
+            type="button"
+          >
+            <X size={20} />
+          </button>
         </div>
-        <div className="stack" style={{ marginTop: 16 }}>
-          <div>
-            <strong>HTML</strong>
-            <pre className="card" style={{ padding: 16, overflow: 'auto' }}><code>{htmlCode}</code></pre>
-          </div>
-          <div>
-            <strong>CSS</strong>
-            <pre className="card" style={{ padding: 16, overflow: 'auto' }}><code>{cssCode}</code></pre>
-          </div>
+        <div className="p-5">
+          <pre className="bg-gray-900 text-gray-100 rounded-xl p-4 overflow-x-auto text-sm whitespace-pre-wrap">
+            {css}
+          </pre>
         </div>
       </div>
     </div>
   );
 }
 
-export default function App() {
-  const [view, setView] = useState<View>('user');
-  const [fonts, setFonts] = useState<FontItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [previewText, setPreviewText] = useState('สวัสดีชาวโลก ၸﺌ်ꩫ်ꩾႃꩫ်ꩺꩫ် 👋 The quick brown fox jumps over the lazy dog.');
-  const [fontSize, setFontSize] = useState(32);
-  const [textColor, setTextColor] = useState('#1F2937');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [auth, setAuth] = useState(false);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const [codeFont, setCodeFont] = useState<FontItem | null>(null);
-  const [formError, setFormError] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', style: 'Regular', owner: '', characteristics: '', details: '', file: null as File | null });
+function LoginModal({
+  open,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    for (const href of GOOGLE_FONT_LINKS) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = href;
-      document.head.appendChild(link);
-    }
-  }, []);
+  if (!open) return null;
 
-  async function loadFonts() {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
     setLoading(true);
     try {
-      const data = await api.getFonts();
-      setFonts(data.items);
+      const res = await api.login(username, password);
+      if (res.ok && res.authenticated) {
+        setPassword("");
+        onSuccess();
+        onClose();
+      } else {
+        setError("เข้าสู่ระบบไม่สำเร็จ");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "เข้าสู่ระบบไม่สำเร็จ");
     } finally {
       setLoading(false);
     }
   }
 
-  async function loadMe() {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl border border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b">
+          <h3 className="text-2xl font-bold text-gray-900">เข้าสู่ระบบหลังบ้าน</h3>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-100"
+            type="button"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
+          <input
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="ชื่อผู้ใช้"
+          />
+          <input
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="รหัสผ่าน"
+          />
+
+          {error && <p className="text-red-600 text-sm whitespace-pre-wrap">{error}</p>}
+
+          <button
+            disabled={loading}
+            className="w-full bg-blue-600 text-white rounded-xl px-4 py-3 font-semibold disabled:opacity-60"
+            type="submit"
+          >
+            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function AddFontModal({
+  open,
+  onClose,
+  onCreated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [style, setStyle] = useState("Regular");
+  const [owner, setOwner] = useState("");
+  const [characteristics, setCharacteristics] = useState("");
+  const [details, setDetails] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  if (!open) return null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!name || !owner || !characteristics || !file) {
+      setError("กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์");
+      return;
+    }
+
     try {
-      const data = await api.me();
-      setAuth(Boolean(data.authenticated));
+      setLoading(true);
+      const form = new FormData();
+      form.append("name", name);
+      form.append("style", style);
+      form.append("owner", owner);
+      form.append("characteristics", characteristics);
+      form.append("details", details);
+      form.append("file", file);
+
+      await api.createFont(form);
+
+      setName("");
+      setStyle("Regular");
+      setOwner("");
+      setCharacteristics("");
+      setDetails("");
+      setFile(null);
+
+      onCreated();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "เพิ่มฟอนต์ไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-3xl shadow-xl border border-gray-200">
+        <div className="flex items-center justify-between p-5 border-b">
+          <h3 className="text-2xl font-bold text-gray-900">เพิ่มฟอนต์ใหม่</h3>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-100"
+            type="button"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
+          <input
+            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            placeholder="ชื่อฟอนต์"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <select
+            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            value={style}
+            onChange={(e) => setStyle(e.target.value)}
+          >
+            <option>Regular</option>
+            <option>Bold</option>
+            <option>Italic</option>
+            <option>Light</option>
+            <option>Medium</option>
+            <option>SemiBold</option>
+          </select>
+
+          <input
+            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            placeholder="เจ้าของ"
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+          />
+
+          <input
+            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            placeholder="ลักษณะ"
+            value={characteristics}
+            onChange={(e) => setCharacteristics(e.target.value)}
+          />
+
+          <textarea
+            className="rounded-xl border border-gray-300 px-4 py-3 outline-none min-h-[110px]"
+            placeholder="รายละเอียด"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+          />
+
+          <input
+            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            type="file"
+            accept=".ttf,.otf,.woff,.woff2"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+
+          {error && <p className="text-red-600 text-sm whitespace-pre-wrap">{error}</p>}
+
+          <button
+            className="w-full bg-blue-600 text-white rounded-xl px-4 py-3 font-semibold disabled:opacity-60"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "กำลังบันทึก..." : "บันทึกฟอนต์"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW);
+  const [search, setSearch] = useState("");
+  const [fontSize, setFontSize] = useState(32);
+  const [textColor, setTextColor] = useState("#1f2937");
+
+  const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("home");
+
+  const [codeFont, setCodeFont] = useState<FontItem | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showAddFont, setShowAddFont] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  async function loadFonts() {
+    try {
+      const res = await api.getFonts();
+      setCustomFonts(res.items || []);
     } catch {
-      setAuth(false);
+      setCustomFonts([]);
+    }
+  }
+
+  async function checkAuth() {
+    try {
+      const res = await api.me();
+      setIsAuthed(Boolean(res.authenticated));
+      if (!res.authenticated && viewMode === "admin") {
+        setViewMode("home");
+      }
+    } catch {
+      setIsAuthed(false);
+      if (viewMode === "admin") setViewMode("home");
     }
   }
 
   useEffect(() => {
-    loadFonts();
-    loadMe();
+    (async () => {
+      setLoading(true);
+      await Promise.all([loadFonts(), checkAuth()]);
+      setLoading(false);
+    })();
   }, []);
 
-  const filteredFonts = useMemo(() => fonts.filter((font) => {
-    const q = searchQuery.toLowerCase();
-    return !q || font.name.toLowerCase().includes(q) || font.style.toLowerCase().includes(q) || font.characteristics.toLowerCase().includes(q);
-  }), [fonts, searchQuery]);
+  const allFonts = useMemo(() => {
+    const merged = [...customFonts, ...GOOGLE_FONTS];
+    const q = search.trim().toLowerCase();
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      await api.login(loginData.username, loginData.password);
-      setAuth(true);
-      setView('admin');
-      setLoginError('');
-      setLoginData({ username: '', password: '' });
-    } catch (error) {
-      setLoginError(error instanceof Error ? error.message : 'Login failed');
-    }
-  }
+    if (!q) return merged;
+
+    return merged.filter((font) =>
+      [
+        font.name,
+        font.owner,
+        font.characteristics,
+        font.style,
+        font.details,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [customFonts, search]);
 
   async function handleLogout() {
-    await api.logout();
-    setAuth(false);
-    setView('user');
-  }
-
-  async function handleAddFont(e: React.FormEvent) {
-    e.preventDefault();
-    setFormError('');
-    if (!formData.name || !formData.owner || !formData.characteristics || !formData.file) {
-      setFormError('กรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์');
-      return;
+    try {
+      await api.logout();
+    } finally {
+      setIsAuthed(false);
+      setViewMode("home");
     }
-    const fd = new FormData();
-    fd.set('name', formData.name);
-    fd.set('style', formData.style);
-    fd.set('owner', formData.owner);
-    fd.set('characteristics', formData.characteristics);
-    fd.set('details', formData.details);
-    fd.set('file', formData.file);
-    await api.createFont(fd);
-    setShowAddForm(false);
-    setFormData({ name: '', style: 'Regular', owner: '', characteristics: '', details: '', file: null });
-    await loadFonts();
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('ต้องการลบฟอนต์นี้หรือไม่')) return;
-    await api.deleteFont(id);
-    await loadFonts();
+  async function handleDeleteFont(id: string) {
+    const ok = window.confirm("ต้องการลบฟอนต์นี้ใช่หรือไม่");
+    if (!ok) return;
+
+    try {
+      await api.deleteFont(id);
+      await loadFonts();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "ลบฟอนต์ไม่สำเร็จ");
+    }
   }
 
   return (
-    <div>
-      <header className="header">
-        <div className="container" style={{ paddingTop: 16, paddingBottom: 16 }}>
-          <div className="space-between" style={{ alignItems: 'center' }}>
-            <div className="row">
-              <div style={{ background: '#2563eb', color: 'white', borderRadius: 16, padding: 12 }}><Type size={24} /></div>
-              <div>
-                <h1 style={{ margin: 0 }}>Font Tai</h1>
-                <div className="muted">แหล่งรวมฟอนต์ไต พรีวิวและจัดการฟอนต์บน Cloudflare</div>
-              </div>
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="border-b border-gray-200 bg-white/90 backdrop-blur sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-3xl">
+              T
             </div>
-            <div className="row wrap">
-              {auth && <span className="badge">Admin login แล้ว</span>}
-              <button className="btn" onClick={() => setView('user')}>หน้าหลัก</button>
-              {!auth && <button className="btn primary" onClick={() => setView('login')}><Settings size={16} /> เข้าหลังบ้าน</button>}
-              {auth && <button className="btn primary" onClick={() => setView('admin')}><Settings size={16} /> จัดการฟอนต์</button>}
+            <div>
+              <h1 className="text-5xl font-black tracking-tight">Font Tai</h1>
+              <p className="text-gray-500 text-lg">
+                แหล่งรวมฟอนต์ไต พรีวิวและจัดการฟอนต์บน Cloudflare
+              </p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {isAuthed && (
+              <span className="px-3 py-2 rounded-xl bg-blue-50 text-blue-700 text-sm font-semibold">
+                Admin login แล้ว
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setViewMode("home")}
+              className="px-5 py-3 rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold"
+            >
+              หน้าหลัก
+            </button>
+
+            {isAuthed ? (
+              <button
+                type="button"
+                onClick={() => setViewMode("admin")}
+                className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold flex items-center gap-2"
+              >
+                <Settings size={18} />
+                จัดการฟอนต์
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowLogin(true)}
+                className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold flex items-center gap-2"
+              >
+                <Settings size={18} />
+                เข้าหลังบ้าน
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      {view === 'login' && (
-        <main className="container" style={{ paddingTop: 32 }}>
-          <form className="card stack" onSubmit={handleLogin} style={{ maxWidth: 420, margin: '0 auto', padding: 24 }}>
-            <h2 style={{ margin: 0 }}>เข้าสู่ระบบหลังบ้าน</h2>
-            <input className="input" placeholder="username" value={loginData.username} onChange={(e) => setLoginData((p) => ({ ...p, username: e.target.value }))} />
-            <input className="input" placeholder="password" type="password" value={loginData.password} onChange={(e) => setLoginData((p) => ({ ...p, password: e.target.value }))} />
-            {loginError && <div style={{ color: '#dc2626' }}>{loginError}</div>}
-            <button className="btn primary" type="submit">เข้าสู่ระบบ</button>
-          </form>
-        </main>
-      )}
-
-      {view === 'admin' && auth && (
-        <main className="container" style={{ paddingTop: 24, paddingBottom: 24 }}>
-          <div className="space-between" style={{ alignItems: 'center', marginBottom: 16 }}>
-            <h2 style={{ margin: 0 }}>ระบบจัดการฟอนต์</h2>
-            <div className="row wrap">
-              <button className="btn primary" onClick={() => setShowAddForm(true)}><Plus size={16} /> เพิ่มฟอนต์</button>
-              <button className="btn danger" onClick={handleLogout}><LogOut size={16} /> ออกจากระบบ</button>
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {viewMode === "admin" && isAuthed ? (
+          <section className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <h2 className="text-4xl font-black">ระบบจัดการฟอนต์</h2>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddFont(true)}
+                  className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold flex items-center gap-2"
+                >
+                  <Plus size={18} />
+                  เพิ่มฟอนต์
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-5 py-3 rounded-2xl bg-red-600 text-white font-semibold flex items-center gap-2"
+                >
+                  <LogOut size={18} />
+                  ออกจากระบบ
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="card" style={{ overflowX: 'auto' }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ชื่อ</th>
-                  <th>สไตล์</th>
-                  <th>เจ้าของ</th>
-                  <th>ลักษณะ</th>
-                  <th>ประเภท</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {fonts.map((font) => (
-                  <tr key={font.id}>
-                    <td>{font.name}</td>
-                    <td>{font.style}</td>
-                    <td>{font.owner}</td>
-                    <td>{font.characteristics}</td>
-                    <td>{font.isCustom ? 'Custom Upload' : 'Google'}</td>
-                    <td>{font.isCustom && <button className="btn" onClick={() => handleDelete(font.id)}><Trash2 size={16} /></button>}</td>
+            <div className="overflow-x-auto rounded-2xl border border-gray-200">
+              <table className="w-full text-left">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-4">ชื่อ</th>
+                    <th className="px-4 py-4">สไตล์</th>
+                    <th className="px-4 py-4">เจ้าของ</th>
+                    <th className="px-4 py-4">ลักษณะ</th>
+                    <th className="px-4 py-4">ประเภท</th>
+                    <th className="px-4 py-4">จัดการ</th>
                   </tr>
+                </thead>
+                <tbody>
+                  {allFonts.map((font) => (
+                    <tr key={font.id} className="border-t border-gray-200">
+                      <td className="px-4 py-4 font-semibold">{font.name}</td>
+                      <td className="px-4 py-4">{font.style}</td>
+                      <td className="px-4 py-4">{font.owner}</td>
+                      <td className="px-4 py-4">{font.characteristics}</td>
+                      <td className="px-4 py-4">{font.isCustom ? "Custom" : "Google"}</td>
+                      <td className="px-4 py-4">
+                        {font.isCustom ? (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteFont(font.id)}
+                            className="px-3 py-2 rounded-xl bg-red-50 text-red-600 font-medium flex items-center gap-2"
+                          >
+                            <Trash2 size={16} />
+                            ลบ
+                          </button>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          <>
+            <section className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] gap-4 items-center">
+                <input
+                  className="rounded-2xl border border-gray-300 px-5 py-4 text-2xl outline-none"
+                  value={previewText}
+                  onChange={(e) => setPreviewText(e.target.value)}
+                  placeholder="พิมพ์ข้อความสำหรับพรีวิว"
+                />
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={16}
+                    max={96}
+                    value={fontSize}
+                    onChange={(e) => setFontSize(Number(e.target.value))}
+                  />
+                  <span className="text-2xl font-bold w-20">{fontSize}px</span>
+                </div>
+
+                <input
+                  type="color"
+                  value={textColor}
+                  onChange={(e) => setTextColor(e.target.value)}
+                  className="w-16 h-12 rounded-xl border border-gray-300 bg-white"
+                />
+              </div>
+
+              <div className="mt-4">
+                <input
+                  className="rounded-2xl border border-gray-300 px-5 py-4 text-xl outline-none w-full max-w-md"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="ค้นหาฟอนต์"
+                />
+              </div>
+            </section>
+
+            {loading ? (
+              <p className="text-xl text-gray-500">กำลังโหลดฟอนต์...</p>
+            ) : (
+              <section className="flex flex-col gap-6">
+                {allFonts.map((font) => (
+                  <FontCard
+                    key={font.id}
+                    font={font}
+                    previewText={previewText}
+                    fontSize={fontSize}
+                    textColor={textColor}
+                    onShowCode={setCodeFont}
+                  />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </main>
-      )}
+              </section>
+            )}
+          </>
+        )}
+      </main>
 
-      {(view === 'user' || (view === 'admin' && !auth)) && (
-        <main className="container" style={{ paddingTop: 24, paddingBottom: 40 }}>
-          <div className="card stack" style={{ padding: 20, marginBottom: 20 }}>
-            <div className="row wrap">
-              <div style={{ flex: 1, minWidth: 260, position: 'relative' }}>
-                <Search size={16} style={{ position: 'absolute', left: 12, top: 14, color: '#6b7280' }} />
-                <input className="input" style={{ paddingLeft: 34 }} value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="พิมพ์ข้อความที่ต้องการพรีวิว" />
-              </div>
-              <div className="row">
-                <SlidersHorizontal size={18} />
-                <input type="range" min="12" max="100" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} />
-                <span>{fontSize}px</span>
-              </div>
-              <div className="row">
-                <Palette size={18} />
-                <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} />
-              </div>
-            </div>
-            <div style={{ maxWidth: 360, position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: 12, top: 14, color: '#6b7280' }} />
-              <input className="input" style={{ paddingLeft: 34 }} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="ค้นหาฟอนต์" />
-            </div>
-          </div>
-
-          <div className="grid">
-            {loading ? <div className="card" style={{ padding: 20 }}>กำลังโหลด...</div> : filteredFonts.map((font) => (
-              <FontCard key={font.id} font={font} previewText={previewText} fontSize={fontSize} textColor={textColor} onShowCode={setCodeFont} />
-            ))}
-          </div>
-        </main>
-      )}
-
-      {showAddForm && (
-        <div className="modal-backdrop">
-          <form className="modal stack" onSubmit={handleAddFont}>
-            <div className="space-between" style={{ alignItems: 'center' }}>
-              <h3 style={{ margin: 0 }}>เพิ่มฟอนต์ใหม่</h3>
-              <button type="button" className="btn" onClick={() => setShowAddForm(false)}><X size={16} /></button>
-            </div>
-            <input className="input" placeholder="ชื่อฟอนต์" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} />
-            <select className="input" value={formData.style} onChange={(e) => setFormData((p) => ({ ...p, style: e.target.value }))}>
-              <option>Regular</option>
-              <option>Bold</option>
-              <option>Italic</option>
-              <option>Bold Italic</option>
-            </select>
-            <input className="input" placeholder="เจ้าของฟอนต์" value={formData.owner} onChange={(e) => setFormData((p) => ({ ...p, owner: e.target.value }))} />
-            <input className="input" placeholder="ลักษณะฟอนต์" value={formData.characteristics} onChange={(e) => setFormData((p) => ({ ...p, characteristics: e.target.value }))} />
-            <textarea className="input" placeholder="รายละเอียด" value={formData.details} onChange={(e) => setFormData((p) => ({ ...p, details: e.target.value }))} />
-            <input className="input" type="file" accept=".ttf,.otf,.woff,.woff2" onChange={(e) => setFormData((p) => ({ ...p, file: e.target.files?.[0] ?? null }))} />
-            {formError && <div style={{ color: '#dc2626' }}>{formError}</div>}
-            <button className="btn primary" type="submit">บันทึกฟอนต์</button>
-          </form>
-        </div>
-      )}
-
-      {codeFont && <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />}
+      <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />
+      <LoginModal
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        onSuccess={async () => {
+          setIsAuthed(true);
+          setViewMode("admin");
+          await checkAuth();
+        }}
+      />
+      <AddFontModal
+        open={showAddFont}
+        onClose={() => setShowAddFont(false)}
+        onCreated={async () => {
+          await loadFonts();
+          setViewMode("home");
+        }}
+      />
     </div>
   );
 }

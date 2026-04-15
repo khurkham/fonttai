@@ -27,7 +27,7 @@ type FontRow = {
   created_at: string;
 };
 
-type AdminLoginBody = {
+type LoginBody = {
   username?: string;
   password?: string;
 };
@@ -44,32 +44,26 @@ app.use(
   })
 );
 
-function json(data: unknown, status = 200): Response {
+function okJson(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-    },
+    headers: { "content-type": "application/json; charset=utf-8" },
   });
 }
 
-function okJson(data: unknown, status = 200): Response {
-  return json(data, status);
+function errJson(message: string, status = 400) {
+  return okJson({ ok: false, message }, status);
 }
 
-function errJson(message: string, status = 400): Response {
-  return json({ ok: false, message }, status);
-}
-
-async function signSession(username: string, secret: string): Promise<string> {
-  return sha256Hex(`${username}:${secret}`);
-}
-
-function isHttpsRequest(url: string): boolean {
+function isHttps(url: string) {
   return url.startsWith("https://");
 }
 
-async function isAuthed(c: any): Promise<boolean> {
+async function signSession(username: string, secret: string) {
+  return sha256Hex(`${username}:${secret}`);
+}
+
+async function isAuthed(c: any) {
   const username = getCookie(c, "admin_user");
   const token = getCookie(c, "admin_token");
   const admin = c.env.ADMIN_USERNAME;
@@ -109,39 +103,26 @@ function mapFontRow(row: FontRow) {
 app.get("/api/health", (c) => {
   return okJson({
     ok: true,
-    message: "worker is running",
+    appName: c.env.APP_NAME ?? null,
     hasDB: Boolean(c.env.DB),
     hasBucket: Boolean(c.env.FONT_BUCKET),
-    appName: c.env.APP_NAME ?? null,
-  });
-});
-
-app.get("/api/check-secrets", (c) => {
-  return okJson({
-    hasAdminUsername: !!c.env.ADMIN_USERNAME,
-    hasAdminPasswordHash: !!c.env.ADMIN_PASSWORD_HASH,
-    hasSessionSecret: !!c.env.SESSION_SECRET,
-    adminUsernameValue: c.env.ADMIN_USERNAME ?? null,
-    hashLength: c.env.ADMIN_PASSWORD_HASH?.length ?? 0,
-    secretLength: c.env.SESSION_SECRET?.length ?? 0,
   });
 });
 
 app.get("/api/fonts", async (c) => {
   try {
-    if (!c.env.DB) {
-      return okJson({ items: [] });
-    }
+    if (!c.env.DB) return okJson({ items: [] });
 
     const result = await c.env.DB.prepare(
       "SELECT * FROM fonts ORDER BY created_at DESC"
     ).all<FontRow>();
 
-    const rows = result.results ?? [];
-    return okJson({ items: rows.map(mapFontRow) });
+    return okJson({
+      items: (result.results ?? []).map(mapFontRow),
+    });
   } catch (error) {
     console.error("/api/fonts error", error);
-    return okJson({ items: [], error: "Failed to load fonts" }, 200);
+    return okJson({ items: [] });
   }
 });
 
@@ -154,16 +135,13 @@ app.get("/api/font-file/:key", async (c) => {
     const key = c.req.param("key");
     const obj = await c.env.FONT_BUCKET.get(key);
 
-    if (!obj) {
-      return errJson("Not found", 404);
-    }
+    if (!obj) return errJson("Not found", 404);
 
     const headers = new Headers();
     obj.writeHttpMetadata(headers);
     headers.set("etag", obj.httpEtag);
-
     if (!headers.get("content-type")) {
-      headers.set("content-type", "font/woff2");
+      headers.set("content-type", "font/ttf");
     }
 
     return new Response(obj.body, { headers });
@@ -175,18 +153,18 @@ app.get("/api/font-file/:key", async (c) => {
 
 app.post("/api/admin/login", async (c) => {
   try {
-    const body = await c.req.json<AdminLoginBody>();
+    const body = await c.req.json<LoginBody>();
 
     const admin = c.env.ADMIN_USERNAME;
     const hash = c.env.ADMIN_PASSWORD_HASH;
     const secret = c.env.SESSION_SECRET;
 
-    if (!body.username || !body.password) {
-      return errJson("Username and password are required", 400);
-    }
-
     if (!admin || !hash || !secret) {
       return errJson("Admin environment is not configured", 500);
+    }
+
+    if (!body.username || !body.password) {
+      return errJson("Username and password are required", 400);
     }
 
     const passwordHash = await sha256Hex(body.password);
@@ -196,7 +174,7 @@ app.post("/api/admin/login", async (c) => {
     }
 
     const token = await signSession(body.username, secret);
-    const secure = isHttpsRequest(c.req.url);
+    const secure = isHttps(c.req.url);
 
     setCookie(c, "admin_user", body.username, {
       httpOnly: true,
@@ -234,18 +212,13 @@ app.get("/api/admin/me", async (c) => {
   });
 });
 
-app.use("/api/admin/fonts/*", requireAuth);
 app.use("/api/admin/fonts", requireAuth);
+app.use("/api/admin/fonts/*", requireAuth);
 
 app.post("/api/admin/fonts", async (c) => {
   try {
-    if (!c.env.DB) {
-      return errJson("Database is not configured", 500);
-    }
-
-    if (!c.env.FONT_BUCKET) {
-      return errJson("Font bucket is not configured", 500);
-    }
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+    if (!c.env.FONT_BUCKET) return errJson("Font bucket is not configured", 500);
 
     const form = await c.req.formData();
 
@@ -260,10 +233,26 @@ app.post("/api/admin/fonts", async (c) => {
       return errJson("Missing required fields", 400);
     }
 
+    const allowed = [
+      "font/ttf",
+      "font/otf",
+      "font/woff",
+      "font/woff2",
+      "application/font-sfnt",
+      "application/x-font-ttf",
+      "application/x-font-otf",
+      "application/font-woff",
+      "application/octet-stream",
+    ];
+
+    if (file.type && !allowed.includes(file.type)) {
+      return errJson("ชนิดไฟล์ฟอนต์ไม่รองรับ", 400);
+    }
+
     const id = crypto.randomUUID();
-    const ext = file.name.split(".").pop() || "woff2";
+    const ext = file.name.split(".").pop()?.toLowerCase() || "ttf";
     const fileKey = `${id}.${ext}`;
-    const mimeType = file.type || "font/woff2";
+    const mimeType = file.type || "font/ttf";
 
     await c.env.FONT_BUCKET.put(fileKey, await file.arrayBuffer(), {
       httpMetadata: { contentType: mimeType },
@@ -271,8 +260,8 @@ app.post("/api/admin/fonts", async (c) => {
 
     await c.env.DB.prepare(
       `INSERT INTO fonts
-      (id, name, style, owner, characteristics, details, is_custom, file_key, mime_type)
-      VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`
+      (id, name, style, owner, characteristics, details, is_custom, source_url, file_key, mime_type)
+      VALUES (?, ?, ?, ?, ?, ?, 1, '', ?, ?)`
     )
       .bind(id, name, style, owner, characteristics, details, fileKey, mimeType)
       .run();
@@ -286,18 +275,14 @@ app.post("/api/admin/fonts", async (c) => {
 
 app.delete("/api/admin/fonts/:id", async (c) => {
   try {
-    if (!c.env.DB) {
-      return errJson("Database is not configured", 500);
-    }
+    if (!c.env.DB) return errJson("Database is not configured", 500);
 
     const id = c.req.param("id");
     const row = await c.env.DB.prepare("SELECT * FROM fonts WHERE id = ?")
       .bind(id)
       .first<FontRow>();
 
-    if (!row) {
-      return errJson("Not found", 404);
-    }
+    if (!row) return errJson("Not found", 404);
 
     if (row.file_key && c.env.FONT_BUCKET) {
       await c.env.FONT_BUCKET.delete(row.file_key);
@@ -317,7 +302,6 @@ app.all("*", async (c) => {
   if (c.env.ASSETS) {
     return c.env.ASSETS.fetch(c.req.raw);
   }
-
   return new Response("Not Found", { status: 404 });
 });
 
