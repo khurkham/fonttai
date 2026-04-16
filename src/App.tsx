@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Settings, LogOut, Trash2, X } from "lucide-react";
+import { LogOut, Plus, Settings, Trash2, X } from "lucide-react";
 import { api } from "./api";
 import { FontCard } from "./components/FontCard";
+import { Pagination } from "./components/Pagination";
+import { SiteFooter } from "./components/SiteFooter";
+import { AdSlot } from "./components/AdSlot";
+import { SeoHead } from "./components/SeoHead";
 import { getFamily } from "./lib";
 import type { FontItem } from "./types";
 
 type ViewMode = "home" | "admin";
+type PublicPage = "home" | "privacy" | "about" | "contact";
 
 const DEFAULT_PREVIEW =
   "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
@@ -129,22 +134,22 @@ function CodeModal({
 }`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-3xl shadow-xl border border-gray-200">
-        <div className="flex items-center justify-between p-5 border-b">
-          <h3 className="text-xl font-bold text-gray-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 p-5">
+          <h3 className="text-2xl font-black text-slate-900">
             โค้ดใช้งาน: {font.name}
           </h3>
           <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100"
             type="button"
+            onClick={onClose}
+            className="rounded-xl border border-slate-200 p-2 hover:bg-slate-50"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         <div className="p-5">
-          <pre className="bg-gray-900 text-gray-100 rounded-xl p-4 overflow-x-auto text-sm whitespace-pre-wrap">
+          <pre className="overflow-x-auto rounded-2xl bg-slate-950 p-5 text-sm leading-6 text-slate-100">
             {css}
           </pre>
         </div>
@@ -190,39 +195,39 @@ function LoginModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl border border-gray-200">
-        <div className="flex items-center justify-between p-5 border-b">
-          <h3 className="text-2xl font-bold text-gray-900">เข้าสู่ระบบหลังบ้าน</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 p-5">
+          <h3 className="text-2xl font-black text-slate-900">เข้าสู่ระบบหลังบ้าน</h3>
           <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100"
             type="button"
+            onClick={onClose}
+            className="rounded-xl border border-slate-200 p-2 hover:bg-slate-50"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="ชื่อผู้ใช้"
           />
           <input
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="รหัสผ่าน"
           />
 
-          {error && <p className="text-red-600 text-sm whitespace-pre-wrap">{error}</p>}
+          {error && <p className="text-sm text-red-600 whitespace-pre-wrap">{error}</p>}
 
           <button
             disabled={loading}
-            className="w-full bg-blue-600 text-white rounded-xl px-4 py-3 font-semibold disabled:opacity-60"
+            className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-60"
             type="submit"
           >
             {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
@@ -291,29 +296,29 @@ function AddFontModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-3xl shadow-xl border border-gray-200">
-        <div className="flex items-center justify-between p-5 border-b">
-          <h3 className="text-2xl font-bold text-gray-900">เพิ่มฟอนต์ใหม่</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 p-5">
+          <h3 className="text-2xl font-black text-slate-900">เพิ่มฟอนต์ใหม่</h3>
           <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100"
             type="button"
+            onClick={onClose}
+            className="rounded-xl border border-slate-200 p-2 hover:bg-slate-50"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
-            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="ชื่อฟอนต์"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <select
-            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             value={style}
             onChange={(e) => setStyle(e.target.value)}
           >
@@ -326,37 +331,37 @@ function AddFontModal({
           </select>
 
           <input
-            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="เจ้าของ"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
           />
 
           <input
-            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="ลักษณะ"
             value={characteristics}
             onChange={(e) => setCharacteristics(e.target.value)}
           />
 
           <textarea
-            className="rounded-xl border border-gray-300 px-4 py-3 outline-none min-h-[110px]"
+            className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="รายละเอียด"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
           />
 
           <input
-            className="rounded-xl border border-gray-300 px-4 py-3 outline-none"
+            className="rounded-2xl border border-slate-300 px-4 py-3"
             type="file"
             accept=".ttf,.otf,.woff,.woff2"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
           />
 
-          {error && <p className="text-red-600 text-sm whitespace-pre-wrap">{error}</p>}
+          {error && <p className="text-sm text-red-600 whitespace-pre-wrap">{error}</p>}
 
           <button
-            className="w-full bg-blue-600 text-white rounded-xl px-4 py-3 font-semibold disabled:opacity-60"
+            className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-60"
             type="submit"
             disabled={loading}
           >
@@ -368,6 +373,51 @@ function AddFontModal({
   );
 }
 
+function StaticPage({ page }: { page: PublicPage }) {
+  if (page === "privacy") {
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">
+          Privacy Policy
+        </h1>
+        <p className="mt-4 text-slate-600 leading-7">
+          เว็บไซต์นี้อาจเก็บข้อมูลที่จำเป็นต่อการใช้งาน เช่น session cookie สำหรับการเข้าสู่ระบบผู้ดูแลระบบ
+          และข้อมูลเชิงเทคนิคเพื่อความปลอดภัยและการปรับปรุงประสบการณ์ใช้งาน โดยจะไม่เผยแพร่ข้อมูลส่วนบุคคลโดยไม่จำเป็น
+        </p>
+      </section>
+    );
+  }
+
+  if (page === "about") {
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">
+          About Us
+        </h1>
+        <p className="mt-4 text-slate-600 leading-7">
+          Font Tai คือเว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ โดยออกแบบมาเพื่อรองรับการใช้งานบนทุกอุปกรณ์
+          และพร้อมสำหรับการขยายเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
+        </p>
+      </section>
+    );
+  }
+
+  if (page === "contact") {
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-4xl font-black tracking-tight text-slate-900">
+          Contact
+        </h1>
+        <p className="mt-4 text-slate-600 leading-7">
+          ติดต่อเจ้าของเว็บไซต์ได้ผ่านอีเมลหรือช่องทางติดต่อที่คุณจะเพิ่มภายหลัง เช่น Facebook Page, Line OA หรือแบบฟอร์มติดต่อ
+        </p>
+      </section>
+    );
+  }
+
+  return null;
+}
+
 export default function App() {
   const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW);
   const [search, setSearch] = useState("");
@@ -377,6 +427,10 @@ export default function App() {
   const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
   const [isAuthed, setIsAuthed] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("home");
+  const [publicPage, setPublicPage] = useState<PublicPage>("home");
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [codeFont, setCodeFont] = useState<FontItem | null>(null);
   const [showLogin, setShowLogin] = useState(false);
@@ -433,6 +487,13 @@ export default function App() {
     );
   }, [customFonts, search]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [search, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(allFonts.length / pageSize));
+  const paginatedFonts = allFonts.slice((page - 1) * pageSize, page * pageSize);
+
   async function handleLogout() {
     try {
       await api.logout();
@@ -454,186 +515,260 @@ export default function App() {
     }
   }
 
+  const seoTitle =
+    publicPage === "privacy"
+      ? "Privacy Policy | Font Tai"
+      : publicPage === "about"
+      ? "About Us | Font Tai"
+      : publicPage === "contact"
+      ? "Contact | Font Tai"
+      : "Font Tai - แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวฟอนต์ออนไลน์";
+
+  const seoDescription =
+    publicPage === "home"
+      ? "เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ รองรับมือถือ เดสก์ท็อป และพร้อมต่อยอด SEO"
+      : "ข้อมูลสำคัญของเว็บไซต์ Font Tai";
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="border-b border-gray-200 bg-white/90 backdrop-blur sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-3xl">
-              T
-            </div>
-            <div>
-              <h1 className="text-5xl font-black tracking-tight">Font Tai</h1>
-              <p className="text-gray-500 text-lg">
-                แหล่งรวมฟอนต์ไต พรีวิวและจัดการฟอนต์บน Cloudflare
-              </p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <SeoHead title={seoTitle} description={seoDescription} />
 
-          <div className="flex items-center gap-3">
-            {isAuthed && (
-              <span className="px-3 py-2 rounded-xl bg-blue-50 text-blue-700 text-sm font-semibold">
-                Admin login แล้ว
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setViewMode("home")}
-              className="px-5 py-3 rounded-2xl border border-gray-300 bg-white text-gray-800 font-semibold"
-            >
-              หน้าหลัก
-            </button>
-
-            {isAuthed ? (
-              <button
-                type="button"
-                onClick={() => setViewMode("admin")}
-                className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold flex items-center gap-2"
-              >
-                <Settings size={18} />
-                จัดการฟอนต์
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowLogin(true)}
-                className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold flex items-center gap-2"
-              >
-                <Settings size={18} />
-                เข้าหลังบ้าน
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {viewMode === "admin" && isAuthed ? (
-          <section className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <h2 className="text-4xl font-black">ระบบจัดการฟอนต์</h2>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddFont(true)}
-                  className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-semibold flex items-center gap-2"
-                >
-                  <Plus size={18} />
-                  เพิ่มฟอนต์
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="px-5 py-3 rounded-2xl bg-red-600 text-white font-semibold flex items-center gap-2"
-                >
-                  <LogOut size={18} />
-                  ออกจากระบบ
-                </button>
+      <div className="flex min-h-screen flex-col">
+        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-600 text-3xl font-extrabold text-white shadow">
+                T
+              </div>
+              <div>
+                <h1 className="text-4xl font-black tracking-tight sm:text-6xl">
+                  Font Tai
+                </h1>
+                <p className="mt-1 text-sm text-slate-500 sm:text-base">
+                  แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวและจัดการฟอนต์บน Cloudflare
+                </p>
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-gray-200">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-4">ชื่อ</th>
-                    <th className="px-4 py-4">สไตล์</th>
-                    <th className="px-4 py-4">เจ้าของ</th>
-                    <th className="px-4 py-4">ลักษณะ</th>
-                    <th className="px-4 py-4">ประเภท</th>
-                    <th className="px-4 py-4">จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allFonts.map((font) => (
-                    <tr key={font.id} className="border-t border-gray-200">
-                      <td className="px-4 py-4 font-semibold">{font.name}</td>
-                      <td className="px-4 py-4">{font.style}</td>
-                      <td className="px-4 py-4">{font.owner}</td>
-                      <td className="px-4 py-4">{font.characteristics}</td>
-                      <td className="px-4 py-4">{font.isCustom ? "Custom" : "Google"}</td>
-                      <td className="px-4 py-4">
-                        {font.isCustom ? (
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteFont(font.id)}
-                            className="px-3 py-2 rounded-xl bg-red-50 text-red-600 font-medium flex items-center gap-2"
-                          >
-                            <Trash2 size={16} />
-                            ลบ
-                          </button>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ) : (
-          <>
-            <section className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] gap-4 items-center">
-                <input
-                  className="rounded-2xl border border-gray-300 px-5 py-4 text-2xl outline-none"
-                  value={previewText}
-                  onChange={(e) => setPreviewText(e.target.value)}
-                  placeholder="พิมพ์ข้อความสำหรับพรีวิว"
-                />
+            <div className="flex flex-wrap items-center gap-3">
+              {isAuthed && (
+                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
+                  Admin login แล้ว
+                </span>
+              )}
 
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min={16}
-                    max={96}
-                    value={fontSize}
-                    onChange={(e) => setFontSize(Number(e.target.value))}
-                  />
-                  <span className="text-2xl font-bold w-20">{fontSize}px</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode("home");
+                  setPublicPage("home");
+                }}
+                className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800"
+              >
+                หน้าหลัก
+              </button>
+
+              {isAuthed ? (
+                <button
+                  type="button"
+                  onClick={() => setViewMode("admin")}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+                >
+                  <Settings size={18} />
+                  จัดการฟอนต์
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowLogin(true)}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+                >
+                  <Settings size={18} />
+                  เข้าหลังบ้าน
+                </button>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8">
+          {viewMode === "admin" && isAuthed ? (
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <h2 className="text-4xl font-black tracking-tight">ระบบจัดการฟอนต์</h2>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddFont(true)}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+                  >
+                    <Plus size={18} />
+                    เพิ่มฟอนต์
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
+                  >
+                    <LogOut size={18} />
+                    ออกจากระบบ
+                  </button>
                 </div>
-
-                <input
-                  type="color"
-                  value={textColor}
-                  onChange={(e) => setTextColor(e.target.value)}
-                  className="w-16 h-12 rounded-xl border border-gray-300 bg-white"
-                />
               </div>
 
-              <div className="mt-4">
-                <input
-                  className="rounded-2xl border border-gray-300 px-5 py-4 text-xl outline-none w-full max-w-md"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="ค้นหาฟอนต์"
-                />
+              <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full min-w-[760px] border-collapse">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ชื่อ</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">สไตล์</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">เจ้าของ</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ลักษณะ</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ประเภท</th>
+                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allFonts.map((font) => (
+                      <tr key={font.id} className="border-t border-slate-200">
+                        <td className="px-4 py-4 font-semibold">{font.name}</td>
+                        <td className="px-4 py-4">{font.style}</td>
+                        <td className="px-4 py-4">{font.owner}</td>
+                        <td className="px-4 py-4">{font.characteristics}</td>
+                        <td className="px-4 py-4">{font.isCustom ? "Custom" : "Google"}</td>
+                        <td className="px-4 py-4">
+                          {font.isCustom ? (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteFont(font.id)}
+                              className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 font-medium text-red-600"
+                            >
+                              <Trash2 size={16} />
+                              ลบ
+                            </button>
+                          ) : (
+                            <span className="text-slate-400">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </section>
+          ) : publicPage !== "home" ? (
+            <StaticPage page={publicPage} />
+          ) : (
+            <>
+              <section className="mb-8 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-8 shadow-sm">
+                <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+                  <div>
+                    <p className="mb-3 inline-flex rounded-full bg-blue-100 px-4 py-2 text-sm font-bold text-blue-700">
+                      Font Preview Platform
+                    </p>
+                    <h2 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+                      พรีวิวฟอนต์ไตและฟอนต์ไทย
+                      <br />
+                      แบบมืออาชีพในเว็บเดียว
+                    </h2>
+                    <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+                      รองรับการแสดงผลทุกอุปกรณ์ ค้นหาฟอนต์ได้ง่าย รองรับฟอนต์อัปโหลดเอง
+                      และพร้อมต่อยอดเป็นเว็บไซต์เชิงพาณิชย์พร้อมพื้นที่โฆษณาในอนาคต
+                    </p>
+                  </div>
 
-            {loading ? (
-              <p className="text-xl text-gray-500">กำลังโหลดฟอนต์...</p>
-            ) : (
-              <section className="flex flex-col gap-6">
-                {allFonts.map((font) => (
-                  <FontCard
-                    key={font.id}
-                    font={font}
-                    previewText={previewText}
-                    fontSize={fontSize}
-                    textColor={textColor}
-                    onShowCode={setCodeFont}
-                  />
-                ))}
+                  <div className="flex items-end">
+                    <AdSlot label="พื้นที่โฆษณา Hero Banner" className="min-h-[160px]" />
+                  </div>
+                </div>
               </section>
-            )}
-          </>
-        )}
-      </main>
+
+              <section className="mb-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
+                  <input
+                    className="rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
+                    value={previewText}
+                    onChange={(e) => setPreviewText(e.target.value)}
+                    placeholder="พิมพ์ข้อความสำหรับพรีวิว"
+                  />
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min={16}
+                      max={96}
+                      value={fontSize}
+                      onChange={(e) => setFontSize(Number(e.target.value))}
+                    />
+                    <span className="min-w-[70px] text-2xl font-black">{fontSize}px</span>
+                  </div>
+
+                  <input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="h-12 w-16 rounded-xl border border-slate-300 bg-white"
+                  />
+                </div>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto]">
+                  <input
+                    className="rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="ค้นหาฟอนต์"
+                  />
+
+                  <select
+                    className="rounded-2xl border border-slate-300 px-4 py-4 outline-none focus:border-blue-400"
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                  >
+                    <option value={10}>แสดง 10 ฟอนต์</option>
+                    <option value={20}>แสดง 20 ฟอนต์</option>
+                    <option value={30}>แสดง 30 ฟอนต์</option>
+                  </select>
+                </div>
+              </section>
+
+              <AdSlot label="พื้นที่โฆษณาเหนือรายการฟอนต์" className="mb-8" />
+
+              {loading ? (
+                <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
+              ) : paginatedFonts.length === 0 ? (
+                <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
+                  ยังไม่มีฟอนต์ให้แสดง
+                </div>
+              ) : (
+                <section className="flex flex-col gap-6">
+                  {paginatedFonts.map((font) => (
+                    <FontCard
+                      key={font.id}
+                      font={font}
+                      previewText={previewText}
+                      fontSize={fontSize}
+                      textColor={textColor}
+                      onShowCode={setCodeFont}
+                    />
+                  ))}
+                </section>
+              )}
+
+              <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+            </>
+          )}
+        </main>
+
+        <SiteFooter
+          onNavigate={(page) => {
+            setViewMode("home");
+            setPublicPage(page);
+          }}
+        />
+      </div>
 
       <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />
+
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
@@ -643,11 +778,13 @@ export default function App() {
           await checkAuth();
         }}
       />
+
       <AddFontModal
         open={showAddFont}
         onClose={() => setShowAddFont(false)}
         onCreated={async () => {
           await loadFonts();
+          setPublicPage("home");
           setViewMode("home");
         }}
       />
