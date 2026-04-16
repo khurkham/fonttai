@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { LogOut, Plus, Trash2, X } from "lucide-react";
+import { Edit, LogOut, Plus, Trash2, X } from "lucide-react";
 import { api } from "./api";
 import { FontCard } from "./components/FontCard";
 import { Pagination } from "./components/Pagination";
@@ -298,6 +298,138 @@ function AddFontModal({
     }
   }
 
+  function EditFontModal({
+  open,
+  font,
+  onClose,
+  onUpdated,
+}: {
+  open: boolean;
+  font: FontItem | null;
+  onClose: () => void;
+  onUpdated: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [style, setStyle] = useState("Regular");
+  const [owner, setOwner] = useState("");
+  const [characteristics, setCharacteristics] = useState("");
+  const [details, setDetails] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
+
+  useEffect(() => {
+    if (!font) return;
+    setName(font.name || "");
+    setStyle(font.style || "Regular");
+    setOwner(font.owner || "");
+    setCharacteristics(font.characteristics || "");
+    setDetails(font.details || "");
+    setError("");
+  }, [font]);
+
+  if (!open || !font) return null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!name || !style || !owner || !characteristics) {
+      setError("กรุณากรอกข้อมูลให้ครบ");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await api.updateFont(font.id, {
+        name,
+        style,
+        owner,
+        characteristics,
+        details,
+      });
+
+      await onUpdated();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "แก้ไขฟอนต์ไม่สำเร็จ");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 p-5">
+          <h3 className="text-2xl font-black text-slate-900">แก้ไขฟอนต์</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-slate-200 p-2 hover:bg-slate-50"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
+          <input
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="ชื่อฟอนต์"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <select
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            value={style}
+            onChange={(e) => setStyle(e.target.value)}
+          >
+            <option>Regular</option>
+            <option>Bold</option>
+            <option>Italic</option>
+            <option>Light</option>
+            <option>Medium</option>
+            <option>SemiBold</option>
+          </select>
+
+          <input
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="เจ้าของ"
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+          />
+
+          <input
+            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="ลักษณะ"
+            value={characteristics}
+            onChange={(e) => setCharacteristics(e.target.value)}
+          />
+
+          <textarea
+            className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="รายละเอียด"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+          />
+
+          {error && <p className="whitespace-pre-wrap text-sm text-red-600">{error}</p>}
+
+          <button
+            className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-60"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
@@ -440,7 +572,8 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [fontSize, setFontSize] = useState(32);
   const [textColor, setTextColor] = useState("#1f2937");
-
+const [editFont, setEditFont] = useState<FontItem | null>(null);
+const [showEditFont, setShowEditFont] = useState(false);
   const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
   const [isAuthed, setIsAuthed] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("home");
@@ -605,19 +738,33 @@ export default function App() {
                         <td className="px-4 py-4">{font.characteristics}</td>
                         <td className="px-4 py-4">{font.isCustom ? "Custom" : "Google"}</td>
                         <td className="px-4 py-4">
-                          {font.isCustom ? (
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteFont(font.id)}
-                              className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 font-medium text-red-600"
-                            >
-                              <Trash2 size={16} />
-                              ลบ
-                            </button>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </td>
+  {font.isCustom ? (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        onClick={() => {
+          setEditFont(font);
+          setShowEditFont(true);
+        }}
+        className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 font-medium text-blue-600"
+      >
+        <Edit size={16} />
+        แก้ไข
+      </button>
+
+      <button
+        type="button"
+        onClick={() => handleDeleteFont(font.id)}
+        className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 font-medium text-red-600"
+      >
+        <Trash2 size={16} />
+        ลบ
+      </button>
+    </div>
+  ) : (
+    <span className="text-slate-400">-</span>
+  )}
+</td>
                       </tr>
                     ))}
                   </tbody>
@@ -752,7 +899,17 @@ export default function App() {
           await checkAuth();
         }}
       />
-
+<EditFontModal
+  open={showEditFont}
+  font={editFont}
+  onClose={() => {
+    setShowEditFont(false);
+    setEditFont(null);
+  }}
+  onUpdated={async () => {
+    await loadFonts();
+  }}
+/>
       <AddFontModal
         open={showAddFont}
         onClose={() => setShowAddFont(false)}

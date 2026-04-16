@@ -272,6 +272,64 @@ app.post("/api/admin/fonts", async (c) => {
     return errJson(`Failed to create font: ${String(error)}`, 500);
   }
 });
+app.patch("/api/admin/fonts/:id", async (c) => {
+  try {
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+
+    const auth = getCookie(c, "fonttai_session");
+    if (auth !== c.env.SESSION_SECRET) {
+      return errJson("Unauthorized", 401);
+    }
+
+    const id = c.req.param("id");
+    const body = await c.req.json<{
+      name?: string;
+      style?: string;
+      owner?: string;
+      characteristics?: string;
+      details?: string;
+    }>();
+
+    const name = body.name?.trim() ?? "";
+    const style = body.style?.trim() ?? "";
+    const owner = body.owner?.trim() ?? "";
+    const characteristics = body.characteristics?.trim() ?? "";
+    const details = body.details?.trim() ?? "";
+
+    if (!name || !style || !owner || !characteristics) {
+      return errJson("Missing required fields", 400);
+    }
+
+    const existing = await c.env.DB.prepare(
+      `SELECT id, is_custom FROM fonts WHERE id = ?`
+    )
+      .bind(id)
+      .first<{ id: string; is_custom: number }>();
+
+    if (!existing) {
+      return errJson("Font not found", 404);
+    }
+
+    if (!existing.is_custom) {
+      return errJson("Only custom fonts can be edited", 400);
+    }
+
+    await c.env.DB.prepare(
+      `
+      UPDATE fonts
+      SET name = ?, style = ?, owner = ?, characteristics = ?, details = ?
+      WHERE id = ?
+      `
+    )
+      .bind(name, style, owner, characteristics, details, id)
+      .run();
+
+    return okJson({ ok: true });
+  } catch (error) {
+    console.error("/api/admin/fonts/:id PATCH error", error);
+    return errJson(`Failed to update font: ${String(error)}`, 500);
+  }
+});
 
 app.delete("/api/admin/fonts/:id", async (c) => {
   try {
