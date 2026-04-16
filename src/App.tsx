@@ -491,13 +491,7 @@ export default function App() {
     if (!q) return merged;
 
     return merged.filter((font) =>
-      [
-        font.name,
-        font.owner,
-        font.characteristics,
-        font.style,
-        font.details,
-      ]
+      [font.name, font.owner, font.characteristics, font.style, font.details]
         .join(" ")
         .toLowerCase()
         .includes(q)
@@ -563,7 +557,7 @@ export default function App() {
           }}
         />
 
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+        <main className="mx-auto mt-[96px] w-full max-w-7xl flex-1 px-4 py-8">
           {viewMode === "admin" && isAuthed ? (
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
