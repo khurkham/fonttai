@@ -99,6 +99,10 @@ function mapFontRow(row: FontRow, baseUrl: string) {
       row.is_custom && row.file_key
         ? new URL(`/api/font-file/${row.file_key}`, baseUrl).toString()
         : "",
+    downloadUrl:
+      row.is_custom && row.file_key
+        ? new URL(`/api/font-download/${row.file_key}`, baseUrl).toString()
+        : "",
   };
 }
 
@@ -120,8 +124,8 @@ app.get("/api/fonts", async (c) => {
     ).all<FontRow>();
 
     return okJson({
-      items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
-    });
+  items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
+});
   } catch (error) {
     console.error("/api/fonts error", error);
     return okJson({ items: [] });
@@ -173,7 +177,7 @@ app.get("/api/font-download/:key", async (c) => {
     headers.set("etag", obj.httpEtag);
 
     if (!headers.get("content-type")) {
-      headers.set("content-type", "font/ttf");
+      headers.set("content-type", "application/octet-stream");
     }
 
     headers.set("content-disposition", `attachment; filename="${key}"`);

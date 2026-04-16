@@ -21,15 +21,13 @@ export function FontCard({
   const [fontLoaded, setFontLoaded] = useState(!font.isCustom);
 
   const fontFamily = getFamily(font.name, font.isCustom);
-  const fileHref = font.isCustom
-    ? normalizeFontUrl(font.fileUrl)
-    : `https://fonts.google.com/specimen/${font.name.replace(/\s+/g, "+")}`;
+const fileHref = font.isCustom
+  ? normalizeFontUrl(font.fileUrl)
+  : `https://fonts.google.com/specimen/${font.name.replace(/\s+/g, "+")}`;
 
-  const downloadHref =
-    font.isCustom && font.fileKey
-      ? `/api/font-download/${font.fileKey}`
-      : fileHref;
-
+const downloadHref = font.isCustom
+  ? normalizeFontUrl(font.downloadUrl)
+  : fileHref;
   useEffect(() => {
     let cancelled = false;
 
@@ -126,18 +124,19 @@ export function FontCard({
 
           {downloadHref ? (
             <a
-              href={downloadHref}
-              target={font.isCustom ? "_self" : "_blank"}
-              rel="noreferrer"
-              className={`inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ${
-                font.isCustom
-                  ? "border border-blue-200 bg-blue-50 text-blue-700"
-                  : "border border-slate-300 bg-white text-slate-700"
-              }`}
-            >
-              <Download size={16} />
-              {font.isCustom ? "ดาวน์โหลดฟอนต์" : "รับจาก Google"}
-            </a>
+  href={downloadHref}
+  download={font.isCustom ? `${font.name}.${font.fileKey.split(".").pop() || "ttf"}` : undefined}
+  target={font.isCustom ? "_self" : "_blank"}
+  rel="noreferrer"
+  className={`inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ${
+    font.isCustom
+      ? "border border-blue-200 bg-blue-50 text-blue-700"
+      : "border border-slate-300 bg-white text-slate-700"
+  }`}
+>
+  <Download size={16} />
+  {font.isCustom ? "ดาวน์โหลดฟอนต์" : "รับจาก Google"}
+</a>
           ) : (
             <button
               type="button"

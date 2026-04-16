@@ -9,7 +9,8 @@ export type FontItem = {
   sourceUrl: string;
   fileKey: string;
   mimeType: string;
-  fileUrl?: string;
+  fileUrl: string;
+  downloadUrl: string;
   createdAt: string;
 };
 
