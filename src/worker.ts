@@ -82,7 +82,7 @@ async function requireAuth(c: any, next: any) {
   return next();
 }
 
-function mapFontRow(row: FontRow) {
+function mapFontRow(row: FontRow, baseUrl: string) {
   return {
     id: row.id,
     name: row.name,
@@ -96,7 +96,9 @@ function mapFontRow(row: FontRow) {
     mimeType: row.mime_type ?? "",
     createdAt: row.created_at,
     fileUrl:
-      row.is_custom && row.file_key ? `/api/font-file/${row.file_key}` : "",
+      row.is_custom && row.file_key
+        ? new URL(`/api/font-file/${row.file_key}`, baseUrl).toString()
+        : "",
   };
 }
 
@@ -118,8 +120,8 @@ app.get("/api/fonts", async (c) => {
     ).all<FontRow>();
 
     return okJson({
-      items: (result.results ?? []).map(mapFontRow),
-    });
+  items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
+});
   } catch (error) {
     console.error("/api/fonts error", error);
     return okJson({ items: [] });
@@ -144,6 +146,9 @@ app.get("/api/font-file/:key", async (c) => {
     if (!headers.get("content-type")) {
       headers.set("content-type", "font/ttf");
     }
+
+    headers.set("content-disposition", `inline; filename="${key}"`);
+    headers.set("cache-control", "public, max-age=31536000, immutable");
 
     return new Response(obj.body, { headers });
   } catch (error) {
