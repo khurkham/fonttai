@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Code, Download } from "lucide-react";
+import { Code, Download, ExternalLink } from "lucide-react";
 import type { FontItem } from "../types";
 import { getFamily, normalizeFontUrl } from "../lib";
 
@@ -24,6 +24,11 @@ export function FontCard({
   const fileHref = font.isCustom
     ? normalizeFontUrl(font.fileUrl)
     : `https://fonts.google.com/specimen/${font.name.replace(/\s+/g, "+")}`;
+
+  const downloadHref =
+    font.isCustom && font.fileKey
+      ? `/api/font-download/${font.fileKey}`
+      : fileHref;
 
   useEffect(() => {
     let cancelled = false;
@@ -119,7 +124,40 @@ export function FontCard({
             รับโค้ด
           </button>
 
-          {fileHref ? (
+          {font.isCustom ? (
+            <>
+              {fileHref ? (
+                <a
+                  href={fileHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+                >
+                  <ExternalLink size={16} />
+                  เปิดไฟล์ฟอนต์
+                </a>
+              ) : null}
+
+              {downloadHref ? (
+                <a
+                  href={downloadHref}
+                  className="inline-flex items-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700"
+                >
+                  <Download size={16} />
+                  ดาวน์โหลดฟอนต์
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-400"
+                >
+                  <Download size={16} />
+                  ไม่พบไฟล์ฟอนต์
+                </button>
+              )}
+            </>
+          ) : (
             <a
               href={fileHref}
               target="_blank"
@@ -127,17 +165,8 @@ export function FontCard({
               className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
             >
               <Download size={16} />
-              {font.isCustom ? "เปิดไฟล์ฟอนต์" : "รับจาก Google"}
+              รับจาก Google
             </a>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-400"
-            >
-              <Download size={16} />
-              ไม่พบไฟล์ฟอนต์
-            </button>
           )}
         </div>
       </div>
