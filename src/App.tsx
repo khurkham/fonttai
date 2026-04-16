@@ -588,15 +588,11 @@ export default function App() {
 
       <div className="flex min-h-screen flex-col">
         <NavbarWithSearch
-          search={search}
-          onSearchChange={setSearch}
-          publicPage={publicPage}
-          onNavigate={setPublicPage}
-          mode={previewMode}
-          isFullscreen={isFullscreen}
-          onChangeMode={setPreviewMode}
-          onToggleFullscreen={handleToggleFullscreen}
-        />
+  search={search}
+  onSearchChange={setSearch}
+  publicPage={publicPage}
+  onNavigate={setPublicPage}
+/>
 
         <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
           <div className={previewContainerClass}>
