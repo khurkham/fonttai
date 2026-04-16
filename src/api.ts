@@ -15,20 +15,28 @@ async function request<T>(input: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  getFonts: () => request<{ items: FontItem[] }>('/api/fonts'),
+  getFonts: () => request<{ items: FontItem[] }>("/api/fonts"),
+
   login: (username: string, password: string) =>
-    request<AuthResponse>('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    request<AuthResponse>("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     }),
-  logout: () => request<AuthResponse>('/api/admin/logout', { method: 'POST' }),
-  me: () => request<AuthResponse>('/api/admin/me'),
+
+  logout: () =>
+    request<AuthResponse>("/api/admin/logout", {
+      method: "POST",
+    }),
+
+  me: () => request<AuthResponse>("/api/admin/me"),
+
   createFont: (formData: FormData) =>
-    request<{ ok: boolean; id: string }>('/api/admin/fonts', {
-      method: 'POST',
+    request<{ ok: boolean; id: string }>("/api/admin/fonts", {
+      method: "POST",
       body: formData,
     }),
+
   updateFont: (
     id: string,
     payload: {
@@ -39,13 +47,14 @@ export const api = {
       details: string;
     }
   ) =>
-    request<{ ok: boolean }>('/api/admin/fonts/' + id, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+    request<{ ok: boolean }>("/api/admin/fonts/" + id, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     }),
+
   deleteFont: (id: string) =>
-    request<{ ok: boolean }>('/api/admin/fonts/' + id, {
-      method: 'DELETE',
+    request<{ ok: boolean }>("/api/admin/fonts/" + id, {
+      method: "DELETE",
     }),
 };

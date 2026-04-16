@@ -39,7 +39,7 @@ app.use(
   cors({
     origin: (origin) => origin || "*",
     credentials: true,
-    allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type"],
   })
 );
@@ -140,6 +140,7 @@ app.get("/api/font-file/:key", async (c) => {
     const headers = new Headers();
     obj.writeHttpMetadata(headers);
     headers.set("etag", obj.httpEtag);
+
     if (!headers.get("content-type")) {
       headers.set("content-type", "font/ttf");
     }
@@ -212,6 +213,17 @@ app.get("/api/admin/me", async (c) => {
   });
 });
 
+app.get("/api/check-secrets", (c) => {
+  return okJson({
+    hasAdminUsername: !!c.env.ADMIN_USERNAME,
+    hasAdminPasswordHash: !!c.env.ADMIN_PASSWORD_HASH,
+    hasSessionSecret: !!c.env.SESSION_SECRET,
+    adminUsernameValue: c.env.ADMIN_USERNAME ?? null,
+    hashLength: c.env.ADMIN_PASSWORD_HASH?.length ?? 0,
+    secretLength: c.env.SESSION_SECRET?.length ?? 0,
+  });
+});
+
 app.use("/api/admin/fonts", requireAuth);
 app.use("/api/admin/fonts/*", requireAuth);
 
@@ -272,14 +284,10 @@ app.post("/api/admin/fonts", async (c) => {
     return errJson(`Failed to create font: ${String(error)}`, 500);
   }
 });
+
 app.patch("/api/admin/fonts/:id", async (c) => {
   try {
     if (!c.env.DB) return errJson("Database is not configured", 500);
-
-    const auth = getCookie(c, "fonttai_session");
-    if (auth !== c.env.SESSION_SECRET) {
-      return errJson("Unauthorized", 401);
-    }
 
     const id = c.req.param("id");
     const body = await c.req.json<{
@@ -353,17 +361,6 @@ app.delete("/api/admin/fonts/:id", async (c) => {
     console.error("/api/admin/fonts DELETE error", error);
     return errJson("Failed to delete font", 500);
   }
-});
-
-app.get("/api/check-secrets", (c) => {
-  return c.json({
-    hasAdminUsername: !!c.env.ADMIN_USERNAME,
-    hasAdminPasswordHash: !!c.env.ADMIN_PASSWORD_HASH,
-    hasSessionSecret: !!c.env.SESSION_SECRET,
-    adminUsernameValue: c.env.ADMIN_USERNAME ?? null,
-    hashLength: c.env.ADMIN_PASSWORD_HASH?.length ?? 0,
-    secretLength: c.env.SESSION_SECRET?.length ?? 0,
-  });
 });
 
 // ต้องอยู่ล่างสุด
