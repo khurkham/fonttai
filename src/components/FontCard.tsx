@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Code, Download, ExternalLink } from "lucide-react";
+import { Code, Download } from "lucide-react";
 import type { FontItem } from "../types";
 import { getFamily, normalizeFontUrl } from "../lib";
 
@@ -124,49 +124,29 @@ export function FontCard({
             รับโค้ด
           </button>
 
-          {font.isCustom ? (
-            <>
-              {fileHref ? (
-                <a
-                  href={fileHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-                >
-                  <ExternalLink size={16} />
-                  เปิดไฟล์ฟอนต์
-                </a>
-              ) : null}
-
-              {downloadHref ? (
-                <a
-                  href={downloadHref}
-                  className="inline-flex items-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700"
-                >
-                  <Download size={16} />
-                  ดาวน์โหลดฟอนต์
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-400"
-                >
-                  <Download size={16} />
-                  ไม่พบไฟล์ฟอนต์
-                </button>
-              )}
-            </>
-          ) : (
+          {downloadHref ? (
             <a
-              href={fileHref}
-              target="_blank"
+              href={downloadHref}
+              target={font.isCustom ? "_self" : "_blank"}
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
+              className={`inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ${
+                font.isCustom
+                  ? "border border-blue-200 bg-blue-50 text-blue-700"
+                  : "border border-slate-300 bg-white text-slate-700"
+              }`}
             >
               <Download size={16} />
-              รับจาก Google
+              {font.isCustom ? "ดาวน์โหลดฟอนต์" : "รับจาก Google"}
             </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-400"
+            >
+              <Download size={16} />
+              ไม่พบไฟล์ฟอนต์
+            </button>
           )}
         </div>
       </div>
