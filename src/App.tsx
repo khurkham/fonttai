@@ -8,10 +8,16 @@ import { AdSlot } from "./components/AdSlot";
 import { SeoHead } from "./components/SeoHead";
 import { getFamily } from "./lib";
 import type { FontItem } from "./types";
+import { NavbarWithSearch } from "./components/NavbarWithSearch";
+import type { PreviewMode } from "./components/ViewportToggle";
 
 type ViewMode = "home" | "admin";
 type PublicPage = "home" | "privacy" | "about" | "contact";
 
+
+const [publicPage, setPublicPage] = useState<"home" | "about" | "services" | "privacy" | "contact">("home");
+const [previewMode, setPreviewMode] = useState<PreviewMode>("desktop");
+const [isFullscreen, setIsFullscreen] = useState(false);
 const DEFAULT_PREVIEW =
   "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
 
@@ -372,19 +378,45 @@ function AddFontModal({
     </div>
   );
 }
+async function handleToggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      await document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  } catch (error) {
+    console.error("Fullscreen error", error);
+  }
+}
+useEffect(() => {
+  const onFsChange = () => {
+    setIsFullscreen(Boolean(document.fullscreenElement));
+  };
 
+  document.addEventListener("fullscreenchange", onFsChange);
+  return () => document.removeEventListener("fullscreenchange", onFsChange);
+}, []);
+const previewContainerClass =
+  previewMode === "mobile"
+    ? "mx-auto w-full max-w-[430px]"
+    : previewMode === "tablet"
+    ? "mx-auto w-full max-w-[900px]"
+    : "w-full";
 function StaticPage({ page }: { page: PublicPage }) {
   if (page === "privacy") {
     return (
       <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">
-          Privacy Policy
-        </h1>
-        <p className="mt-4 text-slate-600 leading-7">
-          เว็บไซต์นี้อาจเก็บข้อมูลที่จำเป็นต่อการใช้งาน เช่น session cookie สำหรับการเข้าสู่ระบบผู้ดูแลระบบ
-          และข้อมูลเชิงเทคนิคเพื่อความปลอดภัยและการปรับปรุงประสบการณ์ใช้งาน โดยจะไม่เผยแพร่ข้อมูลส่วนบุคคลโดยไม่จำเป็น
-        </p>
-      </section>
+      <h1 className="text-4xl font-black tracking-tight text-slate-900">
+        Services
+      </h1>
+      <p className="mt-4 text-slate-600 leading-7">
+        บริการของเว็บไซต์ Font Tai ได้แก่ พรีวิวฟอนต์ออนไลน์ จัดการฟอนต์อัปโหลดเอง
+        และดาวน์โหลด/ใช้งานฟอนต์ผ่านเว็บในรูปแบบที่เหมาะกับทุกอุปกรณ์
+      </p>
+    </section>
     );
   }
 
@@ -591,7 +623,8 @@ export default function App() {
   </div>
 </header>
 
-        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8">
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+          <div className={previewContainerClass}>
           {viewMode === "admin" && isAuthed ? (
             <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -657,7 +690,8 @@ export default function App() {
               </div>
             </section>
           ) : publicPage !== "home" ? (
-            <StaticPage page={publicPage} />
+            <StaticPage page={publicPage} 
+            />
           ) : (
             <>
               <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
@@ -757,6 +791,7 @@ export default function App() {
               <Pagination page={page} totalPages={totalPages} onChange={setPage} />
             </>
           )}
+        </div>
         </main>
 
         <SiteFooter
@@ -766,7 +801,16 @@ export default function App() {
           }}
         />
       </div>
-
+<NavbarWithSearch
+  search={search}
+  onSearchChange={setSearch}
+  publicPage={publicPage}
+  onNavigate={setPublicPage}
+  mode={previewMode}
+  isFullscreen={isFullscreen}
+  onChangeMode={setPreviewMode}
+  onToggleFullscreen={handleToggleFullscreen}
+/>
       <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />
 
       <LoginModal

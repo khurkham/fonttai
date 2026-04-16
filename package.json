@@ -3,14 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "deploy": "npm run build && wrangler deploy",
     "preview": "vite preview"
   },
-
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.5",
     "hono": "^4.8.2",
