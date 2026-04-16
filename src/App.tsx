@@ -788,6 +788,7 @@ export default function App() {
             setViewMode("home");
             setPublicPage(page);
           }}
+          onAdminClick={() => setShowLogin(true)}
         />
       </div>
 

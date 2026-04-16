@@ -1,10 +1,12 @@
+import { Settings } from "lucide-react";
 import { AdSlot } from "./AdSlot";
 
 type Props = {
   onNavigate: (page: "home" | "privacy" | "about" | "contact") => void;
+  onAdminClick: () => void;
 };
 
-export function SiteFooter({ onNavigate }: Props) {
+export function SiteFooter({ onNavigate, onAdminClick }: Props) {
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10">
@@ -56,11 +58,20 @@ export function SiteFooter({ onNavigate }: Props) {
 
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
-              หมายเหตุ
+              ผู้ดูแลระบบ
             </h4>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              พื้นที่โฆษณาจะถูกวางแยกจากเนื้อหาหลักอย่างชัดเจน เพื่อรองรับการใช้งานในอนาคตและเป็นมิตรกับผู้ใช้ทุกอุปกรณ์
+              เข้าสู่ระบบจัดการฟอนต์จากปุ่มด้านล่าง
             </p>
+
+            <button
+              type="button"
+              onClick={onAdminClick}
+              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
+            >
+              <Settings size={16} />
+              เข้าหลังบ้าน
+            </button>
           </div>
         </div>
 
