@@ -22,17 +22,33 @@ export function SiteFooter({ onNavigate }: Props) {
             <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
               เมนูเว็บไซต์
             </h4>
-            <div className="mt-3 flex flex-col gap-2 text-sm text-slate-600">
-              <button type="button" className="text-left hover:text-blue-600" onClick={() => onNavigate("home")}>
+            <div className="mt-3 flex flex-col gap-2">
+              <button
+                type="button"
+                className="text-left text-sm text-slate-600 hover:text-blue-600"
+                onClick={() => onNavigate("home")}
+              >
                 หน้าแรก
               </button>
-              <button type="button" className="text-left hover:text-blue-600" onClick={() => onNavigate("about")}>
+              <button
+                type="button"
+                className="text-left text-sm text-slate-600 hover:text-blue-600"
+                onClick={() => onNavigate("about")}
+              >
                 About Us
               </button>
-              <button type="button" className="text-left hover:text-blue-600" onClick={() => onNavigate("privacy")}>
+              <button
+                type="button"
+                className="text-left text-sm text-slate-600 hover:text-blue-600"
+                onClick={() => onNavigate("privacy")}
+              >
                 Privacy Policy
               </button>
-              <button type="button" className="text-left hover:text-blue-600" onClick={() => onNavigate("contact")}>
+              <button
+                type="button"
+                className="text-left text-sm text-slate-600 hover:text-blue-600"
+                onClick={() => onNavigate("contact")}
+              >
                 Contact
               </button>
             </div>

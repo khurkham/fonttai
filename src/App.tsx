@@ -535,61 +535,61 @@ export default function App() {
 
       <div className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-600 text-3xl font-extrabold text-white shadow">
-                T
-              </div>
-              <div>
-                <h1 className="text-4xl font-black tracking-tight sm:text-6xl">
-                  Font Tai
-                </h1>
-                <p className="mt-1 text-sm text-slate-500 sm:text-base">
-                  แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวและจัดการฟอนต์บน Cloudflare
-                </p>
-              </div>
-            </div>
+  <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
+    <div className="flex items-center gap-3">
+      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600 text-2xl font-extrabold text-white shadow">
+        T
+      </div>
+      <div>
+        <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+          Font Tai
+        </h1>
+        <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+          แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวและจัดการฟอนต์บน Cloudflare
+        </p>
+      </div>
+    </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              {isAuthed && (
-                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
-                  Admin login แล้ว
-                </span>
-              )}
+    <div className="flex flex-wrap items-center gap-2">
+      {isAuthed && (
+        <span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+          Admin login แล้ว
+        </span>
+      )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  setViewMode("home");
-                  setPublicPage("home");
-                }}
-                className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800"
-              >
-                หน้าหลัก
-              </button>
+      <button
+        type="button"
+        onClick={() => {
+          setViewMode("home");
+          setPublicPage("home");
+        }}
+        className="rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800"
+      >
+        หน้าหลัก
+      </button>
 
-              {isAuthed ? (
-                <button
-                  type="button"
-                  onClick={() => setViewMode("admin")}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
-                >
-                  <Settings size={18} />
-                  จัดการฟอนต์
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowLogin(true)}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
-                >
-                  <Settings size={18} />
-                  เข้าหลังบ้าน
-                </button>
-              )}
-            </div>
-          </div>
-        </header>
+      {isAuthed ? (
+        <button
+          type="button"
+          onClick={() => setViewMode("admin")}
+          className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
+        >
+          <Settings size={16} />
+          จัดการฟอนต์
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowLogin(true)}
+          className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
+        >
+          <Settings size={16} />
+          เข้าหลังบ้าน
+        </button>
+      )}
+    </div>
+  </div>
+</header>
 
         <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8">
           {viewMode === "admin" && isAuthed ? (
@@ -660,22 +660,22 @@ export default function App() {
             <StaticPage page={publicPage} />
           ) : (
             <>
-              <section className="mb-8 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-8 shadow-sm">
+              <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
                 <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
                   <div>
-                    <p className="mb-3 inline-flex rounded-full bg-blue-100 px-4 py-2 text-sm font-bold text-blue-700">
-                      Font Preview Platform
-                    </p>
-                    <h2 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
-                      พรีวิวฟอนต์ไตและฟอนต์ไทย
-                      <br />
-                      แบบมืออาชีพในเว็บเดียว
-                    </h2>
-                    <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                      รองรับการแสดงผลทุกอุปกรณ์ ค้นหาฟอนต์ได้ง่าย รองรับฟอนต์อัปโหลดเอง
-                      และพร้อมต่อยอดเป็นเว็บไซต์เชิงพาณิชย์พร้อมพื้นที่โฆษณาในอนาคต
-                    </p>
-                  </div>
+  <p className="mb-3 inline-flex rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">
+    Font Preview Platform
+  </p>
+  <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+    พรีวิวฟอนต์ไตและฟอนต์ไทย
+    <br />
+    แบบมืออาชีพในเว็บเดียว
+  </h2>
+  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+    รองรับทุกอุปกรณ์ ค้นหาฟอนต์ได้ง่าย รองรับฟอนต์อัปโหลดเอง
+    และพร้อมต่อยอดเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
+  </p>
+</div>
 
                   <div className="flex items-end">
                     <AdSlot label="พื้นที่โฆษณา Hero Banner" className="min-h-[160px]" />
