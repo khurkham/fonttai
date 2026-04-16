@@ -19,6 +19,13 @@ export async function sha256Hex(value: string): Promise<string> {
 }
 
 export function getFamily(fontName: string, isCustom: boolean) {
-  if (isCustom) return `'${fontName}'`;
-  return `'${fontName}', sans-serif`;
+  if (isCustom) return `"${fontName}", sans-serif`;
+  return `"${fontName}", sans-serif`;
+}
+
+export function normalizeFontUrl(url?: string) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/")) return url;
+  return `/${url}`;
 }

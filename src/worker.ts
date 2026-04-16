@@ -119,9 +119,10 @@ app.get("/api/fonts", async (c) => {
       "SELECT * FROM fonts ORDER BY created_at DESC"
     ).all<FontRow>();
 
-    return okJson({
+  return okJson({
   items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
 });
+
   } catch (error) {
     console.error("/api/fonts error", error);
     return okJson({ items: [] });
