@@ -119,10 +119,9 @@ app.get("/api/fonts", async (c) => {
       "SELECT * FROM fonts ORDER BY created_at DESC"
     ).all<FontRow>();
 
-  return okJson({
-  items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
-});
-
+    return okJson({
+      items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
+    });
   } catch (error) {
     console.error("/api/fonts error", error);
     return okJson({ items: [] });
@@ -155,6 +154,35 @@ app.get("/api/font-file/:key", async (c) => {
   } catch (error) {
     console.error("/api/font-file error", error);
     return errJson("Failed to load font file", 500);
+  }
+});
+
+app.get("/api/font-download/:key", async (c) => {
+  try {
+    if (!c.env.FONT_BUCKET) {
+      return errJson("Font bucket is not configured", 500);
+    }
+
+    const key = c.req.param("key");
+    const obj = await c.env.FONT_BUCKET.get(key);
+
+    if (!obj) return errJson("Not found", 404);
+
+    const headers = new Headers();
+    obj.writeHttpMetadata(headers);
+    headers.set("etag", obj.httpEtag);
+
+    if (!headers.get("content-type")) {
+      headers.set("content-type", "font/ttf");
+    }
+
+    headers.set("content-disposition", `attachment; filename="${key}"`);
+    headers.set("cache-control", "public, max-age=31536000, immutable");
+
+    return new Response(obj.body, { headers });
+  } catch (error) {
+    console.error("/api/font-download error", error);
+    return errJson("Failed to download font file", 500);
   }
 });
 
@@ -366,35 +394,6 @@ app.delete("/api/admin/fonts/:id", async (c) => {
   } catch (error) {
     console.error("/api/admin/fonts DELETE error", error);
     return errJson("Failed to delete font", 500);
-  }
-});
-
-app.get("/api/font-download/:key", async (c) => {
-  try {
-    if (!c.env.FONT_BUCKET) {
-      return errJson("Font bucket is not configured", 500);
-    }
-
-    const key = c.req.param("key");
-    const obj = await c.env.FONT_BUCKET.get(key);
-
-    if (!obj) return errJson("Not found", 404);
-
-    const headers = new Headers();
-    obj.writeHttpMetadata(headers);
-    headers.set("etag", obj.httpEtag);
-
-    if (!headers.get("content-type")) {
-      headers.set("content-type", "font/ttf");
-    }
-
-    headers.set("content-disposition", `attachment; filename="${key}"`);
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-
-    return new Response(obj.body, { headers });
-  } catch (error) {
-    console.error("/api/font-download error", error);
-    return errJson("Failed to download font file", 500);
   }
 });
 
