@@ -30,6 +30,7 @@ const GOOGLE_FONTS: FontItem[] = [
     mimeType: "",
     createdAt: "",
     fileUrl: "",
+    downloadUrl: "",
   },
   {
     id: "g2",
@@ -44,6 +45,7 @@ const GOOGLE_FONTS: FontItem[] = [
     mimeType: "",
     createdAt: "",
     fileUrl: "",
+    downloadUrl: "",
   },
   {
     id: "g3",
@@ -58,6 +60,7 @@ const GOOGLE_FONTS: FontItem[] = [
     mimeType: "",
     createdAt: "",
     fileUrl: "",
+    downloadUrl: "",
   },
   {
     id: "g4",
@@ -72,6 +75,7 @@ const GOOGLE_FONTS: FontItem[] = [
     mimeType: "",
     createdAt: "",
     fileUrl: "",
+    downloadUrl: "",
   },
   {
     id: "g5",
@@ -86,6 +90,7 @@ const GOOGLE_FONTS: FontItem[] = [
     mimeType: "",
     createdAt: "",
     fileUrl: "",
+    downloadUrl: "",
   },
   {
     id: "g6",
@@ -100,8 +105,41 @@ const GOOGLE_FONTS: FontItem[] = [
     mimeType: "",
     createdAt: "",
     fileUrl: "",
+    downloadUrl: "",
   },
 ];
+
+function pageToPath(page: PublicPage): string {
+  switch (page) {
+    case "about":
+      return "/about/";
+    case "services":
+      return "/services/";
+    case "privacy":
+      return "/privacy/";
+    case "contact":
+      return "/contact/";
+    case "home":
+    default:
+      return "/";
+  }
+}
+
+function pathToPage(pathname: string): PublicPage {
+  const path = pathname.replace(/\/+$/, "") || "/";
+  switch (path) {
+    case "/about":
+      return "about";
+    case "/services":
+      return "services";
+    case "/privacy":
+      return "privacy";
+    case "/contact":
+      return "contact";
+    default:
+      return "home";
+  }
+}
 
 function CodeModal({
   font,
@@ -418,7 +456,6 @@ function EditFontModal({
 
     try {
       setLoading(true);
-
       await api.updateFont(font.id, {
         name,
         style,
@@ -426,7 +463,6 @@ function EditFontModal({
         characteristics,
         details,
       });
-
       await onUpdated();
       onClose();
     } catch (err) {
@@ -576,7 +612,9 @@ export default function App() {
   const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
   const [isAuthed, setIsAuthed] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("home");
-  const [publicPage, setPublicPage] = useState<PublicPage>("home");
+  const [publicPage, setPublicPage] = useState<PublicPage>(() =>
+    pathToPage(window.location.pathname)
+  );
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -614,6 +652,16 @@ export default function App() {
       await Promise.all([loadFonts(), checkAuth()]);
       setLoading(false);
     })();
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPublicPage(pathToPage(window.location.pathname));
+      setViewMode("home");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   const allFonts = useMemo(() => {
@@ -658,6 +706,15 @@ export default function App() {
     }
   }
 
+  function navigateToPage(page: PublicPage) {
+    const nextPath = pageToPath(page);
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, "", nextPath);
+    }
+    setPublicPage(page);
+    setViewMode("home");
+  }
+
   const seoTitle =
     publicPage === "privacy"
       ? "Privacy Policy | Font Tai"
@@ -683,10 +740,7 @@ export default function App() {
           search={search}
           onSearchChange={setSearch}
           publicPage={publicPage}
-          onNavigate={(page) => {
-            setPublicPage(page);
-            setViewMode("home");
-          }}
+          onNavigate={navigateToPage}
         />
 
         <main className="mx-auto mt-[96px] w-full max-w-7xl flex-1 px-4 py-8">
@@ -879,10 +933,7 @@ export default function App() {
         </main>
 
         <SiteFooter
-          onNavigate={(page) => {
-            setViewMode("home");
-            setPublicPage(page);
-          }}
+          onNavigate={(page) => navigateToPage(page)}
           onAdminClick={() => setShowLogin(true)}
         />
       </div>
@@ -916,8 +967,7 @@ export default function App() {
         onClose={() => setShowAddFont(false)}
         onCreated={async () => {
           await loadFonts();
-          setPublicPage("home");
-          setViewMode("home");
+          navigateToPage("home");
         }}
       />
     </div>
