@@ -297,6 +297,17 @@ app.delete("/api/admin/fonts/:id", async (c) => {
   }
 });
 
+app.get("/api/check-secrets", (c) => {
+  return c.json({
+    hasAdminUsername: !!c.env.ADMIN_USERNAME,
+    hasAdminPasswordHash: !!c.env.ADMIN_PASSWORD_HASH,
+    hasSessionSecret: !!c.env.SESSION_SECRET,
+    adminUsernameValue: c.env.ADMIN_USERNAME ?? null,
+    hashLength: c.env.ADMIN_PASSWORD_HASH?.length ?? 0,
+    secretLength: c.env.SESSION_SECRET?.length ?? 0,
+  });
+});
+
 // ต้องอยู่ล่างสุด
 app.all("*", async (c) => {
   if (c.env.ASSETS) {
