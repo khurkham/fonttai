@@ -13,7 +13,7 @@ type ViewMode = "home" | "admin";
 type PublicPage = "home" | "about" | "services" | "privacy" | "contact";
 
 const DEFAULT_PREVIEW =
-  "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
+  "ၾွၼ်ႉတႆးယူႇၼီႇၶူတ်ႉ ႁၢင်ႈလီ ၶိုၵ်ႉတွၼ်း ႁၼ်သႃႇတႆၢႇၵမ်းသိုဝ်ႈ ၸၼ်ဢဝ်လႆႈယဝ်ႉၶႃႈ";
 
 const GOOGLE_FONTS: FontItem[] = [
   {
