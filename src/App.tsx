@@ -567,248 +567,204 @@ function StaticPage({
   page: PublicPage;
   onNavigate: (page: PublicPage) => void;
 }) {
+  const [contactForm, setContactForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [contactError, setContactError] = useState("");
+  const [contactSuccess, setContactSuccess] = useState("");
+
+  function updateContactField(
+    field: "firstName" | "lastName" | "email" | "subject" | "message",
+    value: string
+  ) {
+    setContactForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }
+
+  function handleContactSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setContactError("");
+    setContactSuccess("");
+
+    const firstName = contactForm.firstName.trim();
+    const lastName = contactForm.lastName.trim();
+    const email = contactForm.email.trim();
+    const subject = contactForm.subject.trim();
+    const message = contactForm.message.trim();
+
+    if (!firstName || !lastName || !email || !subject || !message) {
+      setContactError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      setContactError("กรุณากรอกอีเมลให้ถูกต้อง");
+      return;
+    }
+
+    setContactSuccess("ส่งข้อมูลเรียบร้อยแล้ว (ตัวอย่างฟอร์ม สามารถเชื่อมต่อ backend ภายหลังได้)");
+    setContactForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      subject: "",
+      message: "",
+    });
+  }
+
   if (page === "privacy") {
-  return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="mb-6">
-        <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-          Privacy Policy
-        </p>
-        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-          นโยบายความเป็นส่วนตัว
-        </h1>
-        <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-          อัปเดตล่าสุด: [ใส่วันที่]
-        </p>
-      </div>
-
-      <div className="space-y-6 leading-7 text-slate-600">
-        <p>
-          เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งานทุกท่าน
-          นโยบายฉบับนี้อธิบายถึงวิธีการเก็บรวบรวม ใช้ เปิดเผย
-          และคุ้มครองข้อมูลของผู้ใช้งานเมื่อเข้าใช้บริการเว็บไซต์ของเรา
-          หากคุณใช้งานเว็บไซต์นี้ต่อไป จะถือว่าคุณรับทราบและยอมรับนโยบายฉบับนี้
-        </p>
-
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            1. ข้อมูลที่เราอาจเก็บรวบรวม
-          </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-6">
-            <li>
-              ข้อมูลทางเทคนิค เช่น IP address, ประเภทเบราว์เซอร์,
-              ระบบปฏิบัติการ, ภาษา, วันที่และเวลาที่เข้าใช้งาน
-            </li>
-            <li>
-              ข้อมูลการใช้งานเว็บไซต์ เช่น หน้าที่เข้าชม การค้นหาฟอนต์
-              การกดดูรายละเอียด และการดาวน์โหลดฟอนต์
-            </li>
-            <li>
-              ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน
-              เพื่อช่วยให้เว็บไซต์ทำงานได้อย่างมีประสิทธิภาพ
-            </li>
-            <li>
-              ข้อมูลที่ผู้ใช้งานให้กับเราโดยตรง เช่น
-              ข้อมูลจากแบบฟอร์มติดต่อ หรือข้อมูลที่ใช้เข้าสู่ระบบผู้ดูแล
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            2. วัตถุประสงค์ในการใช้ข้อมูล
-          </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-6">
-            <li>เพื่อให้บริการและแสดงผลเว็บไซต์ได้อย่างถูกต้อง</li>
-            <li>เพื่อพัฒนาและปรับปรุงประสบการณ์ของผู้ใช้งาน</li>
-            <li>เพื่อวิเคราะห์พฤติกรรมการใช้งานเว็บไซต์ในภาพรวม</li>
-            <li>เพื่อรักษาความปลอดภัยของระบบ และป้องกันการใช้งานที่ไม่เหมาะสม</li>
-            <li>
-              เพื่อรองรับบริการจากบุคคลที่สาม เช่น ระบบวิเคราะห์ข้อมูล
-              หรือบริการโฆษณาในอนาคต เช่น Google AdSense
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            3. การใช้คุกกี้และเทคโนโลยีที่คล้ายกัน
-          </h2>
-          <p className="mt-3">
-            เว็บไซต์นี้อาจใช้คุกกี้เพื่อจดจำการตั้งค่าของผู้ใช้งาน
-            ช่วยให้เว็บไซต์ทำงานได้อย่างมีประสิทธิภาพ
-            วิเคราะห์การใช้งาน และเตรียมรองรับการแสดงโฆษณาในอนาคต
-            โดยผู้ใช้งานสามารถศึกษารายละเอียดเพิ่มเติมได้ที่หน้า Cookie Policy
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+            Privacy Policy
+          </p>
+          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
+            นโยบายความเป็นส่วนตัว
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
+            อัปเดตล่าสุด: [ใส่วันที่]
           </p>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            4. การให้บริการโดยบุคคลที่สาม
-          </h2>
-          <p className="mt-3">
-            เว็บไซต์นี้อาจใช้บริการจากบุคคลที่สาม เช่น ผู้ให้บริการวิเคราะห์ข้อมูล
-            ผู้ให้บริการจัดเก็บข้อมูล หรือผู้ให้บริการโฆษณา
-            ซึ่งบุคคลที่สามดังกล่าวอาจมีการเก็บข้อมูลบางประเภทตามนโยบายของตนเอง
+        <div className="space-y-6 leading-7 text-slate-600">
+          <p>
+            เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งานทุกท่าน
+            นโยบายฉบับนี้อธิบายถึงวิธีการเก็บรวบรวม ใช้ เปิดเผย
+            และคุ้มครองข้อมูลของผู้ใช้งานเมื่อเข้าใช้บริการเว็บไซต์ของเรา
+            หากคุณใช้งานเว็บไซต์นี้ต่อไป จะถือว่าคุณรับทราบและยอมรับนโยบายฉบับนี้
           </p>
-        </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            5. การเปิดเผยข้อมูล
-          </h2>
-          <p className="mt-3">
-            เราจะไม่ขายหรือเผยแพร่ข้อมูลส่วนบุคคลของผู้ใช้งานโดยไม่จำเป็น
-            อย่างไรก็ตาม เราอาจเปิดเผยข้อมูลในกรณีที่จำเป็น เช่น
-            เพื่อปฏิบัติตามกฎหมาย คำสั่งของหน่วยงานรัฐ
-            หรือเพื่อปกป้องสิทธิ ความปลอดภัย และทรัพย์สินของเว็บไซต์หรือผู้ใช้งาน
-          </p>
-        </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              1. ข้อมูลที่เราอาจเก็บรวบรวม
+            </h2>
+            <ul className="mt-3 list-disc space-y-2 pl-6">
+              <li>
+                ข้อมูลทางเทคนิค เช่น IP address, ประเภทเบราว์เซอร์,
+                ระบบปฏิบัติการ, ภาษา, วันที่และเวลาที่เข้าใช้งาน
+              </li>
+              <li>
+                ข้อมูลการใช้งานเว็บไซต์ เช่น หน้าที่เข้าชม การค้นหาฟอนต์
+                การกดดูรายละเอียด และการดาวน์โหลดฟอนต์
+              </li>
+              <li>
+                ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน
+                เพื่อช่วยให้เว็บไซต์ทำงานได้อย่างมีประสิทธิภาพ
+              </li>
+              <li>
+                ข้อมูลที่ผู้ใช้งานให้กับเราโดยตรง เช่น
+                ข้อมูลจากแบบฟอร์มติดต่อ หรือข้อมูลที่ใช้เข้าสู่ระบบผู้ดูแล
+              </li>
+            </ul>
+          </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            6. การเก็บรักษาและความปลอดภัยของข้อมูล
-          </h2>
-          <p className="mt-3">
-            เราใช้มาตรการที่เหมาะสมในการป้องกันการเข้าถึง การใช้
-            หรือการเปิดเผยข้อมูลโดยไม่ได้รับอนุญาต
-            และจะเก็บรักษาข้อมูลเท่าที่จำเป็นตามวัตถุประสงค์ของการใช้งาน
-            หรือเท่าที่กฎหมายกำหนด
-          </p>
-        </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              2. วัตถุประสงค์ในการใช้ข้อมูล
+            </h2>
+            <ul className="mt-3 list-disc space-y-2 pl-6">
+              <li>เพื่อให้บริการและปรับปรุงเว็บไซต์</li>
+              <li>เพื่อวิเคราะห์การใช้งานและพัฒนาประสบการณ์ผู้ใช้</li>
+              <li>เพื่อรักษาความปลอดภัยของระบบ</li>
+              <li>เพื่อรองรับบริการจากบุคคลที่สาม เช่น Google AdSense ในอนาคต</li>
+            </ul>
+          </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            7. สิทธิของผู้ใช้งาน
-          </h2>
-          <p className="mt-3">
-            ผู้ใช้งานอาจมีสิทธิในการเข้าถึง แก้ไข คัดค้าน จำกัดการใช้
-            หรือขอลบข้อมูลส่วนบุคคลของตนเอง ทั้งนี้ขึ้นอยู่กับกฎหมายที่ใช้บังคับ
-            หากต้องการติดต่อเกี่ยวกับสิทธิดังกล่าว
-            กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
-          </p>
-        </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              3. การใช้คุกกี้และเทคโนโลยีที่คล้ายกัน
+            </h2>
+            <p className="mt-3">
+              เว็บไซต์นี้อาจใช้คุกกี้เพื่อจดจำการตั้งค่า ช่วยให้เว็บไซต์ทำงานได้ดีขึ้น
+              วิเคราะห์การใช้งาน และรองรับการแสดงโฆษณาในอนาคต
+            </p>
+          </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            8. ลิงก์ไปยังเว็บไซต์ภายนอก
-          </h2>
-          <p className="mt-3">
-            เว็บไซต์นี้อาจมีลิงก์ไปยังเว็บไซต์ภายนอก
-            ซึ่งมีนโยบายความเป็นส่วนตัวแยกต่างหาก
-            เราไม่รับผิดชอบต่อเนื้อหา หรือแนวทางการคุ้มครองข้อมูลของเว็บไซต์ภายนอกเหล่านั้น
-          </p>
-        </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              4. การเปิดเผยข้อมูล
+            </h2>
+            <p className="mt-3">
+              เราจะไม่ขายหรือเผยแพร่ข้อมูลส่วนบุคคลของผู้ใช้งานโดยไม่จำเป็น
+              เว้นแต่เป็นไปตามกฎหมายหรือเพื่อคุ้มครองความปลอดภัยของระบบ
+            </p>
+          </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            9. การเปลี่ยนแปลงนโยบาย
-          </h2>
-          <p className="mt-3">
-            เราอาจปรับปรุงนโยบายความเป็นส่วนตัวฉบับนี้เป็นครั้งคราว
-            โดยจะแจ้งวันที่อัปเดตล่าสุดไว้ในหน้านี้
-          </p>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              5. ติดต่อเรา
+            </h2>
+            <p className="mt-3">
+              หากคุณมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
+            </p>
+          </div>
         </div>
-
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            10. ติดต่อเรา
-          </h2>
-          <p className="mt-3">
-            หากคุณมีคำถาม ข้อเสนอแนะ
-            หรือข้อกังวลเกี่ยวกับนโยบายความเป็นส่วนตัวฉบับนี้
-            กรุณาติดต่อเราผ่านหน้า Contact ของเว็บไซต์
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
+      </section>
+    );
+  }
 
   if (page === "cookie") {
-  return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="mb-6">
-        <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-          Cookie Policy
-        </p>
-        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-          นโยบายคุกกี้
-        </h1>
-        <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-          อัปเดตล่าสุด: [ใส่วันที่]
-        </p>
-      </div>
-
-      <div className="space-y-6 leading-7 text-slate-600">
-        <p>
-          เว็บไซต์ Font Tai ใช้คุกกี้และเทคโนโลยีที่คล้ายกัน
-          เพื่อให้เว็บไซต์ทำงานได้อย่างเหมาะสม ปรับปรุงประสบการณ์ของผู้ใช้งาน
-          วิเคราะห์การใช้งาน และรองรับบริการโฆษณาในอนาคต
-        </p>
-
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">1. คุกกี้คืออะไร</h2>
-          <p className="mt-3">
-            คุกกี้คือไฟล์ข้อมูลขนาดเล็กที่ถูกบันทึกไว้ในอุปกรณ์ของคุณ
-            เมื่อคุณเข้าใช้งานเว็บไซต์ เพื่อช่วยให้เว็บไซต์จดจำข้อมูลบางอย่าง
-            เช่น การตั้งค่า หรือพฤติกรรมการใช้งาน
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+            Cookie Policy
+          </p>
+          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
+            นโยบายคุกกี้
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
+            อัปเดตล่าสุด: [ใส่วันที่]
           </p>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            2. ประเภทของคุกกี้ที่เราอาจใช้
-          </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-6">
-            <li>คุกกี้ที่จำเป็นต่อการทำงานของเว็บไซต์</li>
-            <li>คุกกี้เพื่อการวิเคราะห์และวัดผลการใช้งาน</li>
-            <li>คุกกี้เพื่อการโฆษณาและการแสดงเนื้อหาที่เหมาะสม</li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            3. คุกกี้จากบุคคลที่สาม
-          </h2>
-          <p className="mt-3">
-            เว็บไซต์นี้อาจใช้บริการจากบุคคลที่สาม เช่น ระบบวิเคราะห์ข้อมูล
-            หรือระบบโฆษณา ซึ่งอาจมีการตั้งค่าคุกกี้ผ่านเว็บไซต์ของเรา
+        <div className="space-y-6 leading-7 text-slate-600">
+          <p>
+            เว็บไซต์ Font Tai ใช้คุกกี้และเทคโนโลยีที่คล้ายกัน
+            เพื่อให้เว็บไซต์ทำงานได้อย่างเหมาะสม ปรับปรุงประสบการณ์ของผู้ใช้งาน
+            วิเคราะห์การใช้งาน และรองรับบริการโฆษณาในอนาคต
           </p>
-        </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            4. การจัดการคุกกี้
-          </h2>
-          <p className="mt-3">
-            คุณสามารถจัดการ ลบ หรือปิดใช้งานคุกกี้ได้ผ่านการตั้งค่าเบราว์เซอร์ของคุณ
-            อย่างไรก็ตาม การปิดใช้งานคุกกี้บางประเภทอาจทำให้เว็บไซต์บางส่วนทำงานได้ไม่สมบูรณ์
-          </p>
-        </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">1. คุกกี้คืออะไร</h2>
+            <p className="mt-3">
+              คุกกี้คือไฟล์ข้อมูลขนาดเล็กที่ถูกบันทึกไว้ในอุปกรณ์ของคุณ
+              เมื่อคุณเข้าใช้งานเว็บไซต์ เพื่อช่วยให้เว็บไซต์จดจำข้อมูลบางอย่าง
+            </p>
+          </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            5. การให้ความยินยอม
-          </h2>
-          <p className="mt-3">
-            ในบางกรณี เว็บไซต์อาจแสดงแบนเนอร์เพื่อขอความยินยอมในการใช้คุกกี้
-            โดยเฉพาะคุกกี้ที่ไม่จำเป็น หรือคุกกี้ที่ใช้เพื่อวัตถุประสงค์ด้านโฆษณา
-          </p>
-        </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              2. ประเภทของคุกกี้ที่เราอาจใช้
+            </h2>
+            <ul className="mt-3 list-disc space-y-2 pl-6">
+              <li>คุกกี้ที่จำเป็นต่อการทำงานของเว็บไซต์</li>
+              <li>คุกกี้เพื่อการวิเคราะห์และวัดผลการใช้งาน</li>
+              <li>คุกกี้เพื่อการโฆษณาและการแสดงเนื้อหาที่เหมาะสม</li>
+            </ul>
+          </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            6. ติดต่อเรา
-          </h2>
-          <p className="mt-3">
-            หากคุณมีคำถามเกี่ยวกับนโยบายคุกกี้นี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
-          </p>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              3. การจัดการคุกกี้
+            </h2>
+            <p className="mt-3">
+              คุณสามารถจัดการ ลบ หรือปิดใช้งานคุกกี้ได้ผ่านการตั้งค่าเบราว์เซอร์ของคุณ
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
+    );
+  }
 
   if (page === "about") {
     return (
@@ -855,20 +811,16 @@ function StaticPage({
           </p>
         </div>
 
-        <form
-          className="space-y-5"
-          onSubmit={(e) => {
-            e.preventDefault();
-            alert("ตัวอย่างฟอร์มติดต่อ: คุณสามารถเชื่อมต่อ backend ภายหลังได้");
-          }}
-        >
+        <form className="space-y-5" onSubmit={handleContactSubmit} noValidate>
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
-                ชื่อ
+                ชื่อ <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
+                value={contactForm.firstName}
+                onChange={(e) => updateContactField("firstName", e.target.value)}
                 placeholder="กรอกชื่อ"
                 className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
@@ -876,10 +828,12 @@ function StaticPage({
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
-                นามสกุล
+                นามสกุล <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
+                value={contactForm.lastName}
+                onChange={(e) => updateContactField("lastName", e.target.value)}
                 placeholder="กรอกนามสกุล"
                 className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
@@ -888,10 +842,12 @@ function StaticPage({
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              อีเมล
+              อีเมล <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
+              value={contactForm.email}
+              onChange={(e) => updateContactField("email", e.target.value)}
               placeholder="you@example.com"
               className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
@@ -899,10 +855,12 @@ function StaticPage({
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              หัวข้อ
+              หัวข้อ <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
+              value={contactForm.subject}
+              onChange={(e) => updateContactField("subject", e.target.value)}
               placeholder="หัวข้อที่ต้องการติดต่อ"
               className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
@@ -910,14 +868,28 @@ function StaticPage({
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              ข้อความ
+              ข้อความ <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={6}
+              value={contactForm.message}
+              onChange={(e) => updateContactField("message", e.target.value)}
               placeholder="กรอกรายละเอียดที่ต้องการติดต่อ"
               className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
+
+          {contactError ? (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+              {contactError}
+            </div>
+          ) : null}
+
+          {contactSuccess ? (
+            <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+              {contactSuccess}
+            </div>
+          ) : null}
 
           <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
             เมื่อท่านส่งข้อมูลผ่านฟอร์ม จะถือว่าท่านยอมรับใน{" "}
