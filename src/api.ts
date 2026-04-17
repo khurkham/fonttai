@@ -83,4 +83,17 @@ export const api = {
     request<{ ok: boolean }>("/api/admin/contact-messages/" + id, {
       method: "DELETE",
     }),
+
+  exportContactMessagesCsv: async (): Promise<Blob> => {
+    const res = await fetch("/api/admin/contact-messages/export.csv", {
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Export failed");
+    }
+
+    return res.blob();
+  },
 };

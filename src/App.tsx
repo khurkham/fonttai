@@ -1033,32 +1033,46 @@ function ContactDetailModal({
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {!item.isRead ? (
-              <button
-                type="button"
-                onClick={async () => {
-                  await onMarkRead(item.id);
-                  onClose();
-                }}
-                className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
-              >
-                ทำเครื่องหมายว่าอ่านแล้ว
-              </button>
-            ) : null}
+  <button
+    type="button"
+    onClick={() => {
+      const subject = encodeURIComponent(`Re: ${item.subject}`);
+      const body = encodeURIComponent(
+        `เรียน ${item.firstName} ${item.lastName},\n\nขอบคุณสำหรับการติดต่อเรา\n\n`
+      );
+      window.location.href = `mailto:${item.email}?subject=${subject}&body=${body}`;
+    }}
+    className="rounded-2xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-700"
+  >
+    ตอบกลับอีเมล
+  </button>
 
-            <button
-              type="button"
-              onClick={async () => {
-                const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
-                if (!ok) return;
-                await onDelete(item.id);
-                onClose();
-              }}
-              className="rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white"
-            >
-              ลบข้อความ
-            </button>
-          </div>
+  {!item.isRead ? (
+    <button
+      type="button"
+      onClick={async () => {
+        await onMarkRead(item.id);
+        onClose();
+      }}
+      className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
+    >
+      ทำเครื่องหมายว่าอ่านแล้ว
+    </button>
+  ) : null}
+
+  <button
+    type="button"
+    onClick={async () => {
+      const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+      if (!ok) return;
+      await onDelete(item.id);
+      onClose();
+    }}
+    className="rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white"
+  >
+    ลบข้อความ
+  </button>
+</div>
         </div>
       </div>
     </div>
@@ -1101,6 +1115,30 @@ async function loadContactMessages() {
   } finally {
     setContactLoading(false);
   }
+}
+
+async function handleExportContactCsv() {
+  try {
+    const blob = await api.exportContactMessagesCsv();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "contact-messages.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err instanceof Error ? err.message : "Export CSV ไม่สำเร็จ");
+  }
+}
+
+function handleReplyEmail(item: ContactMessage) {
+  const subject = encodeURIComponent(`Re: ${item.subject}`);
+  const body = encodeURIComponent(
+    `เรียน ${item.firstName} ${item.lastName},\n\nขอบคุณสำหรับการติดต่อเรา\n\n`
+  );
+  window.location.href = `mailto:${item.email}?subject=${subject}&body=${body}`;
 }
 
 async function handleMarkContactAsRead(id: string) {
@@ -1284,24 +1322,34 @@ async function loadContactMessages() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={() => setShowAddFont(true)}
-          className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
-        >
-          <Plus size={18} />
-          เพิ่มฟอนต์
-        </button>
+  {adminTab === "contacts" ? (
+    <button
+      type="button"
+      onClick={handleExportContactCsv}
+      className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700"
+    >
+      Export CSV
+    </button>
+  ) : null}
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
-        >
-          <LogOut size={18} />
-          ออกจากระบบ
-        </button>
-      </div>
+  <button
+    type="button"
+    onClick={() => setShowAddFont(true)}
+    className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+  >
+    <Plus size={18} />
+    เพิ่มฟอนต์
+  </button>
+
+  <button
+    type="button"
+    onClick={handleLogout}
+    className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
+  >
+    <LogOut size={18} />
+    ออกจากระบบ
+  </button>
+</div>
     </div>
 
     <div className="mb-6 flex flex-wrap gap-3">
@@ -1437,38 +1485,46 @@ async function loadContactMessages() {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedContact(item)}
-                        className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
-                      >
-                        ดูรายละเอียด
-                      </button>
+  <div className="flex flex-wrap gap-2">
+    <button
+      type="button"
+      onClick={() => setSelectedContact(item)}
+      className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
+    >
+      ดูรายละเอียด
+    </button>
 
-                      {!item.isRead ? (
-                        <button
-                          type="button"
-                          onClick={() => handleMarkContactAsRead(item.id)}
-                          className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
-                        >
-                          อ่านแล้ว
-                        </button>
-                      ) : null}
+    <button
+      type="button"
+      onClick={() => handleReplyEmail(item)}
+      className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"
+    >
+      ตอบกลับอีเมล
+    </button>
 
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
-                          if (!ok) return;
-                          await handleDeleteContactMessage(item.id);
-                        }}
-                        className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
-                      >
-                        ลบ
-                      </button>
-                    </div>
-                  </td>
+    {!item.isRead ? (
+      <button
+        type="button"
+        onClick={() => handleMarkContactAsRead(item.id)}
+        className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
+      >
+        อ่านแล้ว
+      </button>
+    ) : null}
+
+    <button
+      type="button"
+      onClick={async () => {
+        const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+        if (!ok) return;
+        await handleDeleteContactMessage(item.id);
+      }}
+      className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
+    >
+      ลบ
+    </button>
+  </div>
+</td>
                 </tr>
               ))
             )}
@@ -1657,8 +1713,10 @@ async function loadContactMessages() {
   onClose={() => setSelectedContact(null)}
   onMarkRead={handleMarkContactAsRead}
   onDelete={handleDeleteContactMessage}
+  
 />
       <CookieBanner onNavigate={(page) => navigateToPage(page)} />
     </div>
   );
 }
+

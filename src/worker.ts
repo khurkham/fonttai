@@ -116,6 +116,11 @@ function mapContactRow(row: ContactRow) {
   };
 }
 
+function escapeCsv(value: unknown): string {
+  const str = String(value ?? "");
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 function mapFontRow(row: FontRow, baseUrl: string) {
   return {
     id: row.id,
@@ -300,6 +305,7 @@ app.use("/api/admin/fonts", requireAuth);
 app.use("/api/admin/fonts/*", requireAuth);
 app.use("/api/admin/contact-messages", requireAuth);
 app.use("/api/admin/contact-messages/*", requireAuth);
+app.use("/api/admin/contact-messages/export.csv", requireAuth);
 
 app.post("/api/admin/fonts", async (c) => {
   try {
@@ -535,6 +541,60 @@ app.delete("/api/admin/contact-messages/:id", async (c) => {
     return errJson("ไม่สามารถลบข้อความได้", 500);
   }
 });
+
+
+app.get("/api/admin/contact-messages/export.csv", async (c) => {
+  try {
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM contact_messages ORDER BY created_at DESC`
+    ).all<ContactRow>();
+
+    const rows = result.results ?? [];
+
+    const header = [
+      "id",
+      "first_name",
+      "last_name",
+      "email",
+      "subject",
+      "message",
+      "is_read",
+      "created_at",
+    ];
+
+    const csvLines = [
+      header.join(","),
+      ...rows.map((row) =>
+        [
+          escapeCsv(row.id),
+          escapeCsv(row.first_name),
+          escapeCsv(row.last_name),
+          escapeCsv(row.email),
+          escapeCsv(row.subject),
+          escapeCsv(row.message),
+          escapeCsv(row.is_read),
+          escapeCsv(row.created_at),
+        ].join(",")
+      ),
+    ];
+
+    const csv = "\uFEFF" + csvLines.join("\n");
+
+    return new Response(csv, {
+      headers: {
+        "content-type": "text/csv; charset=utf-8",
+        "content-disposition":
+          'attachment; filename="contact-messages.csv"',
+      },
+    });
+  } catch (error) {
+    console.error("/api/admin/contact-messages/export.csv error", error);
+    return errJson("ไม่สามารถ export CSV ได้", 500);
+  }
+});
+
 
 // ต้องอยู่ล่างสุด
 app.all("*", async (c) => {
