@@ -10,7 +10,7 @@ import type { FontItem } from "./types";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 
 type ViewMode = "home" | "admin";
-type PublicPage = "home" | "about" | "services" | "privacy" | "contact";
+type PublicPage = "home" | "about" | "services" | "privacy" | "cookie" | "contact";
 
 const DEFAULT_PREVIEW =
   "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
@@ -116,6 +116,8 @@ function pageToPath(page: PublicPage): string {
       return "/services/";
     case "privacy":
       return "/privacy/";
+    case "cookie":
+      return "/cookie/";
     case "contact":
       return "/contact/";
     case "home":
@@ -133,12 +135,16 @@ function pathToPage(pathname: string): PublicPage {
       return "services";
     case "/privacy":
       return "privacy";
+    case "/cookie":
+      return "cookie";
     case "/contact":
       return "contact";
     default:
       return "home";
   }
 }
+
+
 
 function CodeModal({
   font,
@@ -543,18 +549,89 @@ function EditFontModal({
 
 function StaticPage({ page }: { page: PublicPage }) {
   if (page === "privacy") {
-    return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">
-          Privacy Policy
-        </h1>
-        <p className="mt-4 leading-7 text-slate-600">
-          เว็บไซต์นี้อาจเก็บข้อมูลที่จำเป็นต่อการใช้งาน เช่น session cookie สำหรับการเข้าสู่ระบบผู้ดูแลระบบ
-          และข้อมูลเชิงเทคนิคเพื่อความปลอดภัยและการปรับปรุงประสบการณ์ใช้งาน โดยจะไม่เผยแพร่ข้อมูลส่วนบุคคลโดยไม่จำเป็น
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <h1 className="text-4xl font-black tracking-tight text-slate-900">
+        Privacy Policy
+      </h1>
+      <div className="mt-4 space-y-5 leading-7 text-slate-600">
+        <p>อัปเดตล่าสุด: [ใส่วันที่]</p>
+
+        <p>
+          เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งาน เอกสารฉบับนี้อธิบายถึงวิธีการเก็บรวบรวม
+          ใช้ เปิดเผย และคุ้มครองข้อมูลของผู้ใช้งานเมื่อเข้าใช้บริการเว็บไซต์นี้
         </p>
-      </section>
-    );
-  }
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">1. ข้อมูลที่เราอาจเก็บรวบรวม</h2>
+          <ul className="mt-2 list-disc space-y-2 pl-6">
+            <li>ข้อมูลทางเทคนิค เช่น IP address, browser, อุปกรณ์, เวลาเข้าใช้งาน</li>
+            <li>ข้อมูลการใช้งาน เช่น หน้าที่เข้าชม การค้นหา และการดาวน์โหลดฟอนต์</li>
+            <li>ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน</li>
+            <li>ข้อมูลที่คุณให้โดยตรง เช่น ข้อมูลจากแบบฟอร์มติดต่อ หรือข้อมูลเข้าสู่ระบบผู้ดูแล</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">2. วัตถุประสงค์ในการใช้ข้อมูล</h2>
+          <ul className="mt-2 list-disc space-y-2 pl-6">
+            <li>ให้บริการและปรับปรุงเว็บไซต์</li>
+            <li>วิเคราะห์การใช้งานและพัฒนาประสบการณ์ผู้ใช้</li>
+            <li>รักษาความปลอดภัยของระบบ</li>
+            <li>สนับสนุนการแสดงโฆษณา เช่น Google AdSense</li>
+            <li>ปฏิบัติตามข้อกำหนดทางกฎหมาย</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">3. คุกกี้และเทคโนโลยีติดตาม</h2>
+          <p className="mt-2">
+            เว็บไซต์นี้อาจใช้คุกกี้เพื่อจดจำการตั้งค่า วิเคราะห์การใช้งาน
+            และสนับสนุนการแสดงโฆษณาผ่านผู้ให้บริการภายนอก
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">4. การโฆษณาโดยบุคคลที่สาม</h2>
+          <p className="mt-2">
+            เว็บไซต์นี้อาจใช้บริการโฆษณาจากบุคคลที่สาม เช่น Google AdSense
+            ซึ่งอาจใช้คุกกี้หรือเทคโนโลยีที่คล้ายกันเพื่อแสดงโฆษณา วัดผล และปรับแต่งประสบการณ์ที่เกี่ยวข้อง
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">5. การเปิดเผยข้อมูล</h2>
+          <p className="mt-2">
+            เราอาจเปิดเผยข้อมูลเท่าที่จำเป็นต่อผู้ให้บริการภายนอกที่ช่วยให้เว็บไซต์ทำงานได้
+            หรือเมื่อมีกฎหมาย คำสั่งศาล หรือคำร้องขอจากหน่วยงานที่มีอำนาจ
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">6. สิทธิของผู้ใช้งาน</h2>
+          <p className="mt-2">
+            ผู้ใช้งานอาจมีสิทธิในการเข้าถึง แก้ไข คัดค้าน จำกัดการใช้ หรือขอลบข้อมูลส่วนบุคคล
+            ทั้งนี้ขึ้นอยู่กับกฎหมายที่ใช้บังคับ
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">7. การเปลี่ยนแปลงนโยบาย</h2>
+          <p className="mt-2">
+            เราอาจปรับปรุงนโยบายฉบับนี้เป็นครั้งคราว โดยจะแจ้งวันที่อัปเดตล่าสุดไว้ในหน้านี้
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">8. ติดต่อเรา</h2>
+          <p className="mt-2">
+            หากคุณมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
   if (page === "about") {
     return (
@@ -596,6 +673,74 @@ function StaticPage({ page }: { page: PublicPage }) {
       </section>
     );
   }
+
+  if (page === "cookie") {
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <h1 className="text-4xl font-black tracking-tight text-slate-900">
+        Cookie Policy
+      </h1>
+      <div className="mt-4 space-y-5 leading-7 text-slate-600">
+        <p>
+          อัปเดตล่าสุด: [ใส่วันที่]
+        </p>
+
+        <p>
+          เว็บไซต์ Font Tai ใช้คุกกี้และเทคโนโลยีที่คล้ายกันเพื่อให้เว็บไซต์ทำงานได้อย่างถูกต้อง
+          ปรับปรุงประสบการณ์ของผู้ใช้งาน วิเคราะห์การใช้งาน และสนับสนุนการแสดงโฆษณา
+        </p>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">1. คุกกี้คืออะไร</h2>
+          <p className="mt-2">
+            คุกกี้คือไฟล์ข้อความขนาดเล็กที่ถูกบันทึกลงในอุปกรณ์ของคุณเมื่อคุณเข้าใช้งานเว็บไซต์
+            เพื่อช่วยให้เว็บไซต์จดจำข้อมูลบางอย่างเกี่ยวกับการใช้งานของคุณ
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">2. ประเภทของคุกกี้ที่เราอาจใช้</h2>
+          <ul className="mt-2 list-disc space-y-2 pl-6">
+            <li>คุกกี้ที่จำเป็นต่อการทำงานของเว็บไซต์</li>
+            <li>คุกกี้เพื่อการวิเคราะห์การใช้งาน</li>
+            <li>คุกกี้เพื่อการโฆษณาและวัดผลโฆษณา</li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">3. คุกกี้จากบุคคลที่สาม</h2>
+          <p className="mt-2">
+            เว็บไซต์นี้อาจใช้บริการของบุคคลที่สาม เช่น Google AdSense ซึ่งอาจใช้คุกกี้หรือเทคโนโลยีที่คล้ายกัน
+            เพื่อแสดงโฆษณา วัดผล และปรับแต่งประสบการณ์ที่เกี่ยวข้องตามนโยบายของผู้ให้บริการนั้น
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">4. การจัดการคุกกี้</h2>
+          <p className="mt-2">
+            คุณสามารถจัดการหรือลบคุกกี้ได้ผ่านการตั้งค่าเบราว์เซอร์ของคุณ
+            อย่างไรก็ตาม การปิดใช้งานคุกกี้บางประเภทอาจทำให้เว็บไซต์บางส่วนทำงานได้ไม่สมบูรณ์
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">5. การขอความยินยอม</h2>
+          <p className="mt-2">
+            ในบางประเทศหรือบางภูมิภาค เราอาจแสดงแบนเนอร์หรือเครื่องมือขอความยินยอมก่อนใช้งานคุกกี้ที่ไม่จำเป็น
+            หรือก่อนประมวลผลข้อมูลเพื่อวัตถุประสงค์ด้านโฆษณา
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">6. ติดต่อเรา</h2>
+          <p className="mt-2">
+            หากคุณมีคำถามเกี่ยวกับนโยบายคุกกี้นี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
   return null;
 }
@@ -714,16 +859,18 @@ export default function App() {
   }
 
   const seoTitle =
-    publicPage === "privacy"
-      ? "Privacy Policy | Font Tai"
-      : publicPage === "about"
-      ? "About Us | Font Tai"
-      : publicPage === "services"
-      ? "Services | Font Tai"
-      : publicPage === "contact"
-      ? "Contact | Font Tai"
-      : "Font Tai - แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวฟอนต์ออนไลน์";
-
+  publicPage === "privacy"
+    ? "Privacy Policy | Font Tai"
+    : publicPage === "cookie"
+    ? "Cookie Policy | Font Tai"
+    : publicPage === "about"
+    ? "About Us | Font Tai"
+    : publicPage === "services"
+    ? "Services | Font Tai"
+    : publicPage === "contact"
+    ? "Contact | Font Tai"
+    : "Font Tai - แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวฟอนต์ออนไลน์";
+    
   const seoDescription =
     publicPage === "home"
       ? "เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ รองรับมือถือ เดสก์ท็อป และพร้อมต่อยอด SEO"

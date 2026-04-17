@@ -2,7 +2,7 @@ import { Settings } from "lucide-react";
 import { AdSlot } from "./AdSlot";
 
 type Props = {
-  onNavigate: (page: "home" | "privacy" | "about" | "contact") => void;
+  onNavigate: (page: "home" | "privacy" | "cookie" | "about" | "contact") => void;
   onAdminClick: () => void;
 };
 
@@ -82,3 +82,10 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
     </footer>
   );
 }
+<button
+  type="button"
+  className="text-left text-sm text-slate-600 hover:text-blue-600"
+  onClick={() => onNavigate("cookie")}
+>
+  Cookie Policy
+</button>
