@@ -1,4 +1,4 @@
-import type { AuthResponse, FontItem } from "./types";
+import type { AuthResponse, ContactMessage, FontItem } from "./types";
 
 async function request<T>(input: string, init?: RequestInit): Promise<T> {
   const res = await fetch(input, {
@@ -70,4 +70,7 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     }),
+
+  getContactMessages: () =>
+    request<{ items: ContactMessage[] }>("/api/admin/contact-messages"),
 };

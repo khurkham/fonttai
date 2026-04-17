@@ -721,6 +721,7 @@ function StaticPage({
     );
   }
 
+
   if (page === "contact") {
     return (
       <section className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -882,6 +883,9 @@ function StaticPage({
 }
 
 export default function App() {
+  const [adminTab, setAdminTab] = useState<"fonts" | "contacts">("fonts");
+const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
+const [contactLoading, setContactLoading] = useState(false);
   const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW);
   const [search, setSearch] = useState("");
   const [fontSize, setFontSize] = useState(32);
@@ -902,6 +906,18 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showAddFont, setShowAddFont] = useState(false);
   const [loading, setLoading] = useState(true);
+
+async function loadContactMessages() {
+  try {
+    setContactLoading(true);
+    const res = await api.getContactMessages();
+    setContactMessages(res.items || []);
+  } catch {
+    setContactMessages([]);
+  } finally {
+    setContactLoading(false);
+  }
+}
 
   async function loadFonts() {
     try {
@@ -924,6 +940,12 @@ export default function App() {
       if (viewMode === "admin") setViewMode("home");
     }
   }
+
+  useEffect(() => {
+  if (viewMode === "admin" && isAuthed && adminTab === "contacts") {
+    loadContactMessages();
+  }
+}, [viewMode, isAuthed, adminTab]);
 
   useEffect(() => {
     (async () => {
@@ -1037,86 +1059,162 @@ export default function App() {
 
         <main className="mx-auto mt-[96px] w-full max-w-7xl flex-1 px-4 py-8">
           {viewMode === "admin" && isAuthed ? (
-            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <h2 className="text-4xl font-black tracking-tight">ระบบจัดการฟอนต์</h2>
+  <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 className="text-4xl font-black tracking-tight">ระบบจัดการเว็บไซต์</h2>
+        <p className="mt-2 text-sm text-slate-500">
+          จัดการฟอนต์และตรวจสอบข้อความติดต่อจากผู้ใช้งาน
+        </p>
+      </div>
 
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddFont(true)}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
-                  >
-                    <Plus size={18} />
-                    เพิ่มฟอนต์
-                  </button>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={() => setShowAddFont(true)}
+          className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+        >
+          <Plus size={18} />
+          เพิ่มฟอนต์
+        </button>
 
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
-                  >
-                    <LogOut size={18} />
-                    ออกจากระบบ
-                  </button>
-                </div>
-              </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
+        >
+          <LogOut size={18} />
+          ออกจากระบบ
+        </button>
+      </div>
+    </div>
 
-              <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                <table className="w-full min-w-[760px] border-collapse">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ชื่อ</th>
-                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">สไตล์</th>
-                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">เจ้าของ</th>
-                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ลักษณะ</th>
-                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ประเภท</th>
-                      <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">จัดการ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allFonts.map((font) => (
-                      <tr key={font.id} className="border-t border-slate-200">
-                        <td className="px-4 py-4 font-semibold">{font.name}</td>
-                        <td className="px-4 py-4">{font.style}</td>
-                        <td className="px-4 py-4">{font.owner}</td>
-                        <td className="px-4 py-4">{font.characteristics}</td>
-                        <td className="px-4 py-4">{font.isCustom ? "Custom" : "Google"}</td>
-                        <td className="px-4 py-4">
-                          {font.isCustom ? (
-                            <div className="flex flex-wrap gap-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditFont(font);
-                                  setShowEditFont(true);
-                                }}
-                                className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 font-medium text-blue-600"
-                              >
-                                <Edit size={16} />
-                                แก้ไข
-                              </button>
+    <div className="mb-6 flex flex-wrap gap-3">
+      <button
+        type="button"
+        onClick={() => setAdminTab("fonts")}
+        className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+          adminTab === "fonts"
+            ? "bg-blue-600 text-white"
+            : "border border-slate-300 bg-white text-slate-700"
+        }`}
+      >
+        จัดการฟอนต์
+      </button>
 
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteFont(font.id)}
-                                className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 font-medium text-red-600"
-                              >
-                                <Trash2 size={16} />
-                                ลบ
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          ) : publicPage !== "home" ? (
+      <button
+        type="button"
+        onClick={() => setAdminTab("contacts")}
+        className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+          adminTab === "contacts"
+            ? "bg-blue-600 text-white"
+            : "border border-slate-300 bg-white text-slate-700"
+        }`}
+      >
+        ข้อความติดต่อ
+      </button>
+    </div>
+
+    {adminTab === "fonts" ? (
+      <div className="overflow-x-auto rounded-2xl border border-slate-200">
+        <table className="w-full min-w-[760px] border-collapse">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ชื่อ</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">สไตล์</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">เจ้าของ</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ลักษณะ</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ประเภท</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allFonts.map((font) => (
+              <tr key={font.id} className="border-t border-slate-200">
+                <td className="px-4 py-4 font-semibold">{font.name}</td>
+                <td className="px-4 py-4">{font.style}</td>
+                <td className="px-4 py-4">{font.owner}</td>
+                <td className="px-4 py-4">{font.characteristics}</td>
+                <td className="px-4 py-4">{font.isCustom ? "Custom" : "Google"}</td>
+                <td className="px-4 py-4">
+                  {font.isCustom ? (
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditFont(font);
+                          setShowEditFont(true);
+                        }}
+                        className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 font-medium text-blue-600"
+                      >
+                        <Edit size={16} />
+                        แก้ไข
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteFont(font.id)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 font-medium text-red-600"
+                      >
+                        <Trash2 size={16} />
+                        ลบ
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-slate-400">-</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <div className="overflow-x-auto rounded-2xl border border-slate-200">
+        <table className="w-full min-w-[980px] border-collapse">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">วันที่</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ชื่อ-นามสกุล</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">อีเมล</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">หัวข้อ</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ข้อความ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {contactLoading ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  กำลังโหลดข้อความติดต่อ...
+                </td>
+              </tr>
+            ) : contactMessages.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  ยังไม่มีข้อความติดต่อ
+                </td>
+              </tr>
+            ) : (
+              contactMessages.map((item) => (
+                <tr key={item.id} className="border-t border-slate-200 align-top">
+                  <td className="px-4 py-4 text-sm text-slate-600">{item.createdAt}</td>
+                  <td className="px-4 py-4 font-medium text-slate-900">
+                    {item.firstName} {item.lastName}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-slate-600">{item.email}</td>
+                  <td className="px-4 py-4 text-sm font-medium text-slate-900">{item.subject}</td>
+                  <td className="px-4 py-4 text-sm leading-6 text-slate-600 whitespace-pre-wrap">
+                    {item.message}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+) : publicPage !== "home" ? (
             <StaticPage page={publicPage} onNavigate={navigateToPage} />
           ) : (
             <>
@@ -1263,11 +1361,13 @@ export default function App() {
         open={showLogin}
         onClose={() => setShowLogin(false)}
         onSuccess={async () => {
-          setIsAuthed(true);
-          setViewMode("admin");
-          await checkAuth();
-        }}
+  setIsAuthed(true);
+  setViewMode("admin");
+  await Promise.all([checkAuth(), loadContactMessages(), loadFonts()]);
+}}
       />
+
+      
 
       <EditFontModal
         open={showEditFont}

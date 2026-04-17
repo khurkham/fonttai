@@ -2,7 +2,17 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { sha256Hex } from "./lib";
+import type { ContactMessage, FontItem } from "./types";
 
+type ContactRow = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  subject: string;
+  message: string;
+  created_at: string;
+};
 
 type ContactBody = {
   firstName?: string;
@@ -90,6 +100,18 @@ async function requireAuth(c: any, next: any) {
     return errJson("Unauthorized", 401);
   }
   return next();
+}
+
+function mapContactRow(row: ContactRow) {
+  return {
+    id: row.id,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    email: row.email,
+    subject: row.subject,
+    message: row.message,
+    createdAt: row.created_at,
+  };
 }
 
 function mapFontRow(row: FontRow, baseUrl: string) {
@@ -274,6 +296,7 @@ app.get("/api/check-secrets", (c) => {
 
 app.use("/api/admin/fonts", requireAuth);
 app.use("/api/admin/fonts/*", requireAuth);
+app.use("/api/admin/contact-messages", requireAuth);
 
 app.post("/api/admin/fonts", async (c) => {
   try {
@@ -451,6 +474,24 @@ app.post("/api/contact", async (c) => {
   } catch (error) {
     console.error("/api/contact error", error);
     return errJson("ไม่สามารถส่งข้อมูลติดต่อได้", 500);
+  }
+});
+
+app.get("/api/admin/contact-messages", async (c) => {
+  try {
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM contact_messages ORDER BY created_at DESC`
+    ).all<ContactRow>();
+
+    return okJson({
+      ok: true,
+      items: (result.results ?? []).map(mapContactRow),
+    });
+  } catch (error) {
+    console.error("/api/admin/contact-messages error", error);
+    return errJson("ไม่สามารถดึงข้อมูลข้อความติดต่อได้", 500);
   }
 });
 

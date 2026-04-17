@@ -19,3 +19,13 @@ export type AuthResponse = {
   authenticated?: boolean;
   message?: string;
 };
+
+export type ContactMessage = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+};
