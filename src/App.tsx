@@ -853,6 +853,8 @@ export default function App() {
                   <div className="flex items-end">
                     <AdSlot
                       label="พื้นที่โฆษณา Hero Banner"
+                      variant="banner"
+                      slotId="hero-banner"
                       className="min-h-[160px]"
                     />
                   </div>
@@ -909,7 +911,9 @@ export default function App() {
 
               <AdSlot
                 label="พื้นที่โฆษณาเหนือรายการฟอนต์"
-                className="mb-8 min-h-[120px]"
+                variant="banner"
+                slotId="top-font-list"
+                className="mb-8 min-h-[140px]"
               />
 
               {loading ? (
@@ -935,6 +939,8 @@ export default function App() {
                         <div className="mt-6">
                           <AdSlot
                             label="พื้นที่โฆษณาคั่นรายการฟอนต์"
+                            variant="inline"
+                            slotId={`inline-${index + 1}`}
                             className="min-h-[120px]"
                           />
                         </div>
@@ -948,7 +954,9 @@ export default function App() {
 
               <AdSlot
                 label="พื้นที่โฆษณาก่อนส่วนท้ายเว็บไซต์"
-                className="mt-10 min-h-[120px]"
+                variant="banner"
+                slotId="before-footer"
+                className="mt-10 min-h-[140px]"
               />
             </>
           )}
