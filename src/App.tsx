@@ -6,7 +6,6 @@ import { Pagination } from "./components/Pagination";
 import { SiteFooter } from "./components/SiteFooter";
 import { AdSlot } from "./components/AdSlot";
 import { SeoHead } from "./components/SeoHead";
-import { getFamily } from "./lib";
 import type { FontItem } from "./types";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 
@@ -150,16 +149,15 @@ function CodeModal({
 }) {
   if (!font) return null;
 
-  const fontFamily = getFamily(font.name, font.isCustom);
   const css = font.isCustom
     ? `@font-face {
-  font-family: "${fontFamily}";
+  font-family: "${font.name}";
   src: url("${font.fileUrl}") format("truetype");
   font-display: swap;
 }
 
 .your-class {
-  font-family: "${fontFamily}", sans-serif;
+  font-family: "${font.name}", sans-serif;
 }`
     : `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -169,7 +167,7 @@ function CodeModal({
       )}&display=swap" rel="stylesheet">
 
 .your-class {
-  font-family: "${fontFamily}", sans-serif;
+  font-family: "${font.name}", sans-serif;
 }`;
 
   return (
@@ -734,11 +732,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <SeoHead
-  title={seoTitle}
-  description={seoDescription}
-  path={pageToPath(publicPage)}
-  image="/og-image.jpg"
-/>
+        title={seoTitle}
+        description={seoDescription}
+        path={pageToPath(publicPage)}
+        image="/og-image.jpg"
+      />
 
       <div className="flex min-h-screen flex-col">
         <NavbarWithSearch
@@ -938,7 +936,7 @@ export default function App() {
         </main>
 
         <SiteFooter
-          onNavigate={(page) => navigateToPage(page)}
+          onNavigate={navigateToPage}
           onAdminClick={() => setShowLogin(true)}
         />
       </div>
