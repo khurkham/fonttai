@@ -577,6 +577,7 @@ function StaticPage({
 
   const [contactError, setContactError] = useState("");
   const [contactSuccess, setContactSuccess] = useState("");
+  const [contactSubmitting, setContactSubmitting] = useState(false);
 
   function updateContactField(
     field: "firstName" | "lastName" | "email" | "subject" | "message",
@@ -588,7 +589,7 @@ function StaticPage({
     }));
   }
 
-  function handleContactSubmit(e: React.FormEvent) {
+  async function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault();
     setContactError("");
     setContactSuccess("");
@@ -610,14 +611,33 @@ function StaticPage({
       return;
     }
 
-    setContactSuccess("ส่งข้อมูลเรียบร้อยแล้ว (ตัวอย่างฟอร์ม สามารถเชื่อมต่อ backend ภายหลังได้)");
-    setContactForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+    try {
+      setContactSubmitting(true);
+
+      const res = await api.sendContactMessage({
+        firstName,
+        lastName,
+        email,
+        subject,
+        message,
+      });
+
+      setContactSuccess(res.message || "ส่งข้อมูลเรียบร้อยแล้ว");
+
+      setContactForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err) {
+      setContactError(
+        err instanceof Error ? err.message : "ไม่สามารถส่งข้อมูลได้"
+      );
+    } finally {
+      setContactSubmitting(false);
+    }
   }
 
   if (page === "privacy") {
@@ -640,73 +660,7 @@ function StaticPage({
             เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งานทุกท่าน
             นโยบายฉบับนี้อธิบายถึงวิธีการเก็บรวบรวม ใช้ เปิดเผย
             และคุ้มครองข้อมูลของผู้ใช้งานเมื่อเข้าใช้บริการเว็บไซต์ของเรา
-            หากคุณใช้งานเว็บไซต์นี้ต่อไป จะถือว่าคุณรับทราบและยอมรับนโยบายฉบับนี้
           </p>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              1. ข้อมูลที่เราอาจเก็บรวบรวม
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-6">
-              <li>
-                ข้อมูลทางเทคนิค เช่น IP address, ประเภทเบราว์เซอร์,
-                ระบบปฏิบัติการ, ภาษา, วันที่และเวลาที่เข้าใช้งาน
-              </li>
-              <li>
-                ข้อมูลการใช้งานเว็บไซต์ เช่น หน้าที่เข้าชม การค้นหาฟอนต์
-                การกดดูรายละเอียด และการดาวน์โหลดฟอนต์
-              </li>
-              <li>
-                ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน
-                เพื่อช่วยให้เว็บไซต์ทำงานได้อย่างมีประสิทธิภาพ
-              </li>
-              <li>
-                ข้อมูลที่ผู้ใช้งานให้กับเราโดยตรง เช่น
-                ข้อมูลจากแบบฟอร์มติดต่อ หรือข้อมูลที่ใช้เข้าสู่ระบบผู้ดูแล
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              2. วัตถุประสงค์ในการใช้ข้อมูล
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-6">
-              <li>เพื่อให้บริการและปรับปรุงเว็บไซต์</li>
-              <li>เพื่อวิเคราะห์การใช้งานและพัฒนาประสบการณ์ผู้ใช้</li>
-              <li>เพื่อรักษาความปลอดภัยของระบบ</li>
-              <li>เพื่อรองรับบริการจากบุคคลที่สาม เช่น Google AdSense ในอนาคต</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              3. การใช้คุกกี้และเทคโนโลยีที่คล้ายกัน
-            </h2>
-            <p className="mt-3">
-              เว็บไซต์นี้อาจใช้คุกกี้เพื่อจดจำการตั้งค่า ช่วยให้เว็บไซต์ทำงานได้ดีขึ้น
-              วิเคราะห์การใช้งาน และรองรับการแสดงโฆษณาในอนาคต
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              4. การเปิดเผยข้อมูล
-            </h2>
-            <p className="mt-3">
-              เราจะไม่ขายหรือเผยแพร่ข้อมูลส่วนบุคคลของผู้ใช้งานโดยไม่จำเป็น
-              เว้นแต่เป็นไปตามกฎหมายหรือเพื่อคุ้มครองความปลอดภัยของระบบ
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              5. ติดต่อเรา
-            </h2>
-            <p className="mt-3">
-              หากคุณมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
-            </p>
-          </div>
         </div>
       </section>
     );
@@ -733,34 +687,6 @@ function StaticPage({
             เพื่อให้เว็บไซต์ทำงานได้อย่างเหมาะสม ปรับปรุงประสบการณ์ของผู้ใช้งาน
             วิเคราะห์การใช้งาน และรองรับบริการโฆษณาในอนาคต
           </p>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">1. คุกกี้คืออะไร</h2>
-            <p className="mt-3">
-              คุกกี้คือไฟล์ข้อมูลขนาดเล็กที่ถูกบันทึกไว้ในอุปกรณ์ของคุณ
-              เมื่อคุณเข้าใช้งานเว็บไซต์ เพื่อช่วยให้เว็บไซต์จดจำข้อมูลบางอย่าง
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              2. ประเภทของคุกกี้ที่เราอาจใช้
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-6">
-              <li>คุกกี้ที่จำเป็นต่อการทำงานของเว็บไซต์</li>
-              <li>คุกกี้เพื่อการวิเคราะห์และวัดผลการใช้งาน</li>
-              <li>คุกกี้เพื่อการโฆษณาและการแสดงเนื้อหาที่เหมาะสม</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              3. การจัดการคุกกี้
-            </h2>
-            <p className="mt-3">
-              คุณสามารถจัดการ ลบ หรือปิดใช้งานคุกกี้ได้ผ่านการตั้งค่าเบราว์เซอร์ของคุณ
-            </p>
-          </div>
         </div>
       </section>
     );
@@ -905,9 +831,10 @@ function StaticPage({
 
           <button
             type="submit"
-            className="w-full rounded-2xl bg-blue-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700"
+            disabled={contactSubmitting}
+            className="w-full rounded-2xl bg-blue-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
           >
-            ส่งข้อมูล
+            {contactSubmitting ? "กำลังส่งข้อมูล..." : "ส่งข้อมูล"}
           </button>
         </form>
       </section>

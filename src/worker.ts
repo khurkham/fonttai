@@ -3,6 +3,16 @@ import { cors } from "hono/cors";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { sha256Hex } from "./lib";
 
+
+type ContactBody = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  subject?: string;
+  message?: string;
+};
+
+
 type Bindings = {
   DB?: D1Database;
   FONT_BUCKET?: R2Bucket;
@@ -398,6 +408,49 @@ app.delete("/api/admin/fonts/:id", async (c) => {
   } catch (error) {
     console.error("/api/admin/fonts DELETE error", error);
     return errJson("Failed to delete font", 500);
+  }
+});
+
+
+app.post("/api/contact", async (c) => {
+  try {
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+
+    const body = await c.req.json<ContactBody>();
+
+    const firstName = body.firstName?.trim() ?? "";
+    const lastName = body.lastName?.trim() ?? "";
+    const email = body.email?.trim() ?? "";
+    const subject = body.subject?.trim() ?? "";
+    const message = body.message?.trim() ?? "";
+
+    if (!firstName || !lastName || !email || !subject || !message) {
+      return errJson("กรุณากรอกข้อมูลให้ครบทุกช่อง", 400);
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      return errJson("กรุณากรอกอีเมลให้ถูกต้อง", 400);
+    }
+
+    const id = crypto.randomUUID();
+
+    await c.env.DB.prepare(
+      `INSERT INTO contact_messages
+       (id, first_name, last_name, email, subject, message)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    )
+      .bind(id, firstName, lastName, email, subject, message)
+      .run();
+
+    return okJson({
+      ok: true,
+      message: "ส่งข้อมูลเรียบร้อยแล้ว",
+      id,
+    });
+  } catch (error) {
+    console.error("/api/contact error", error);
+    return errJson("ไม่สามารถส่งข้อมูลติดต่อได้", 500);
   }
 });
 

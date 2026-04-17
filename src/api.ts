@@ -57,4 +57,17 @@ export const api = {
     request<{ ok: boolean }>("/api/admin/fonts/" + id, {
       method: "DELETE",
     }),
+
+  sendContactMessage: (payload: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    subject: string;
+    message: string;
+  }) =>
+    request<{ ok: boolean; message?: string; id?: string }>("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
 };
