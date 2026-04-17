@@ -7,8 +7,8 @@ import { SiteFooter } from "./components/SiteFooter";
 import { AdSlot } from "./components/AdSlot";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
-import type { FontItem } from "./types";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
+import type { ContactMessage, FontItem } from "./types";
 
 type ViewMode = "home" | "admin";
 type PublicPage =
@@ -976,7 +976,98 @@ function StaticPage({
   return null;
 }
 
+function ContactDetailModal({
+  item,
+  onClose,
+  onMarkRead,
+  onDelete,
+}: {
+  item: ContactMessage | null;
+  onClose: () => void;
+  onMarkRead: (id: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  if (!item) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+      <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 p-5">
+          <div>
+            <h3 className="text-2xl font-black text-slate-900">รายละเอียดข้อความติดต่อ</h3>
+            <p className="mt-1 text-sm text-slate-500">{item.createdAt}</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-slate-200 p-2 hover:bg-slate-50"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="space-y-5 p-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">ชื่อ-นามสกุล</p>
+              <p className="mt-2 font-semibold text-slate-900">
+                {item.firstName} {item.lastName}
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">อีเมล</p>
+              <p className="mt-2 font-semibold text-slate-900">{item.email}</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">หัวข้อ</p>
+            <p className="mt-2 font-semibold text-slate-900">{item.subject}</p>
+          </div>
+
+          <div className="rounded-2xl bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-slate-400">ข้อความ</p>
+            <p className="mt-2 whitespace-pre-wrap leading-7 text-slate-700">{item.message}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {!item.isRead ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  await onMarkRead(item.id);
+                  onClose();
+                }}
+                className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
+              >
+                ทำเครื่องหมายว่าอ่านแล้ว
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={async () => {
+                const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+                if (!ok) return;
+                await onDelete(item.id);
+                onClose();
+              }}
+              className="rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white"
+            >
+              ลบข้อความ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+
+const [selectedContact, setSelectedContact] = useState<ContactMessage | null>(null);
   const [adminTab, setAdminTab] = useState<"fonts" | "contacts">("fonts");
 const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
 const [contactLoading, setContactLoading] = useState(false);
@@ -1000,7 +1091,35 @@ const [contactLoading, setContactLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showAddFont, setShowAddFont] = useState(false);
   const [loading, setLoading] = useState(true);
+async function loadContactMessages() {
+  try {
+    setContactLoading(true);
+    const res = await api.getContactMessages();
+    setContactMessages(res.items || []);
+  } catch {
+    setContactMessages([]);
+  } finally {
+    setContactLoading(false);
+  }
+}
 
+async function handleMarkContactAsRead(id: string) {
+  try {
+    await api.markContactAsRead(id);
+    await loadContactMessages();
+  } catch (err) {
+    alert(err instanceof Error ? err.message : "อัปเดตสถานะไม่สำเร็จ");
+  }
+}
+
+async function handleDeleteContactMessage(id: string) {
+  try {
+    await api.deleteContactMessage(id);
+    await loadContactMessages();
+  } catch (err) {
+    alert(err instanceof Error ? err.message : "ลบข้อความไม่สำเร็จ");
+  }
+}
 async function loadContactMessages() {
   try {
     setContactLoading(true);
@@ -1034,6 +1153,8 @@ async function loadContactMessages() {
       if (viewMode === "admin") setViewMode("home");
     }
   }
+
+  
 
   useEffect(() => {
   if (viewMode === "admin" && isAuthed && adminTab === "contacts") {
@@ -1152,7 +1273,7 @@ async function loadContactMessages() {
         />
 
         <main className="mx-auto mt-[96px] w-full max-w-7xl flex-1 px-4 py-8">
-          {viewMode === "admin" && isAuthed ? (
+        {viewMode === "admin" && isAuthed ? (
   <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
     <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
@@ -1265,40 +1386,88 @@ async function loadContactMessages() {
       </div>
     ) : (
       <div className="overflow-x-auto rounded-2xl border border-slate-200">
-        <table className="w-full min-w-[980px] border-collapse">
+        <table className="w-full min-w-[1100px] border-collapse">
           <thead className="bg-slate-50">
             <tr>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">สถานะ</th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">วันที่</th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ชื่อ-นามสกุล</th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">อีเมล</th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">หัวข้อ</th>
               <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">ข้อความ</th>
+              <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">จัดการ</th>
             </tr>
           </thead>
           <tbody>
             {contactLoading ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
                   กำลังโหลดข้อความติดต่อ...
                 </td>
               </tr>
             ) : contactMessages.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
                   ยังไม่มีข้อความติดต่อ
                 </td>
               </tr>
             ) : (
               contactMessages.map((item) => (
                 <tr key={item.id} className="border-t border-slate-200 align-top">
+                  <td className="px-4 py-4">
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+                        item.isRead
+                          ? "bg-slate-100 text-slate-600"
+                          : "bg-emerald-100 text-emerald-700"
+                      }`}
+                    >
+                      {item.isRead ? "อ่านแล้ว" : "ยังไม่อ่าน"}
+                    </span>
+                  </td>
                   <td className="px-4 py-4 text-sm text-slate-600">{item.createdAt}</td>
                   <td className="px-4 py-4 font-medium text-slate-900">
                     {item.firstName} {item.lastName}
                   </td>
                   <td className="px-4 py-4 text-sm text-slate-600">{item.email}</td>
                   <td className="px-4 py-4 text-sm font-medium text-slate-900">{item.subject}</td>
-                  <td className="px-4 py-4 text-sm leading-6 text-slate-600 whitespace-pre-wrap">
-                    {item.message}
+                  <td className="px-4 py-4 text-sm leading-6 text-slate-600">
+                    <div className="max-w-[320px] whitespace-pre-wrap line-clamp-3">
+                      {item.message}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedContact(item)}
+                        className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
+                      >
+                        ดูรายละเอียด
+                      </button>
+
+                      {!item.isRead ? (
+                        <button
+                          type="button"
+                          onClick={() => handleMarkContactAsRead(item.id)}
+                          className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
+                        >
+                          อ่านแล้ว
+                        </button>
+                      ) : null}
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+                          if (!ok) return;
+                          await handleDeleteContactMessage(item.id);
+                        }}
+                        className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
+                      >
+                        ลบ
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -1454,10 +1623,10 @@ async function loadContactMessages() {
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
-        onSuccess={async () => {
+       onSuccess={async () => {
   setIsAuthed(true);
   setViewMode("admin");
-  await Promise.all([checkAuth(), loadContactMessages(), loadFonts()]);
+  await Promise.all([checkAuth(), loadFonts(), loadContactMessages()]);
 }}
       />
 
@@ -1483,7 +1652,12 @@ async function loadContactMessages() {
           navigateToPage("home");
         }}
       />
-
+<ContactDetailModal
+  item={selectedContact}
+  onClose={() => setSelectedContact(null)}
+  onMarkRead={handleMarkContactAsRead}
+  onDelete={handleDeleteContactMessage}
+/>
       <CookieBanner onNavigate={(page) => navigateToPage(page)} />
     </div>
   );

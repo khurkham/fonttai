@@ -12,6 +12,7 @@ type ContactRow = {
   subject: string;
   message: string;
   created_at: string;
+  is_read: number;
 };
 
 type ContactBody = {
@@ -111,6 +112,7 @@ function mapContactRow(row: ContactRow) {
     subject: row.subject,
     message: row.message,
     createdAt: row.created_at,
+    isRead: Boolean(row.is_read),
   };
 }
 
@@ -297,6 +299,7 @@ app.get("/api/check-secrets", (c) => {
 app.use("/api/admin/fonts", requireAuth);
 app.use("/api/admin/fonts/*", requireAuth);
 app.use("/api/admin/contact-messages", requireAuth);
+app.use("/api/admin/contact-messages/*", requireAuth);
 
 app.post("/api/admin/fonts", async (c) => {
   try {
@@ -492,6 +495,44 @@ app.get("/api/admin/contact-messages", async (c) => {
   } catch (error) {
     console.error("/api/admin/contact-messages error", error);
     return errJson("ไม่สามารถดึงข้อมูลข้อความติดต่อได้", 500);
+  }
+});
+
+app.patch("/api/admin/contact-messages/:id/read", async (c) => {
+  try {
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+
+    const id = c.req.param("id");
+
+    await c.env.DB.prepare(
+      `UPDATE contact_messages SET is_read = 1 WHERE id = ?`
+    )
+      .bind(id)
+      .run();
+
+    return okJson({ ok: true });
+  } catch (error) {
+    console.error("/api/admin/contact-messages/:id/read error", error);
+    return errJson("ไม่สามารถอัปเดตสถานะข้อความได้", 500);
+  }
+});
+
+app.delete("/api/admin/contact-messages/:id", async (c) => {
+  try {
+    if (!c.env.DB) return errJson("Database is not configured", 500);
+
+    const id = c.req.param("id");
+
+    await c.env.DB.prepare(
+      `DELETE FROM contact_messages WHERE id = ?`
+    )
+      .bind(id)
+      .run();
+
+    return okJson({ ok: true });
+  } catch (error) {
+    console.error("/api/admin/contact-messages/:id delete error", error);
+    return errJson("ไม่สามารถลบข้อความได้", 500);
   }
 });
 

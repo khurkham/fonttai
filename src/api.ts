@@ -73,4 +73,14 @@ export const api = {
 
   getContactMessages: () =>
     request<{ items: ContactMessage[] }>("/api/admin/contact-messages"),
+
+  markContactAsRead: (id: string) =>
+    request<{ ok: boolean }>("/api/admin/contact-messages/" + id + "/read", {
+      method: "PATCH",
+    }),
+
+  deleteContactMessage: (id: string) =>
+    request<{ ok: boolean }>("/api/admin/contact-messages/" + id, {
+      method: "DELETE",
+    }),
 };
