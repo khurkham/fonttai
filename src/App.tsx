@@ -13,7 +13,7 @@ type ViewMode = "home" | "admin";
 type PublicPage = "home" | "about" | "services" | "privacy" | "contact";
 
 const DEFAULT_PREVIEW =
-  "ၾွၼ်ႉတႆးယူႇၼီႇၶူတ်ႉ ႁၢင်ႈလီ ၶိုၵ်ႉတွၼ်း ႁၼ်သႃႇတႆၢႇၵမ်းသိုဝ်ႈ ၸၼ်ဢဝ်လႆႈယဝ်ႉၶႃႈ";
+  "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
 
 const GOOGLE_FONTS: FontItem[] = [
   {
@@ -907,7 +907,10 @@ export default function App() {
                 </div>
               </section>
 
-              <AdSlot label="พื้นที่โฆษณาเหนือรายการฟอนต์" className="mb-8" />
+              <AdSlot
+                label="พื้นที่โฆษณาเหนือรายการฟอนต์"
+                className="mb-8 min-h-[120px]"
+              />
 
               {loading ? (
                 <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
@@ -917,20 +920,36 @@ export default function App() {
                 </div>
               ) : (
                 <section className="flex flex-col gap-6">
-                  {paginatedFonts.map((font) => (
-                    <FontCard
-                      key={font.id}
-                      font={font}
-                      previewText={previewText}
-                      fontSize={fontSize}
-                      textColor={textColor}
-                      onShowCode={setCodeFont}
-                    />
+                  {paginatedFonts.map((font, index) => (
+                    <div key={font.id}>
+                      <FontCard
+                        font={font}
+                        previewText={previewText}
+                        fontSize={fontSize}
+                        textColor={textColor}
+                        onShowCode={setCodeFont}
+                      />
+
+                      {(index + 1) % 5 === 0 &&
+                      index !== paginatedFonts.length - 1 ? (
+                        <div className="mt-6">
+                          <AdSlot
+                            label="พื้นที่โฆษณาคั่นรายการฟอนต์"
+                            className="min-h-[120px]"
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                   ))}
                 </section>
               )}
 
               <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+
+              <AdSlot
+                label="พื้นที่โฆษณาก่อนส่วนท้ายเว็บไซต์"
+                className="mt-10 min-h-[120px]"
+              />
             </>
           )}
         </main>

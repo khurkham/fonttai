@@ -10,7 +10,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10">
-        <AdSlot label="พื้นที่โฆษณาด้านล่างเว็บไซต์" className="mb-8" />
+        <AdSlot label="พื้นที่โฆษณาก่อนส่วนท้ายเว็บไซต์" className="mt-10 min-h-[120px]" />
 
         <div className="grid gap-8 md:grid-cols-3">
           <div>
