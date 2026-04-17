@@ -10,7 +10,12 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10">
-        <AdSlot label="พื้นที่โฆษณาก่อนส่วนท้ายเว็บไซต์" className="mt-10 min-h-[120px]" />
+        <AdSlot
+          label="พื้นที่โฆษณาด้านล่างเว็บไซต์"
+          variant="banner"
+          slotId="footer-banner"
+          className="mb-8 min-h-[140px]"
+        />
 
         <div className="grid gap-8 md:grid-cols-3">
           <div>
@@ -24,6 +29,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
               เมนูเว็บไซต์
             </h4>
+
             <div className="mt-3 flex flex-col gap-2">
               <button
                 type="button"
@@ -32,6 +38,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
               >
                 หน้าแรก
               </button>
+
               <button
                 type="button"
                 className="text-left text-sm text-slate-600 hover:text-blue-600"
@@ -39,6 +46,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
               >
                 About Us
               </button>
+
               <button
                 type="button"
                 className="text-left text-sm text-slate-600 hover:text-blue-600"
@@ -46,6 +54,15 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
               >
                 Privacy Policy
               </button>
+
+              <button
+                type="button"
+                className="text-left text-sm text-slate-600 hover:text-blue-600"
+                onClick={() => onNavigate("cookie")}
+              >
+                Cookie Policy
+              </button>
+
               <button
                 type="button"
                 className="text-left text-sm text-slate-600 hover:text-blue-600"
@@ -82,10 +99,3 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
     </footer>
   );
 }
-<button
-  type="button"
-  className="text-left text-sm text-slate-600 hover:text-blue-600"
-  onClick={() => onNavigate("cookie")}
->
-  Cookie Policy
-</button>

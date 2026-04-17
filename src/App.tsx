@@ -8,6 +8,7 @@ import { AdSlot } from "./components/AdSlot";
 import { SeoHead } from "./components/SeoHead";
 import type { FontItem } from "./types";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
+import { CookieBanner } from "./components/CookieBanner";
 
 type ViewMode = "home" | "admin";
 type PublicPage = "home" | "about" | "services" | "privacy" | "cookie" | "contact";
@@ -870,7 +871,7 @@ export default function App() {
     : publicPage === "contact"
     ? "Contact | Font Tai"
     : "Font Tai - แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวฟอนต์ออนไลน์";
-    
+
   const seoDescription =
     publicPage === "home"
       ? "เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ รองรับมือถือ เดสก์ท็อป และพร้อมต่อยอด SEO"
@@ -1147,6 +1148,10 @@ export default function App() {
           navigateToPage("home");
         }}
       />
+
+      <CookieBanner
+  onNavigate={(page) => navigateToPage(page)}
+/>
     </div>
   );
 }
