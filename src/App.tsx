@@ -17,7 +17,8 @@ type PublicPage =
   | "services"
   | "privacy"
   | "cookie"
-  | "contact";
+  | "contact"
+  | "notfound";
 
 const DEFAULT_PREVIEW =
   "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
@@ -127,6 +128,8 @@ function pageToPath(page: PublicPage): string {
       return "/cookie/";
     case "contact":
       return "/contact/";
+    case "notfound":
+      return "/404/";
     case "home":
     default:
       return "/";
@@ -135,7 +138,10 @@ function pageToPath(page: PublicPage): string {
 
 function pathToPage(pathname: string): PublicPage {
   const path = pathname.replace(/\/+$/, "") || "/";
+
   switch (path) {
+    case "/":
+      return "home";
     case "/about":
       return "about";
     case "/services":
@@ -146,8 +152,10 @@ function pathToPage(pathname: string): PublicPage {
       return "cookie";
     case "/contact":
       return "contact";
+    case "/404":
+      return "notfound";
     default:
-      return "home";
+      return "notfound";
   }
 }
 
@@ -552,7 +560,13 @@ function EditFontModal({
   );
 }
 
-function StaticPage({ page }: { page: PublicPage }) {
+function StaticPage({
+  page,
+  onNavigate,
+}: {
+  page: PublicPage;
+  onNavigate: (page: PublicPage) => void;
+}) {
   if (page === "privacy") {
     return (
       <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -561,78 +575,11 @@ function StaticPage({ page }: { page: PublicPage }) {
         </h1>
         <div className="mt-4 space-y-5 leading-7 text-slate-600">
           <p>อัปเดตล่าสุด: [ใส่วันที่]</p>
-
           <p>
-            เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งาน เอกสารฉบับนี้อธิบายถึงวิธีการเก็บรวบรวม
-            ใช้ เปิดเผย และคุ้มครองข้อมูลของผู้ใช้งานเมื่อเข้าใช้บริการเว็บไซต์นี้
+            เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งาน
+            เอกสารฉบับนี้อธิบายถึงวิธีการเก็บรวบรวม ใช้ เปิดเผย
+            และคุ้มครองข้อมูลของผู้ใช้งานเมื่อเข้าใช้บริการเว็บไซต์นี้
           </p>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">1. ข้อมูลที่เราอาจเก็บรวบรวม</h2>
-            <ul className="mt-2 list-disc space-y-2 pl-6">
-              <li>ข้อมูลทางเทคนิค เช่น IP address, browser, อุปกรณ์, เวลาเข้าใช้งาน</li>
-              <li>ข้อมูลการใช้งาน เช่น หน้าที่เข้าชม การค้นหา และการดาวน์โหลดฟอนต์</li>
-              <li>ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน</li>
-              <li>ข้อมูลที่คุณให้โดยตรง เช่น ข้อมูลจากแบบฟอร์มติดต่อ หรือข้อมูลเข้าสู่ระบบผู้ดูแล</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">2. วัตถุประสงค์ในการใช้ข้อมูล</h2>
-            <ul className="mt-2 list-disc space-y-2 pl-6">
-              <li>ให้บริการและปรับปรุงเว็บไซต์</li>
-              <li>วิเคราะห์การใช้งานและพัฒนาประสบการณ์ผู้ใช้</li>
-              <li>รักษาความปลอดภัยของระบบ</li>
-              <li>สนับสนุนการแสดงโฆษณา เช่น Google AdSense</li>
-              <li>ปฏิบัติตามข้อกำหนดทางกฎหมาย</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">3. คุกกี้และเทคโนโลยีติดตาม</h2>
-            <p className="mt-2">
-              เว็บไซต์นี้อาจใช้คุกกี้เพื่อจดจำการตั้งค่า วิเคราะห์การใช้งาน
-              และสนับสนุนการแสดงโฆษณาผ่านผู้ให้บริการภายนอก
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">4. การโฆษณาโดยบุคคลที่สาม</h2>
-            <p className="mt-2">
-              เว็บไซต์นี้อาจใช้บริการโฆษณาจากบุคคลที่สาม เช่น Google AdSense
-              ซึ่งอาจใช้คุกกี้หรือเทคโนโลยีที่คล้ายกันเพื่อแสดงโฆษณา วัดผล และปรับแต่งประสบการณ์ที่เกี่ยวข้อง
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">5. การเปิดเผยข้อมูล</h2>
-            <p className="mt-2">
-              เราอาจเปิดเผยข้อมูลเท่าที่จำเป็นต่อผู้ให้บริการภายนอกที่ช่วยให้เว็บไซต์ทำงานได้
-              หรือเมื่อมีกฎหมาย คำสั่งศาล หรือคำร้องขอจากหน่วยงานที่มีอำนาจ
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">6. สิทธิของผู้ใช้งาน</h2>
-            <p className="mt-2">
-              ผู้ใช้งานอาจมีสิทธิในการเข้าถึง แก้ไข คัดค้าน จำกัดการใช้ หรือขอลบข้อมูลส่วนบุคคล
-              ทั้งนี้ขึ้นอยู่กับกฎหมายที่ใช้บังคับ
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">7. การเปลี่ยนแปลงนโยบาย</h2>
-            <p className="mt-2">
-              เราอาจปรับปรุงนโยบายฉบับนี้เป็นครั้งคราว โดยจะแจ้งวันที่อัปเดตล่าสุดไว้ในหน้านี้
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">8. ติดต่อเรา</h2>
-            <p className="mt-2">
-              หากคุณมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัวนี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
-            </p>
-          </div>
         </div>
       </section>
     );
@@ -646,59 +593,11 @@ function StaticPage({ page }: { page: PublicPage }) {
         </h1>
         <div className="mt-4 space-y-5 leading-7 text-slate-600">
           <p>อัปเดตล่าสุด: [ใส่วันที่]</p>
-
           <p>
             เว็บไซต์ Font Tai ใช้คุกกี้และเทคโนโลยีที่คล้ายกันเพื่อให้เว็บไซต์ทำงานได้อย่างถูกต้อง
-            ปรับปรุงประสบการณ์ของผู้ใช้งาน วิเคราะห์การใช้งาน และสนับสนุนการแสดงโฆษณา
+            ปรับปรุงประสบการณ์ของผู้ใช้งาน วิเคราะห์การใช้งาน
+            และสนับสนุนการแสดงโฆษณา
           </p>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">1. คุกกี้คืออะไร</h2>
-            <p className="mt-2">
-              คุกกี้คือไฟล์ข้อความขนาดเล็กที่ถูกบันทึกลงในอุปกรณ์ของคุณเมื่อคุณเข้าใช้งานเว็บไซต์
-              เพื่อช่วยให้เว็บไซต์จดจำข้อมูลบางอย่างเกี่ยวกับการใช้งานของคุณ
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">2. ประเภทของคุกกี้ที่เราอาจใช้</h2>
-            <ul className="mt-2 list-disc space-y-2 pl-6">
-              <li>คุกกี้ที่จำเป็นต่อการทำงานของเว็บไซต์</li>
-              <li>คุกกี้เพื่อการวิเคราะห์การใช้งาน</li>
-              <li>คุกกี้เพื่อการโฆษณาและวัดผลโฆษณา</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">3. คุกกี้จากบุคคลที่สาม</h2>
-            <p className="mt-2">
-              เว็บไซต์นี้อาจใช้บริการของบุคคลที่สาม เช่น Google AdSense ซึ่งอาจใช้คุกกี้หรือเทคโนโลยีที่คล้ายกัน
-              เพื่อแสดงโฆษณา วัดผล และปรับแต่งประสบการณ์ที่เกี่ยวข้อง
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">4. การจัดการคุกกี้</h2>
-            <p className="mt-2">
-              คุณสามารถจัดการหรือลบคุกกี้ได้ผ่านการตั้งค่าเบราว์เซอร์ของคุณ
-              อย่างไรก็ตาม การปิดใช้งานคุกกี้บางประเภทอาจทำให้เว็บไซต์บางส่วนทำงานได้ไม่สมบูรณ์
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">5. การขอความยินยอม</h2>
-            <p className="mt-2">
-              ในบางประเทศหรือบางภูมิภาค เราอาจแสดงแบนเนอร์หรือเครื่องมือขอความยินยอมก่อนใช้งานคุกกี้ที่ไม่จำเป็น
-              หรือก่อนประมวลผลข้อมูลเพื่อวัตถุประสงค์ด้านโฆษณา
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">6. ติดต่อเรา</h2>
-            <p className="mt-2">
-              หากคุณมีคำถามเกี่ยวกับนโยบายคุกกี้นี้ กรุณาติดต่อผ่านหน้า Contact ของเว็บไซต์
-            </p>
-          </div>
         </div>
       </section>
     );
@@ -711,8 +610,9 @@ function StaticPage({ page }: { page: PublicPage }) {
           About Us
         </h1>
         <p className="mt-4 leading-7 text-slate-600">
-          Font Tai คือเว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์
-          โดยออกแบบมาเพื่อรองรับการใช้งานบนทุกอุปกรณ์ และพร้อมสำหรับการขยายเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
+          Font Tai คือเว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด
+          และจัดการฟอนต์ โดยออกแบบมาเพื่อรองรับการใช้งานบนทุกอุปกรณ์
+          และพร้อมสำหรับการขยายเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
         </p>
       </section>
     );
@@ -725,8 +625,8 @@ function StaticPage({ page }: { page: PublicPage }) {
           Services
         </h1>
         <p className="mt-4 leading-7 text-slate-600">
-          บริการของเว็บไซต์ Font Tai ได้แก่ พรีวิวฟอนต์ออนไลน์ จัดการฟอนต์อัปโหลดเอง
-          และดาวน์โหลดหรือใช้งานฟอนต์ผ่านเว็บในรูปแบบที่เหมาะกับทุกอุปกรณ์
+          บริการของเว็บไซต์ Font Tai ได้แก่ พรีวิวฟอนต์ออนไลน์
+          จัดการฟอนต์อัปโหลดเอง และดาวน์โหลดหรือใช้งานฟอนต์ผ่านเว็บในรูปแบบที่เหมาะกับทุกอุปกรณ์
         </p>
       </section>
     );
@@ -734,13 +634,140 @@ function StaticPage({ page }: { page: PublicPage }) {
 
   if (page === "contact") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-4xl font-black tracking-tight text-slate-900">
-          Contact
-        </h1>
-        <p className="mt-4 leading-7 text-slate-600">
-          ติดต่อเจ้าของเว็บไซต์ได้ผ่านอีเมลหรือช่องทางติดต่อที่คุณจะเพิ่มภายหลัง เช่น Facebook Page, Line OA หรือแบบฟอร์มติดต่อ
+      <section className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="mb-8 text-center">
+          <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+            Contact Form
+          </p>
+          <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+            แบบฟอร์มติดต่อกลับ
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
+            หากต้องการติดต่อสอบถาม แนะนำฟอนต์ แจ้งปัญหาการใช้งาน
+            หรือสอบถามความร่วมมือทางธุรกิจ สามารถส่งข้อมูลมาหาเราได้ผ่านแบบฟอร์มด้านล่าง
+          </p>
+        </div>
+
+        <form
+          className="space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            alert("ตัวอย่างฟอร์มติดต่อ: คุณสามารถเชื่อมต่อ backend ภายหลังได้");
+          }}
+        >
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                ชื่อ
+              </label>
+              <input
+                type="text"
+                placeholder="กรอกชื่อ"
+                className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                นามสกุล
+              </label>
+              <input
+                type="text"
+                placeholder="กรอกนามสกุล"
+                className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              อีเมล
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              หัวข้อ
+            </label>
+            <input
+              type="text"
+              placeholder="หัวข้อที่ต้องการติดต่อ"
+              className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              ข้อความ
+            </label>
+            <textarea
+              rows={6}
+              placeholder="กรอกรายละเอียดที่ต้องการติดต่อ"
+              className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+            />
+          </div>
+
+          <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+            เมื่อท่านส่งข้อมูลผ่านฟอร์ม จะถือว่าท่านยอมรับใน{" "}
+            <button
+              type="button"
+              onClick={() => onNavigate("privacy")}
+              className="font-semibold text-blue-600 underline underline-offset-2"
+            >
+              นโยบายความเป็นส่วนตัว
+            </button>{" "}
+            ของเรา
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-2xl bg-blue-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700"
+          >
+            ส่งข้อมูล
+          </button>
+        </form>
+      </section>
+    );
+  }
+
+  if (page === "notfound") {
+    return (
+      <section className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm sm:p-12">
+        <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-600">
+          Error 404
         </p>
+
+        <h1 className="mt-4 text-5xl font-black tracking-tight text-slate-900 sm:text-6xl">
+          ไม่พบหน้าที่คุณค้นหา
+        </h1>
+
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+          ขออภัย หน้าที่คุณพยายามเข้าถึงอาจถูกลบ เปลี่ยนชื่อ
+          หรือไม่มีอยู่ในเว็บไซต์นี้แล้ว
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => onNavigate("home")}
+            className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+          >
+            กลับหน้าแรก
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate("contact")}
+            className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            ติดต่อเรา
+          </button>
+        </div>
       </section>
     );
   }
@@ -872,11 +899,17 @@ export default function App() {
       ? "Services | Font Tai"
       : publicPage === "contact"
       ? "Contact | Font Tai"
+      : publicPage === "notfound"
+      ? "404 Not Found | Font Tai"
       : "Font Tai - แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวฟอนต์ออนไลน์";
 
   const seoDescription =
     publicPage === "home"
       ? "เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ รองรับมือถือ เดสก์ท็อป และพร้อมต่อยอด SEO"
+      : publicPage === "contact"
+      ? "ติดต่อทีมงาน Font Tai ผ่านแบบฟอร์มติดต่อบนเว็บไซต์"
+      : publicPage === "notfound"
+      ? "ไม่พบหน้าที่คุณต้องการ"
       : "ข้อมูลสำคัญของเว็บไซต์ Font Tai";
 
   return (
@@ -978,7 +1011,7 @@ export default function App() {
               </div>
             </section>
           ) : publicPage !== "home" ? (
-            <StaticPage page={publicPage} />
+            <StaticPage page={publicPage} onNavigate={navigateToPage} />
           ) : (
             <>
               <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
@@ -1151,9 +1184,7 @@ export default function App() {
         }}
       />
 
-      <CookieBanner
-        onNavigate={(page) => navigateToPage(page)}
-      />
+      <CookieBanner onNavigate={(page) => navigateToPage(page)} />
     </div>
   );
 }

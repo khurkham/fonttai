@@ -1,8 +1,17 @@
-import { Settings } from "lucide-react";
+import { Mail, MapPin, Phone, Settings } from "lucide-react";
 import { AdSlot } from "./AdSlot";
 
 type Props = {
-  onNavigate: (page: "home" | "privacy" | "cookie" | "about" | "contact") => void;
+  onNavigate: (
+    page:
+      | "home"
+      | "about"
+      | "services"
+      | "privacy"
+      | "cookie"
+      | "contact"
+      | "notfound"
+  ) => void;
   onAdminClick: () => void;
 };
 
@@ -17,56 +26,63 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           className="mb-8 min-h-[140px]"
         />
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <h3 className="text-xl font-bold text-slate-900">Font Tai</h3>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์บนระบบ Cloudflare
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-lg font-black text-white shadow-sm">
+                T
+              </div>
+              <div>
+                <h3 className="text-2xl font-black tracking-tight text-slate-900">
+                  Font Tai
+                </h3>
+                <p className="text-sm text-slate-500">
+                  Thai & Tai Font Preview Platform
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด
+              และจัดการฟอนต์ รองรับการใช้งานบนทุกอุปกรณ์
+              และพร้อมต่อยอดสู่ระบบเว็บไซต์เชิงพาณิชย์ในอนาคต
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
+            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
               เมนูเว็บไซต์
             </h4>
 
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-3">
               <button
                 type="button"
-                className="text-left text-sm text-slate-600 hover:text-blue-600"
                 onClick={() => onNavigate("home")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
               >
                 หน้าแรก
               </button>
 
               <button
                 type="button"
-                className="text-left text-sm text-slate-600 hover:text-blue-600"
                 onClick={() => onNavigate("about")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
               >
                 About Us
               </button>
 
               <button
                 type="button"
-                className="text-left text-sm text-slate-600 hover:text-blue-600"
-                onClick={() => onNavigate("privacy")}
+                onClick={() => onNavigate("services")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
               >
-                Privacy Policy
+                Services
               </button>
 
               <button
                 type="button"
-                className="text-left text-sm text-slate-600 hover:text-blue-600"
-                onClick={() => onNavigate("cookie")}
-              >
-                Cookie Policy
-              </button>
-
-              <button
-                type="button"
-                className="text-left text-sm text-slate-600 hover:text-blue-600"
                 onClick={() => onNavigate("contact")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
               >
                 Contact
               </button>
@@ -74,17 +90,63 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
-              ผู้ดูแลระบบ
+            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
+              นโยบายเว็บไซต์
             </h4>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              เข้าสู่ระบบจัดการฟอนต์จากปุ่มด้านล่าง
-            </p>
+
+            <div className="mt-4 flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => onNavigate("privacy")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
+              >
+                Privacy Policy
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigate("cookie")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
+              >
+                Cookie Policy
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigate("notfound")}
+                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
+              >
+                หน้า 404
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
+              ติดต่อ / ผู้ดูแลระบบ
+            </h4>
+
+            <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <div className="flex items-start gap-3">
+                <Mail size={16} className="mt-0.5 text-blue-600" />
+                <span>your@email.com</span>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <Phone size={16} className="mt-0.5 text-blue-600" />
+                <span>+66 xx-xxx-xxxx</span>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <MapPin size={16} className="mt-0.5 text-blue-600" />
+                <span>Thailand</span>
+              </div>
+            </div>
 
             <button
               type="button"
               onClick={onAdminClick}
-              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
+              className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               <Settings size={16} />
               เข้าหลังบ้าน
@@ -92,8 +154,38 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-slate-200 pt-6 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} Font Tai. All rights reserved.
+        <div className="mt-8 border-t border-slate-200 pt-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-sm text-slate-500">
+              © {new Date().getFullYear()} Font Tai. All rights reserved.
+            </p>
+
+            <div className="flex flex-wrap gap-4 text-sm text-slate-500">
+              <button
+                type="button"
+                onClick={() => onNavigate("privacy")}
+                className="transition hover:text-blue-600"
+              >
+                Privacy
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigate("cookie")}
+                className="transition hover:text-blue-600"
+              >
+                Cookies
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigate("contact")}
+                className="transition hover:text-blue-600"
+              >
+                Contact
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
