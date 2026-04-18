@@ -80,6 +80,41 @@ function isHttps(url: string) {
   return url.startsWith("https://");
 }
 
+
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function getClientIp(c: any): string {
+  return (
+    c.req.header("CF-Connecting-IP") ||
+    c.req.header("x-forwarded-for") ||
+    "unknown"
+  );
+}
+
+function shouldTrackPath(pathname: string): boolean {
+  if (pathname.startsWith("/api/")) return false;
+  if (pathname.startsWith("/assets/")) return false;
+  if (pathname === "/favicon.ico") return false;
+  if (pathname.endsWith(".png")) return false;
+  if (pathname.endsWith(".jpg")) return false;
+  if (pathname.endsWith(".jpeg")) return false;
+  if (pathname.endsWith(".webp")) return false;
+  if (pathname.endsWith(".svg")) return false;
+  if (pathname.endsWith(".css")) return false;
+  if (pathname.endsWith(".js")) return false;
+  if (pathname.endsWith(".woff")) return false;
+  if (pathname.endsWith(".woff2")) return false;
+  if (pathname.endsWith(".ttf")) return false;
+  if (pathname.endsWith(".otf")) return false;
+  return true;
+}
+
 async function signSession(username: string, secret: string) {
   return sha256Hex(`${username}:${secret}`);
 }
@@ -595,12 +630,80 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
   }
 });
 
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function getClientIp(c: any): string {
+  return (
+    c.req.header("CF-Connecting-IP") ||
+    c.req.header("x-forwarded-for") ||
+    "unknown"
+  );
+}
+
+function shouldTrackPath(pathname: string): boolean {
+  if (pathname.startsWith("/api/")) return false;
+  if (pathname.startsWith("/assets/")) return false;
+  if (pathname === "/favicon.ico") return false;
+  if (pathname.endsWith(".png")) return false;
+  if (pathname.endsWith(".jpg")) return false;
+  if (pathname.endsWith(".jpeg")) return false;
+  if (pathname.endsWith(".webp")) return false;
+  if (pathname.endsWith(".svg")) return false;
+  if (pathname.endsWith(".css")) return false;
+  if (pathname.endsWith(".js")) return false;
+  if (pathname.endsWith(".woff")) return false;
+  if (pathname.endsWith(".woff2")) return false;
+  if (pathname.endsWith(".ttf")) return false;
+  if (pathname.endsWith(".otf")) return false;
+  return true;
+}
 
 // ต้องอยู่ล่างสุด
 app.all("*", async (c) => {
+  try {
+    if (c.env.DB) {
+      const pathname = new URL(c.req.url).pathname;
+
+      if (shouldTrackPath(pathname)) {
+        const ip = getClientIp(c);
+        const ipHash = await sha256Hex(ip);
+        const userAgent = c.req.header("user-agent") || "";
+
+        const recent = await c.env.DB.prepare(
+          `SELECT id
+           FROM visitor_stats
+           WHERE ip_hash = ?
+             AND path = ?
+             AND visited_at >= datetime('now', '-10 minutes')
+           LIMIT 1`
+        )
+          .bind(ipHash, pathname)
+          .first<{ id: string }>();
+
+        if (!recent) {
+          await c.env.DB.prepare(
+            `INSERT INTO visitor_stats (id, path, ip_hash, user_agent)
+             VALUES (?, ?, ?, ?)`
+          )
+            .bind(crypto.randomUUID(), pathname, ipHash, userAgent)
+            .run();
+        }
+      }
+    }
+  } catch (error) {
+    console.error("visitor tracking error", error);
+  }
+
   if (c.env.ASSETS) {
     return c.env.ASSETS.fetch(c.req.raw);
   }
+
   return new Response("Not Found", { status: 404 });
 });
 

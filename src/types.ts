@@ -40,3 +40,9 @@ export type ContactMessage = {
   createdAt: string;
   isRead: boolean;
 };
+
+export type VisitorCounter = {
+  totalVisitors: number;
+  todayVisitors: number;
+  onlineNow: number;
+};

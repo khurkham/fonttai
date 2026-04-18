@@ -1,5 +1,8 @@
 import { Eye, Mail, MapPin, Phone, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AdSlot } from "./AdSlot";
+import { api } from "../api";
+import type { VisitorCounter } from "../types";
 
 type Props = {
   onNavigate: (
@@ -16,9 +19,38 @@ type Props = {
 };
 
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
-  const totalVisitors = "12,845";
-  const todayVisitors = "128";
-  const onlineNow = "9";
+  const [stats, setStats] = useState<VisitorCounter>({
+    totalVisitors: 0,
+    todayVisitors: 0,
+    onlineNow: 0,
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadStats() {
+      try {
+        const res = await api.getVisitorCounter();
+        if (active) {
+          setStats(res.stats);
+        }
+      } catch {
+        if (active) {
+          setStats({
+            totalVisitors: 0,
+            todayVisitors: 0,
+            onlineNow: 0,
+          });
+        }
+      }
+    }
+
+    loadStats();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
@@ -109,28 +141,27 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
                 <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
                   <span className="text-sm text-slate-500">ผู้เข้าชมทั้งหมด</span>
                   <span className="text-base font-bold text-slate-900">
-                    {totalVisitors}
+                    {stats.totalVisitors.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
                   <span className="text-sm text-slate-500">วันนี้</span>
                   <span className="text-base font-bold text-slate-900">
-                    {todayVisitors}
+                    {stats.todayVisitors.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
                   <span className="text-sm text-slate-500">ออนไลน์ตอนนี้</span>
                   <span className="text-base font-bold text-emerald-600">
-                    {onlineNow}
+                    {stats.onlineNow.toLocaleString()}
                   </span>
                 </div>
               </div>
 
               <p className="mt-4 text-xs leading-5 text-slate-400">
-                ตอนนี้เป็นตัวอย่าง Counter แบบ placeholder
-                หากต้องการสามารถเชื่อมต่อฐานข้อมูลจริงภายหลังได้
+                ระบบนับผู้เข้าชมจริงจากฐานข้อมูล D1
               </p>
             </div>
           </div>

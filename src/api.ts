@@ -1,4 +1,9 @@
-import type { AuthResponse, ContactMessage, FontItem } from "./types";
+import type {
+  AuthResponse,
+  ContactMessage,
+  FontItem,
+  VisitorCounter,
+} from "./types";
 
 async function request<T>(input: string, init?: RequestInit): Promise<T> {
   const res = await fetch(input, {
@@ -16,6 +21,9 @@ async function request<T>(input: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   getFonts: () => request<{ items: FontItem[] }>("/api/fonts"),
+
+  getVisitorCounter: () =>
+    request<{ ok: boolean; stats: VisitorCounter }>("/api/visitor-counter"),
 
   login: (username: string, password: string) =>
     request<AuthResponse>("/api/admin/login", {
