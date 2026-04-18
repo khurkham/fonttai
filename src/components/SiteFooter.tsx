@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone, Settings } from "lucide-react";
+import { Eye, Mail, MapPin, Phone, Settings } from "lucide-react";
 import { AdSlot } from "./AdSlot";
 
 type Props = {
@@ -16,6 +16,10 @@ type Props = {
 };
 
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
+  const totalVisitors = "12,845";
+  const todayVisitors = "128";
+  const onlineNow = "9";
+
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10">
@@ -30,24 +34,23 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           <div>
             <div className="flex items-center gap-3">
               <img
-  src="/logo.png"
-  alt="Font Tai Logo"
-  className="h-11 w-11 rounded-2xl object-cover shadow-sm"
-/>
+                src="/logo.png"
+                alt="Font Tai Logo"
+                className="h-11 w-11 rounded-2xl object-contain shadow-sm"
+              />
               <div>
                 <h3 className="text-2xl font-black tracking-tight text-slate-900">
                   Font Tai
                 </h3>
                 <p className="text-sm text-slate-500">
-                  Thai & Tai Font Preview Platform
+                  Thai &amp; Tai Font Preview Platform
                 </p>
               </div>
             </div>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด
-              และจัดการฟอนต์ รองรับการใช้งานบนทุกอุปกรณ์
-              และพร้อมต่อยอดสู่ระบบเว็บไซต์เชิงพาณิชย์ในอนาคต
+              เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์
+              รองรับการใช้งานบนทุกอุปกรณ์ และพร้อมต่อยอดสู่ระบบเว็บไซต์เชิงพาณิชย์ในอนาคต
             </p>
           </div>
 
@@ -93,33 +96,42 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
 
           <div>
             <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
-              นโยบายเว็บไซต์
+              สถิติผู้เข้าใช้งาน
             </h4>
 
-            <div className="mt-4 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => onNavigate("privacy")}
-                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
-              >
-                Privacy Policy
-              </button>
+            <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-4 flex items-center gap-2 text-slate-900">
+                <Eye size={18} className="text-blue-600" />
+                <span className="text-sm font-bold">Visitor Counter</span>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => onNavigate("cookie")}
-                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
-              >
-                Cookie Policy
-              </button>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
+                  <span className="text-sm text-slate-500">ผู้เข้าชมทั้งหมด</span>
+                  <span className="text-base font-bold text-slate-900">
+                    {totalVisitors}
+                  </span>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => onNavigate("notfound")}
-                className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
-              >
-                หน้า 404
-              </button>
+                <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
+                  <span className="text-sm text-slate-500">วันนี้</span>
+                  <span className="text-base font-bold text-slate-900">
+                    {todayVisitors}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
+                  <span className="text-sm text-slate-500">ออนไลน์ตอนนี้</span>
+                  <span className="text-base font-bold text-emerald-600">
+                    {onlineNow}
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs leading-5 text-slate-400">
+                ตอนนี้เป็นตัวอย่าง Counter แบบ placeholder
+                หากต้องการสามารถเชื่อมต่อฐานข้อมูลจริงภายหลังได้
+              </p>
             </div>
           </div>
 
