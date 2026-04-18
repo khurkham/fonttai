@@ -621,13 +621,7 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
-function getClientIp(c: any): string {
-  return (
-    c.req.header("CF-Connecting-IP") ||
-    c.req.header("x-forwarded-for") ||
-    "unknown"
-  );
-}
+
 
 function shouldTrackPath(pathname: string): boolean {
   if (pathname.startsWith("/api/")) return false;
