@@ -97,23 +97,6 @@ function getClientIp(c: any): string {
   );
 }
 
-function shouldTrackPath(pathname: string): boolean {
-  if (pathname.startsWith("/api/")) return false;
-  if (pathname.startsWith("/assets/")) return false;
-  if (pathname === "/favicon.ico") return false;
-  if (pathname.endsWith(".png")) return false;
-  if (pathname.endsWith(".jpg")) return false;
-  if (pathname.endsWith(".jpeg")) return false;
-  if (pathname.endsWith(".webp")) return false;
-  if (pathname.endsWith(".svg")) return false;
-  if (pathname.endsWith(".css")) return false;
-  if (pathname.endsWith(".js")) return false;
-  if (pathname.endsWith(".woff")) return false;
-  if (pathname.endsWith(".woff2")) return false;
-  if (pathname.endsWith(".ttf")) return false;
-  if (pathname.endsWith(".otf")) return false;
-  return true;
-}
 
 async function signSession(username: string, secret: string) {
   return sha256Hex(`${username}:${secret}`);
