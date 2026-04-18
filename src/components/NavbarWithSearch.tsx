@@ -60,9 +60,11 @@ export function NavbarWithSearch({
             onClick={() => onNavigate("home")}
             className="flex shrink-0 items-center gap-3 text-left"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-lg font-black text-white shadow-sm">
-              T
-            </div>
+            <img
+  src="/logo.png"
+  alt="Font Tai Logo"
+  className="h-11 w-auto max-w-[44px] object-contain"
+/>
             <div>
               <div className="text-2xl font-black tracking-tight text-slate-900">
                 Font Tai

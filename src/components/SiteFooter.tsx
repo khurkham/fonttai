@@ -29,9 +29,11 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
         <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-lg font-black text-white shadow-sm">
-                T
-              </div>
+              <img
+  src="/logo.png"
+  alt="Font Tai Logo"
+  className="h-11 w-11 rounded-2xl object-cover shadow-sm"
+/>
               <div>
                 <h3 className="text-2xl font-black tracking-tight text-slate-900">
                   Font Tai
@@ -129,12 +131,12 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             <div className="mt-4 space-y-3 text-sm text-slate-600">
               <div className="flex items-start gap-3">
                 <Mail size={16} className="mt-0.5 text-blue-600" />
-                <span>your@email.com</span>
+                <span>bejaitai@email.com</span>
               </div>
 
               <div className="flex items-start gap-3">
                 <Phone size={16} className="mt-0.5 text-blue-600" />
-                <span>+66 xx-xxx-xxxx</span>
+                <span>+66 94-624-8370</span>
               </div>
 
               <div className="flex items-start gap-3">
