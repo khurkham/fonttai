@@ -1,8 +1,32 @@
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { sha256Hex } from "./lib";
-import type { ContactMessage, FontItem } from "./types";
+
+type Env = {
+  Bindings: {
+    ASSETS?: Fetcher;
+    DB: D1Database;
+    FONT_BUCKET: R2Bucket;
+    APP_NAME?: string;
+
+    ADMIN_USERNAME?: string;
+    ADMIN_PASSWORD_HASH?: string;
+    SESSION_SECRET?: string;
+  };
+};
+
+type FontRow = {
+  id: string;
+  name: string;
+  style: string;
+  owner: string;
+  characteristics: string;
+  details: string;
+  is_custom: number;
+  source_url: string | null;
+  file_key: string | null;
+  mime_type: string | null;
+  created_at: string;
+};
 
 type ContactRow = {
   id: string;
@@ -15,6 +39,11 @@ type ContactRow = {
   is_read: number;
 };
 
+type LoginBody = {
+  username?: string;
+  password?: string;
+};
+
 type ContactBody = {
   firstName?: string;
   lastName?: string;
@@ -23,96 +52,93 @@ type ContactBody = {
   message?: string;
 };
 
+const app = new Hono<Env>();
 
-type Bindings = {
-  DB?: D1Database;
-  FONT_BUCKET?: R2Bucket;
-  ASSETS?: Fetcher;
-  APP_NAME?: string;
-  ADMIN_USERNAME?: string;
-  ADMIN_PASSWORD_HASH?: string;
-  SESSION_SECRET?: string;
-};
-
-type FontRow = {
-  id: string;
-  name: string;
-  style: string;
-  owner: string;
-  characteristics: string;
-  details: string | null;
-  is_custom: number;
-  source_url: string | null;
-  file_key: string | null;
-  mime_type: string | null;
-  created_at: string;
-};
-
-type LoginBody = {
-  username?: string;
-  password?: string;
-};
-
-const app = new Hono<{ Bindings: Bindings }>();
-
-app.use(
-  "/api/*",
-  cors({
-    origin: (origin) => origin || "*",
-    credentials: true,
-    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type"],
-  })
-);
-
-function okJson(data: unknown, status = 200) {
+function okJson(data: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8" },
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+    },
   });
 }
 
 function errJson(message: string, status = 400) {
-  return okJson({ ok: false, message }, status);
+  return new Response(JSON.stringify({ ok: false, message }), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+    },
+  });
 }
 
-function isHttps(url: string) {
-  return url.startsWith("https://");
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
+function getAdminConfig(env: Env["Bindings"]) {
+  const username = env.ADMIN_USERNAME?.trim() || "";
+  const passwordHash = env.ADMIN_PASSWORD_HASH?.trim() || "";
+  const sessionSecret = env.SESSION_SECRET?.trim() || "";
 
-
-
-function getClientIp(c: any): string {
-  return (
-    c.req.header("CF-Connecting-IP") ||
-    c.req.header("x-forwarded-for") ||
-    "unknown"
-  );
+  return {
+    username,
+    passwordHash,
+    sessionSecret,
+    configured: Boolean(username && passwordHash && sessionSecret),
+  };
 }
 
-
-async function signSession(username: string, secret: string) {
-  return sha256Hex(`${username}:${secret}`);
+async function createSessionToken(env: Env["Bindings"]) {
+  const { username, passwordHash, sessionSecret } = getAdminConfig(env);
+  return sha256Hex(`${username}|${passwordHash}|${sessionSecret}`);
 }
 
-async function isAuthed(c: any) {
-  const username = getCookie(c, "admin_user");
-  const token = getCookie(c, "admin_token");
-  const admin = c.env.ADMIN_USERNAME;
-  const secret = c.env.SESSION_SECRET;
+async function isAuthenticated(env: Env["Bindings"], token?: string | null) {
+  if (!token) return false;
+  const config = getAdminConfig(env);
+  if (!config.configured) return false;
 
-  if (!username || !token || !admin || !secret) return false;
-
-  const expected = await signSession(username, secret);
-  return username === admin && token === expected;
+  const expected = await createSessionToken(env);
+  return token === expected;
 }
 
-async function requireAuth(c: any, next: any) {
-  if (!(await isAuthed(c))) {
+async function requireAuth(c: Parameters<ReturnType<typeof app.use>>[1] extends never ? never : any, next: () => Promise<void>) {
+  const token = getCookie(c, "admin_session");
+  const authed = await isAuthenticated(c.env, token);
+
+  if (!authed) {
     return errJson("Unauthorized", 401);
   }
-  return next();
+
+  await next();
+}
+
+function mapFontRow(c: any, row: FontRow) {
+  const fileUrl =
+    row.file_key && row.is_custom
+      ? `${new URL(c.req.url).origin}/api/font-file/${encodeURIComponent(row.file_key)}`
+      : undefined;
+
+  return {
+    id: row.id,
+    name: row.name,
+    style: row.style,
+    owner: row.owner,
+    characteristics: row.characteristics,
+    details: row.details,
+    isCustom: Boolean(row.is_custom),
+    sourceUrl: row.source_url || "",
+    fileKey: row.file_key || "",
+    mimeType: row.mime_type || "",
+    fileUrl,
+    downloadUrl: fileUrl,
+    createdAt: row.created_at,
+  };
 }
 
 function mapContactRow(row: ContactRow) {
@@ -133,333 +159,123 @@ function escapeCsv(value: unknown): string {
   return `"${str.replace(/"/g, '""')}"`;
 }
 
-function mapFontRow(row: FontRow, baseUrl: string) {
-  return {
-    id: row.id,
-    name: row.name,
-    style: row.style,
-    owner: row.owner,
-    characteristics: row.characteristics,
-    details: row.details ?? "",
-    isCustom: Boolean(row.is_custom),
-    sourceUrl: row.source_url ?? "",
-    fileKey: row.file_key ?? "",
-    mimeType: row.mime_type ?? "",
-    createdAt: row.created_at,
-    fileUrl:
-      row.is_custom && row.file_key
-        ? new URL(`/api/font-file/${row.file_key}`, baseUrl).toString()
-        : "",
-    downloadUrl:
-      row.is_custom && row.file_key
-        ? new URL(`/api/font-download/${row.file_key}`, baseUrl).toString()
-        : "",
-  };
+function getClientIp(c: any): string {
+  return (
+    c.req.header("CF-Connecting-IP") ||
+    c.req.header("x-forwarded-for") ||
+    "unknown"
+  );
 }
 
-app.get("/api/health", (c) => {
-  return okJson({
-    ok: true,
-    appName: c.env.APP_NAME ?? null,
-    hasDB: Boolean(c.env.DB),
-    hasBucket: Boolean(c.env.FONT_BUCKET),
-  });
-});
+function shouldTrackPath(pathname: string): boolean {
+  if (pathname.startsWith("/api/")) return false;
+  if (pathname.startsWith("/assets/")) return false;
+  if (pathname === "/favicon.ico") return false;
+  if (pathname.endsWith(".png")) return false;
+  if (pathname.endsWith(".jpg")) return false;
+  if (pathname.endsWith(".jpeg")) return false;
+  if (pathname.endsWith(".webp")) return false;
+  if (pathname.endsWith(".svg")) return false;
+  if (pathname.endsWith(".css")) return false;
+  if (pathname.endsWith(".js")) return false;
+  if (pathname.endsWith(".woff")) return false;
+  if (pathname.endsWith(".woff2")) return false;
+  if (pathname.endsWith(".ttf")) return false;
+  if (pathname.endsWith(".otf")) return false;
+  return true;
+}
+
+function getMimeType(filename: string, fallback = "application/octet-stream") {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".ttf")) return "font/ttf";
+  if (lower.endsWith(".otf")) return "font/otf";
+  if (lower.endsWith(".woff")) return "font/woff";
+  if (lower.endsWith(".woff2")) return "font/woff2";
+  return fallback;
+}
+
+// ---------- public routes ----------
 
 app.get("/api/fonts", async (c) => {
   try {
-    if (!c.env.DB) return okJson({ items: [] });
-
     const result = await c.env.DB.prepare(
-      "SELECT * FROM fonts ORDER BY created_at DESC"
+      `
+      SELECT
+        id, name, style, owner, characteristics, details,
+        is_custom, source_url, file_key, mime_type, created_at
+      FROM fonts
+      ORDER BY is_custom DESC, created_at DESC, name ASC
+      `
     ).all<FontRow>();
 
-    return okJson({
-  items: (result.results ?? []).map((row) => mapFontRow(row, c.req.url)),
-});
+    const items = (result.results ?? []).map((row) => mapFontRow(c, row));
+    return okJson({ ok: true, items });
   } catch (error) {
     console.error("/api/fonts error", error);
-    return okJson({ items: [] });
+    return errJson("ไม่สามารถโหลดรายการฟอนต์ได้", 500);
   }
 });
 
 app.get("/api/font-file/:key", async (c) => {
   try {
-    if (!c.env.FONT_BUCKET) {
-      return errJson("Font bucket is not configured", 500);
-    }
-
     const key = c.req.param("key");
-    const obj = await c.env.FONT_BUCKET.get(key);
+    if (!key) return errJson("Missing font key", 400);
 
-    if (!obj) return errJson("Not found", 404);
+    const object = await c.env.FONT_BUCKET.get(key);
+    if (!object) return errJson("ไม่พบไฟล์ฟอนต์", 404);
 
     const headers = new Headers();
-    obj.writeHttpMetadata(headers);
-    headers.set("etag", obj.httpEtag);
-
-    if (!headers.get("content-type")) {
-      headers.set("content-type", "font/ttf");
-    }
-
-    headers.set("content-disposition", `inline; filename="${key}"`);
+    headers.set(
+      "content-type",
+      object.httpMetadata?.contentType || getMimeType(key)
+    );
     headers.set("cache-control", "public, max-age=31536000, immutable");
+    headers.set("content-disposition", `inline; filename="${key.split("/").pop() || "font"}"`);
 
-    return new Response(obj.body, { headers });
-  } catch (error) {
-    console.error("/api/font-file error", error);
-    return errJson("Failed to load font file", 500);
-  }
-});
-
-app.get("/api/font-download/:key", async (c) => {
-  try {
-    if (!c.env.FONT_BUCKET) {
-      return errJson("Font bucket is not configured", 500);
-    }
-
-    const key = c.req.param("key");
-    const obj = await c.env.FONT_BUCKET.get(key);
-
-    if (!obj) return errJson("Not found", 404);
-
-    const headers = new Headers();
-    obj.writeHttpMetadata(headers);
-    headers.set("etag", obj.httpEtag);
-
-    if (!headers.get("content-type")) {
-      headers.set("content-type", "application/octet-stream");
-    }
-
-    headers.set("content-disposition", `attachment; filename="${key}"`);
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-
-    return new Response(obj.body, { headers });
-  } catch (error) {
-    console.error("/api/font-download error", error);
-    return errJson("Failed to download font file", 500);
-  }
-});
-
-app.post("/api/admin/login", async (c) => {
-  try {
-    const body = await c.req.json<LoginBody>();
-
-    const admin = c.env.ADMIN_USERNAME;
-    const hash = c.env.ADMIN_PASSWORD_HASH;
-    const secret = c.env.SESSION_SECRET;
-
-    if (!admin || !hash || !secret) {
-      return errJson("Admin environment is not configured", 500);
-    }
-
-    if (!body.username || !body.password) {
-      return errJson("Username and password are required", 400);
-    }
-
-    const passwordHash = await sha256Hex(body.password);
-
-    if (body.username !== admin || passwordHash !== hash) {
-      return errJson("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", 401);
-    }
-
-    const token = await signSession(body.username, secret);
-    const secure = isHttps(c.req.url);
-
-    setCookie(c, "admin_user", body.username, {
-      httpOnly: true,
-      secure,
-      sameSite: "Lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+    return new Response(object.body, {
+      status: 200,
+      headers,
     });
+  } catch (error) {
+    console.error("/api/font-file/:key error", error);
+    return errJson("ไม่สามารถเปิดไฟล์ฟอนต์ได้", 500);
+  }
+});
 
-    setCookie(c, "admin_token", token, {
-      httpOnly: true,
-      secure,
-      sameSite: "Lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+app.get("/api/visitor-counter", async (c) => {
+  try {
+    const totalResult = await c.env.DB.prepare(
+      `SELECT COUNT(DISTINCT ip_hash) AS count FROM visitor_stats`
+    ).first<{ count: number }>();
+
+    const todayResult = await c.env.DB.prepare(
+      `SELECT COUNT(DISTINCT ip_hash) AS count
+       FROM visitor_stats
+       WHERE date(visited_at, 'localtime') = date('now', 'localtime')`
+    ).first<{ count: number }>();
+
+    const onlineResult = await c.env.DB.prepare(
+      `SELECT COUNT(DISTINCT ip_hash) AS count
+       FROM visitor_stats
+       WHERE visited_at >= datetime('now', '-5 minutes')`
+    ).first<{ count: number }>();
+
+    return okJson({
+      ok: true,
+      stats: {
+        totalVisitors: Number(totalResult?.count ?? 0),
+        todayVisitors: Number(todayResult?.count ?? 0),
+        onlineNow: Number(onlineResult?.count ?? 0),
+      },
     });
-
-    return okJson({ ok: true, authenticated: true });
   } catch (error) {
-    console.error("/api/admin/login error", error);
-    return errJson("Login failed", 500);
+    console.error("/api/visitor-counter error", error);
+    return errJson("ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
   }
 });
-
-app.post("/api/admin/logout", (c) => {
-  deleteCookie(c, "admin_user", { path: "/" });
-  deleteCookie(c, "admin_token", { path: "/" });
-  return okJson({ ok: true });
-});
-
-app.get("/api/admin/me", async (c) => {
-  return okJson({
-    ok: true,
-    authenticated: await isAuthed(c),
-  });
-});
-
-app.get("/api/check-secrets", (c) => {
-  return okJson({
-    hasAdminUsername: !!c.env.ADMIN_USERNAME,
-    hasAdminPasswordHash: !!c.env.ADMIN_PASSWORD_HASH,
-    hasSessionSecret: !!c.env.SESSION_SECRET,
-    adminUsernameValue: c.env.ADMIN_USERNAME ?? null,
-    hashLength: c.env.ADMIN_PASSWORD_HASH?.length ?? 0,
-    secretLength: c.env.SESSION_SECRET?.length ?? 0,
-  });
-});
-
-app.use("/api/admin/fonts", requireAuth);
-app.use("/api/admin/fonts/*", requireAuth);
-app.use("/api/admin/contact-messages", requireAuth);
-app.use("/api/admin/contact-messages/*", requireAuth);
-app.use("/api/admin/contact-messages/export.csv", requireAuth);
-
-app.post("/api/admin/fonts", async (c) => {
-  try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-    if (!c.env.FONT_BUCKET) return errJson("Font bucket is not configured", 500);
-
-    const form = await c.req.formData();
-
-    const name = String(form.get("name") || "").trim();
-    const style = String(form.get("style") || "Regular").trim();
-    const owner = String(form.get("owner") || "").trim();
-    const characteristics = String(form.get("characteristics") || "").trim();
-    const details = String(form.get("details") || "").trim();
-    const file = form.get("file");
-
-    if (!name || !owner || !characteristics || !(file instanceof File)) {
-      return errJson("Missing required fields", 400);
-    }
-
-    const allowed = [
-      "font/ttf",
-      "font/otf",
-      "font/woff",
-      "font/woff2",
-      "application/font-sfnt",
-      "application/x-font-ttf",
-      "application/x-font-otf",
-      "application/font-woff",
-      "application/octet-stream",
-    ];
-
-    if (file.type && !allowed.includes(file.type)) {
-      return errJson("ชนิดไฟล์ฟอนต์ไม่รองรับ", 400);
-    }
-
-    const id = crypto.randomUUID();
-    const ext = file.name.split(".").pop()?.toLowerCase() || "ttf";
-    const fileKey = `${id}.${ext}`;
-    const mimeType = file.type || "font/ttf";
-
-    await c.env.FONT_BUCKET.put(fileKey, await file.arrayBuffer(), {
-      httpMetadata: { contentType: mimeType },
-    });
-
-    await c.env.DB.prepare(
-      `INSERT INTO fonts
-      (id, name, style, owner, characteristics, details, is_custom, source_url, file_key, mime_type)
-      VALUES (?, ?, ?, ?, ?, ?, 1, '', ?, ?)`
-    )
-      .bind(id, name, style, owner, characteristics, details, fileKey, mimeType)
-      .run();
-
-    return okJson({ ok: true, id });
-  } catch (error) {
-    console.error("/api/admin/fonts POST error", error);
-    return errJson(`Failed to create font: ${String(error)}`, 500);
-  }
-});
-
-app.patch("/api/admin/fonts/:id", async (c) => {
-  try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
-    const id = c.req.param("id");
-    const body = await c.req.json<{
-      name?: string;
-      style?: string;
-      owner?: string;
-      characteristics?: string;
-      details?: string;
-    }>();
-
-    const name = body.name?.trim() ?? "";
-    const style = body.style?.trim() ?? "";
-    const owner = body.owner?.trim() ?? "";
-    const characteristics = body.characteristics?.trim() ?? "";
-    const details = body.details?.trim() ?? "";
-
-    if (!name || !style || !owner || !characteristics) {
-      return errJson("Missing required fields", 400);
-    }
-
-    const existing = await c.env.DB.prepare(
-      `SELECT id, is_custom FROM fonts WHERE id = ?`
-    )
-      .bind(id)
-      .first<{ id: string; is_custom: number }>();
-
-    if (!existing) {
-      return errJson("Font not found", 404);
-    }
-
-    if (!existing.is_custom) {
-      return errJson("Only custom fonts can be edited", 400);
-    }
-
-    await c.env.DB.prepare(
-      `
-      UPDATE fonts
-      SET name = ?, style = ?, owner = ?, characteristics = ?, details = ?
-      WHERE id = ?
-      `
-    )
-      .bind(name, style, owner, characteristics, details, id)
-      .run();
-
-    return okJson({ ok: true });
-  } catch (error) {
-    console.error("/api/admin/fonts/:id PATCH error", error);
-    return errJson(`Failed to update font: ${String(error)}`, 500);
-  }
-});
-
-app.delete("/api/admin/fonts/:id", async (c) => {
-  try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
-    const id = c.req.param("id");
-    const row = await c.env.DB.prepare("SELECT * FROM fonts WHERE id = ?")
-      .bind(id)
-      .first<FontRow>();
-
-    if (!row) return errJson("Not found", 404);
-
-    if (row.file_key && c.env.FONT_BUCKET) {
-      await c.env.FONT_BUCKET.delete(row.file_key);
-    }
-
-    await c.env.DB.prepare("DELETE FROM fonts WHERE id = ?").bind(id).run();
-
-    return okJson({ ok: true });
-  } catch (error) {
-    console.error("/api/admin/fonts DELETE error", error);
-    return errJson("Failed to delete font", 500);
-  }
-});
-
 
 app.post("/api/contact", async (c) => {
   try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
     const body = await c.req.json<ContactBody>();
 
     const firstName = body.firstName?.trim() ?? "";
@@ -481,8 +297,8 @@ app.post("/api/contact", async (c) => {
 
     await c.env.DB.prepare(
       `INSERT INTO contact_messages
-       (id, first_name, last_name, email, subject, message)
-       VALUES (?, ?, ?, ?, ?, ?)`
+       (id, first_name, last_name, email, subject, message, is_read)
+       VALUES (?, ?, ?, ?, ?, ?, 0)`
     )
       .bind(id, firstName, lastName, email, subject, message)
       .run();
@@ -498,10 +314,199 @@ app.post("/api/contact", async (c) => {
   }
 });
 
+// ---------- auth routes ----------
+
+app.get("/api/check-secrets", async (c) => {
+  const config = getAdminConfig(c.env);
+  return okJson({
+    ok: true,
+    hasAdminUsername: Boolean(config.username),
+    hasAdminPasswordHash: Boolean(config.passwordHash),
+    hasSessionSecret: Boolean(config.sessionSecret),
+    passwordHashLength: config.passwordHash.length,
+    sessionSecretLength: config.sessionSecret.length,
+    configured: config.configured,
+  });
+});
+
+app.post("/api/admin/login", async (c) => {
+  try {
+    const config = getAdminConfig(c.env);
+    if (!config.configured) {
+      return errJson("Admin environment is not configured", 500);
+    }
+
+    const body = await c.req.json<LoginBody>();
+    const username = body.username?.trim() ?? "";
+    const password = body.password ?? "";
+
+    if (!username || !password) {
+      return errJson("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", 400);
+    }
+
+    const passwordHash = await sha256Hex(password);
+
+    if (
+      username !== config.username ||
+      passwordHash !== config.passwordHash
+    ) {
+      return errJson("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", 401);
+    }
+
+    const token = await createSessionToken(c.env);
+
+    setCookie(c, "admin_session", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return okJson({
+      ok: true,
+      authenticated: true,
+    });
+  } catch (error) {
+    console.error("/api/admin/login error", error);
+    return errJson("ไม่สามารถเข้าสู่ระบบได้", 500);
+  }
+});
+
+app.post("/api/admin/logout", async (c) => {
+  deleteCookie(c, "admin_session", { path: "/" });
+  return okJson({ ok: true, authenticated: false });
+});
+
+app.get("/api/admin/me", async (c) => {
+  const token = getCookie(c, "admin_session");
+  const authenticated = await isAuthenticated(c.env, token);
+
+  return okJson({
+    ok: true,
+    authenticated,
+  });
+});
+
+// ---------- protected admin routes ----------
+
+app.use("/api/admin/fonts", requireAuth);
+app.use("/api/admin/fonts/*", requireAuth);
+app.use("/api/admin/contact-messages", requireAuth);
+app.use("/api/admin/contact-messages/*", requireAuth);
+app.use("/api/admin/contact-messages/export.csv", requireAuth);
+
+app.post("/api/admin/fonts", async (c) => {
+  try {
+    const form = await c.req.formData();
+
+    const name = String(form.get("name") || "").trim();
+    const style = String(form.get("style") || "").trim();
+    const owner = String(form.get("owner") || "").trim();
+    const characteristics = String(form.get("characteristics") || "").trim();
+    const details = String(form.get("details") || "").trim();
+    const file = form.get("file");
+
+    if (!name || !style || !owner || !characteristics || !(file instanceof File)) {
+      return errJson("กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์", 400);
+    }
+
+    const id = crypto.randomUUID();
+    const safeFilename = file.name.replace(/\s+/g, "-");
+    const fileKey = `fonts/${id}-${safeFilename}`;
+    const mimeType = file.type || getMimeType(file.name);
+
+    await c.env.FONT_BUCKET.put(fileKey, await file.arrayBuffer(), {
+      httpMetadata: {
+        contentType: mimeType,
+      },
+    });
+
+    await c.env.DB.prepare(
+      `INSERT INTO fonts
+       (id, name, style, owner, characteristics, details, is_custom, source_url, file_key, mime_type)
+       VALUES (?, ?, ?, ?, ?, ?, 1, '', ?, ?)`
+    )
+      .bind(id, name, style, owner, characteristics, details, fileKey, mimeType)
+      .run();
+
+    return okJson({ ok: true, id }, 201);
+  } catch (error) {
+    console.error("/api/admin/fonts POST error", error);
+    return errJson("ไม่สามารถเพิ่มฟอนต์ได้", 500);
+  }
+});
+
+app.patch("/api/admin/fonts/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json<{
+      name?: string;
+      style?: string;
+      owner?: string;
+      characteristics?: string;
+      details?: string;
+    }>();
+
+    const name = body.name?.trim() ?? "";
+    const style = body.style?.trim() ?? "";
+    const owner = body.owner?.trim() ?? "";
+    const characteristics = body.characteristics?.trim() ?? "";
+    const details = body.details?.trim() ?? "";
+
+    if (!id || !name || !style || !owner || !characteristics) {
+      return errJson("กรุณากรอกข้อมูลให้ครบ", 400);
+    }
+
+    await c.env.DB.prepare(
+      `UPDATE fonts
+       SET name = ?, style = ?, owner = ?, characteristics = ?, details = ?
+       WHERE id = ? AND is_custom = 1`
+    )
+      .bind(name, style, owner, characteristics, details, id)
+      .run();
+
+    return okJson({ ok: true });
+  } catch (error) {
+    console.error("/api/admin/fonts/:id PATCH error", error);
+    return errJson("ไม่สามารถแก้ไขฟอนต์ได้", 500);
+  }
+});
+
+app.delete("/api/admin/fonts/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    if (!id) return errJson("Missing font id", 400);
+
+    const font = await c.env.DB.prepare(
+      `SELECT id, file_key, is_custom FROM fonts WHERE id = ? LIMIT 1`
+    )
+      .bind(id)
+      .first<{ id: string; file_key: string | null; is_custom: number }>();
+
+    if (!font) {
+      return errJson("ไม่พบฟอนต์", 404);
+    }
+
+    if (!font.is_custom) {
+      return errJson("ไม่สามารถลบฟอนต์ระบบได้", 400);
+    }
+
+    if (font.file_key) {
+      await c.env.FONT_BUCKET.delete(font.file_key);
+    }
+
+    await c.env.DB.prepare(`DELETE FROM fonts WHERE id = ?`).bind(id).run();
+
+    return okJson({ ok: true });
+  } catch (error) {
+    console.error("/api/admin/fonts/:id DELETE error", error);
+    return errJson("ไม่สามารถลบฟอนต์ได้", 500);
+  }
+});
+
 app.get("/api/admin/contact-messages", async (c) => {
   try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
     const result = await c.env.DB.prepare(
       `SELECT * FROM contact_messages ORDER BY created_at DESC`
     ).all<ContactRow>();
@@ -518,8 +523,6 @@ app.get("/api/admin/contact-messages", async (c) => {
 
 app.patch("/api/admin/contact-messages/:id/read", async (c) => {
   try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
     const id = c.req.param("id");
 
     await c.env.DB.prepare(
@@ -537,8 +540,6 @@ app.patch("/api/admin/contact-messages/:id/read", async (c) => {
 
 app.delete("/api/admin/contact-messages/:id", async (c) => {
   try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
     const id = c.req.param("id");
 
     await c.env.DB.prepare(
@@ -554,11 +555,8 @@ app.delete("/api/admin/contact-messages/:id", async (c) => {
   }
 });
 
-
 app.get("/api/admin/contact-messages/export.csv", async (c) => {
   try {
-    if (!c.env.DB) return errJson("Database is not configured", 500);
-
     const result = await c.env.DB.prepare(
       `SELECT * FROM contact_messages ORDER BY created_at DESC`
     ).all<ContactRow>();
@@ -597,8 +595,7 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
     return new Response(csv, {
       headers: {
         "content-type": "text/csv; charset=utf-8",
-        "content-disposition":
-          'attachment; filename="contact-messages.csv"',
+        "content-disposition": 'attachment; filename="contact-messages.csv"',
       },
     });
   } catch (error) {
@@ -607,64 +604,35 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
   }
 });
 
-async function sha256Hex(input: string): Promise<string> {
-  const data = new TextEncoder().encode(input);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
+// ---------- SPA assets + visitor tracking ----------
 
-
-
-function shouldTrackPath(pathname: string): boolean {
-  if (pathname.startsWith("/api/")) return false;
-  if (pathname.startsWith("/assets/")) return false;
-  if (pathname === "/favicon.ico") return false;
-  if (pathname.endsWith(".png")) return false;
-  if (pathname.endsWith(".jpg")) return false;
-  if (pathname.endsWith(".jpeg")) return false;
-  if (pathname.endsWith(".webp")) return false;
-  if (pathname.endsWith(".svg")) return false;
-  if (pathname.endsWith(".css")) return false;
-  if (pathname.endsWith(".js")) return false;
-  if (pathname.endsWith(".woff")) return false;
-  if (pathname.endsWith(".woff2")) return false;
-  if (pathname.endsWith(".ttf")) return false;
-  if (pathname.endsWith(".otf")) return false;
-  return true;
-}
-
-// ต้องอยู่ล่างสุด
 app.all("*", async (c) => {
   try {
-    if (c.env.DB) {
-      const pathname = new URL(c.req.url).pathname;
+    const pathname = new URL(c.req.url).pathname;
 
-      if (shouldTrackPath(pathname)) {
-        const ip = getClientIp(c);
-        const ipHash = await sha256Hex(ip);
-        const userAgent = c.req.header("user-agent") || "";
+    if (shouldTrackPath(pathname)) {
+      const ip = getClientIp(c);
+      const ipHash = await sha256Hex(ip);
+      const userAgent = c.req.header("user-agent") || "";
 
-        const recent = await c.env.DB.prepare(
-          `SELECT id
-           FROM visitor_stats
-           WHERE ip_hash = ?
-             AND path = ?
-             AND visited_at >= datetime('now', '-10 minutes')
-           LIMIT 1`
+      const recent = await c.env.DB.prepare(
+        `SELECT id
+         FROM visitor_stats
+         WHERE ip_hash = ?
+           AND path = ?
+           AND visited_at >= datetime('now', '-10 minutes')
+         LIMIT 1`
+      )
+        .bind(ipHash, pathname)
+        .first<{ id: string }>();
+
+      if (!recent) {
+        await c.env.DB.prepare(
+          `INSERT INTO visitor_stats (id, path, ip_hash, user_agent)
+           VALUES (?, ?, ?, ?)`
         )
-          .bind(ipHash, pathname)
-          .first<{ id: string }>();
-
-        if (!recent) {
-          await c.env.DB.prepare(
-            `INSERT INTO visitor_stats (id, path, ip_hash, user_agent)
-             VALUES (?, ?, ?, ?)`
-          )
-            .bind(crypto.randomUUID(), pathname, ipHash, userAgent)
-            .run();
-        }
+          .bind(crypto.randomUUID(), pathname, ipHash, userAgent)
+          .run();
       }
     }
   } catch (error) {
