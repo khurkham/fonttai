@@ -255,11 +255,10 @@ app.get("/api/visitor-counter", async (c) => {
     ).first<{ count: number }>();
 
     const onlineResult = await c.env.DB.prepare(
-  `SELECT COUNT(DISTINCT ip_hash) AS count
-   FROM visitor_stats
-   WHERE visited_at >= datetime('now', '-10 minutes')`
-).first<{ count: number }>();
-
+      `SELECT COUNT(DISTINCT ip_hash) AS count
+       FROM visitor_stats
+       WHERE visited_at >= datetime('now', '-10 minutes')
+    ).first<{ count: number }>();
 
     return okJson({
       ok: true,
@@ -274,6 +273,8 @@ app.get("/api/visitor-counter", async (c) => {
     return errJson("ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
   }
 });
+
+
 
 app.post("/api/contact", async (c) => {
   try {
