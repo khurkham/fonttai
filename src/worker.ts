@@ -107,7 +107,7 @@ async function isAuthenticated(env: Env["Bindings"], token?: string | null) {
   return token === expected;
 }
 
-async function requireAuth(c: Parameters<ReturnType<typeof app.use>>[1] extends never ? never : any, next: () => Promise<void>) {
+async function requireAuth(c: any, next: () => Promise<void>) {
   const token = getCookie(c, "admin_session");
   const authed = await isAuthenticated(c.env, token);
 
@@ -121,7 +121,9 @@ async function requireAuth(c: Parameters<ReturnType<typeof app.use>>[1] extends 
 function mapFontRow(c: any, row: FontRow) {
   const fileUrl =
     row.file_key && row.is_custom
-      ? `${new URL(c.req.url).origin}/api/font-file/${encodeURIComponent(row.file_key)}`
+      ? `${new URL(c.req.url).origin}/api/font-file/${encodeURIComponent(
+          row.file_key
+        )}`
       : undefined;
 
   return {
@@ -230,7 +232,10 @@ app.get("/api/font-file/:key", async (c) => {
       object.httpMetadata?.contentType || getMimeType(key)
     );
     headers.set("cache-control", "public, max-age=31536000, immutable");
-    headers.set("content-disposition", `inline; filename="${key.split("/").pop() || "font"}"`);
+    headers.set(
+      "content-disposition",
+      `attachment; filename="${key.split("/").pop() || "font"}"`
+    );
 
     return new Response(object.body, {
       status: 200,
@@ -238,7 +243,7 @@ app.get("/api/font-file/:key", async (c) => {
     });
   } catch (error) {
     console.error("/api/font-file/:key error", error);
-    return errJson("ไม่สามารถเปิดไฟล์ฟอนต์ได้", 500);
+    return errJson("ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
 
@@ -257,7 +262,7 @@ app.get("/api/visitor-counter", async (c) => {
     const onlineResult = await c.env.DB.prepare(
       `SELECT COUNT(DISTINCT ip_hash) AS count
        FROM visitor_stats
-       WHERE visited_at >= datetime('now', '-10 minutes')
+       WHERE visited_at >= datetime('now', '-10 minutes')`
     ).first<{ count: number }>();
 
     return okJson({
@@ -273,8 +278,6 @@ app.get("/api/visitor-counter", async (c) => {
     return errJson("ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
   }
 });
-
-
 
 app.post("/api/contact", async (c) => {
   try {
@@ -622,7 +625,7 @@ app.all("*", async (c) => {
          FROM visitor_stats
          WHERE ip_hash = ?
            AND path = ?
-           AND visited_at >= datetime('now', '-10 minutes')
+           AND visited_at >= datetime('now', '-3 minutes')
          LIMIT 1`
       )
         .bind(ipHash, pathname)
@@ -649,3 +652,4 @@ app.all("*", async (c) => {
 });
 
 export default app;
+
