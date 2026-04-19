@@ -8,7 +8,7 @@ import { AdSlot } from "./components/AdSlot";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
-import type { ContactMessage, FontItem } from "./types";
+import type { ContactMessage, FontItem, VisitorCounter } from "./types";
 
 type ViewMode = "home" | "admin";
 type PublicPage =
@@ -462,6 +462,7 @@ function EditFontModal({
 
   if (!open || !font) return null;
 
+  
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -1080,11 +1081,19 @@ function ContactDetailModal({
 }
 
 export default function App() {
-
-const [selectedContact, setSelectedContact] = useState<ContactMessage | null>(null);
-  const [adminTab, setAdminTab] = useState<"fonts" | "contacts">("fonts");
+  const [selectedContact, setSelectedContact] = useState<ContactMessage | null>(null);
+const [adminTab, setAdminTab] = useState<"fonts" | "contacts" | "stats">("fonts");
 const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
 const [contactLoading, setContactLoading] = useState(false);
+
+const [stats, setStats] = useState<VisitorCounter>({
+  totalVisitors: 0,
+  todayVisitors: 0,
+  onlineNow: 0,
+});
+const [statsLoading, setStatsLoading] = useState(false);
+
+
   const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW);
   const [search, setSearch] = useState("");
   const [fontSize, setFontSize] = useState(32);
@@ -1116,7 +1125,21 @@ async function loadContactMessages() {
     setContactLoading(false);
   }
 }
-
+async function loadStats() {
+  try {
+    setStatsLoading(true);
+    const res = await api.getVisitorCounter();
+    setStats(res.stats);
+  } catch {
+    setStats({
+      totalVisitors: 0,
+      todayVisitors: 0,
+      onlineNow: 0,
+    });
+  } finally {
+    setStatsLoading(false);
+  }
+}
 async function handleExportContactCsv() {
   try {
     const blob = await api.exportContactMessagesCsv();
@@ -1185,8 +1208,8 @@ async function handleDeleteContactMessage(id: string) {
   
 
   useEffect(() => {
-  if (viewMode === "admin" && isAuthed && adminTab === "contacts") {
-    loadContactMessages();
+  if (viewMode === "admin" && isAuthed && adminTab === "stats") {
+    loadStats();
   }
 }, [viewMode, isAuthed, adminTab]);
 
@@ -1307,39 +1330,39 @@ async function handleDeleteContactMessage(id: string) {
       <div>
         <h2 className="text-4xl font-black tracking-tight">ระบบจัดการเว็บไซต์</h2>
         <p className="mt-2 text-sm text-slate-500">
-          จัดการฟอนต์และตรวจสอบข้อความติดต่อจากผู้ใช้งาน
+          จัดการฟอนต์ ตรวจสอบข้อความติดต่อ และดูสถิติผู้เข้าใช้งาน
         </p>
       </div>
 
       <div className="flex flex-wrap gap-3">
-  {adminTab === "contacts" ? (
-    <button
-      type="button"
-      onClick={handleExportContactCsv}
-      className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700"
-    >
-      Export CSV
-    </button>
-  ) : null}
+        {adminTab === "contacts" ? (
+          <button
+            type="button"
+            onClick={handleExportContactCsv}
+            className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700"
+          >
+            Export CSV
+          </button>
+        ) : null}
 
-  <button
-    type="button"
-    onClick={() => setShowAddFont(true)}
-    className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
-  >
-    <Plus size={18} />
-    เพิ่มฟอนต์
-  </button>
+        <button
+          type="button"
+          onClick={() => setShowAddFont(true)}
+          className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+        >
+          <Plus size={18} />
+          เพิ่มฟอนต์
+        </button>
 
-  <button
-    type="button"
-    onClick={handleLogout}
-    className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
-  >
-    <LogOut size={18} />
-    ออกจากระบบ
-  </button>
-</div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
+        >
+          <LogOut size={18} />
+          ออกจากระบบ
+        </button>
+      </div>
     </div>
 
     <div className="mb-6 flex flex-wrap gap-3">
@@ -1365,6 +1388,18 @@ async function handleDeleteContactMessage(id: string) {
         }`}
       >
         ข้อความติดต่อ
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setAdminTab("stats")}
+        className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+          adminTab === "stats"
+            ? "bg-blue-600 text-white"
+            : "border border-slate-300 bg-white text-slate-700"
+        }`}
+      >
+        สถิติ
       </button>
     </div>
 
@@ -1422,7 +1457,7 @@ async function handleDeleteContactMessage(id: string) {
           </tbody>
         </table>
       </div>
-    ) : (
+    ) : adminTab === "contacts" ? (
       <div className="overflow-x-auto rounded-2xl border border-slate-200">
         <table className="w-full min-w-[1100px] border-collapse">
           <thead className="bg-slate-50">
@@ -1475,51 +1510,129 @@ async function handleDeleteContactMessage(id: string) {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-  <div className="flex flex-wrap gap-2">
-    <button
-      type="button"
-      onClick={() => setSelectedContact(item)}
-      className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
-    >
-      ดูรายละเอียด
-    </button>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedContact(item)}
+                        className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
+                      >
+                        ดูรายละเอียด
+                      </button>
 
-    <button
-      type="button"
-      onClick={() => handleReplyEmail(item)}
-      className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"
-    >
-      ตอบกลับอีเมล
-    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleReplyEmail(item)}
+                        className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"
+                      >
+                        ตอบกลับอีเมล
+                      </button>
 
-    {!item.isRead ? (
-      <button
-        type="button"
-        onClick={() => handleMarkContactAsRead(item.id)}
-        className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
-      >
-        อ่านแล้ว
-      </button>
-    ) : null}
+                      {!item.isRead ? (
+                        <button
+                          type="button"
+                          onClick={() => handleMarkContactAsRead(item.id)}
+                          className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
+                        >
+                          อ่านแล้ว
+                        </button>
+                      ) : null}
 
-    <button
-      type="button"
-      onClick={async () => {
-        const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
-        if (!ok) return;
-        await handleDeleteContactMessage(item.id);
-      }}
-      className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
-    >
-      ลบ
-    </button>
-  </div>
-</td>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+                          if (!ok) return;
+                          await handleDeleteContactMessage(item.id);
+                        }}
+                        className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
+                      >
+                        ลบ
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+      </div>
+    ) : (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <p className="text-sm font-medium text-slate-500">ผู้เข้าชมทั้งหมด</p>
+            <p className="mt-3 text-4xl font-black text-slate-900">
+              {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <p className="text-sm font-medium text-slate-500">ผู้เข้าชมวันนี้</p>
+            <p className="mt-3 text-4xl font-black text-slate-900">
+              {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+            <p className="text-sm font-medium text-slate-500">ออนไลน์ตอนนี้</p>
+            <p className="mt-3 text-4xl font-black text-emerald-600">
+              {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6">
+          <h3 className="text-2xl font-black text-slate-900">ตารางสรุปสถิติ</h3>
+
+          <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200">
+            <table className="w-full min-w-[640px] border-collapse">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                    รายการ
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                    ค่า
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                    หมายเหตุ
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-t border-slate-200">
+                  <td className="px-4 py-4 font-medium text-slate-900">ผู้เข้าชมทั้งหมด</td>
+                  <td className="px-4 py-4 text-slate-700">
+                    {stats.totalVisitors.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-slate-500">
+                    นับจาก IP hash ไม่ซ้ำในฐานข้อมูล
+                  </td>
+                </tr>
+
+                <tr className="border-t border-slate-200">
+                  <td className="px-4 py-4 font-medium text-slate-900">ผู้เข้าชมวันนี้</td>
+                  <td className="px-4 py-4 text-slate-700">
+                    {stats.todayVisitors.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-slate-500">
+                    นับเฉพาะข้อมูลของวันปัจจุบัน
+                  </td>
+                </tr>
+
+                <tr className="border-t border-slate-200">
+                  <td className="px-4 py-4 font-medium text-slate-900">ออนไลน์ตอนนี้</td>
+                  <td className="px-4 py-4 font-semibold text-emerald-600">
+                    {stats.onlineNow.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-slate-500">
+                    ประมาณการจากผู้เข้าชมในช่วง 5 นาทีล่าสุด
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     )}
   </section>
@@ -1667,12 +1780,12 @@ async function handleDeleteContactMessage(id: string) {
       <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />
 
     <LoginModal
-  open={showLogin}
+ open={showLogin}
   onClose={() => setShowLogin(false)}
   onSuccess={async () => {
     setIsAuthed(true);
     setViewMode("admin");
-    await Promise.all([loadFonts(), loadContactMessages()]);
+    await Promise.all([loadFonts(), checkAuth(), loadStats()]);
   }}
       />
 
