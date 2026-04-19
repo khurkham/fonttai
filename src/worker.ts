@@ -255,10 +255,11 @@ app.get("/api/visitor-counter", async (c) => {
     ).first<{ count: number }>();
 
     const onlineResult = await c.env.DB.prepare(
-      `SELECT COUNT(DISTINCT ip_hash) AS count
-       FROM visitor_stats
-       WHERE visited_at >= datetime('now', '-5 minutes')`
-    ).first<{ count: number }>();
+  `SELECT COUNT(DISTINCT ip_hash) AS count
+   FROM visitor_stats
+   WHERE visited_at >= datetime('now', '-10 minutes')`
+).first<{ count: number }>();
+
 
     return okJson({
       ok: true,
