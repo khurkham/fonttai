@@ -221,7 +221,7 @@ function LoginModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: () => Promise<void>;
 }) {
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
@@ -239,7 +239,7 @@ function LoginModal({
       const res = await api.login(username, password);
       if (res.ok && res.authenticated) {
         setPassword("");
-        onSuccess();
+        await onSuccess();
         onClose();
       } else {
         setError("เข้าสู่ระบบไม่สำเร็จ");
@@ -1158,17 +1158,7 @@ async function handleDeleteContactMessage(id: string) {
     alert(err instanceof Error ? err.message : "ลบข้อความไม่สำเร็จ");
   }
 }
-async function loadContactMessages() {
-  try {
-    setContactLoading(true);
-    const res = await api.getContactMessages();
-    setContactMessages(res.items || []);
-  } catch {
-    setContactMessages([]);
-  } finally {
-    setContactLoading(false);
-  }
-}
+
 
   async function loadFonts() {
     try {
@@ -1676,14 +1666,14 @@ async function loadContactMessages() {
 
       <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />
 
-      <LoginModal
-        open={showLogin}
-        onClose={() => setShowLogin(false)}
-       onSuccess={async () => {
-  setIsAuthed(true);
-  setViewMode("admin");
-  await Promise.all([checkAuth(), loadFonts(), loadContactMessages()]);
-}}
+    <LoginModal
+  open={showLogin}
+  onClose={() => setShowLogin(false)}
+  onSuccess={async () => {
+    setIsAuthed(true);
+    setViewMode("admin");
+    await Promise.all([loadFonts(), loadContactMessages()]);
+  }}
       />
 
       
