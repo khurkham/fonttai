@@ -1216,14 +1216,15 @@ export default function App() {
   }, [viewMode, isAuthed, adminTab]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      if (viewMode === "admin" && isAuthed && adminTab === "stats") {
-        loadStats();
-      }
-    }, 15000);
+  const interval = window.setInterval(() => {
+    if (viewMode === "admin" && isAuthed && adminTab === "stats") {
+      loadStats();
+    }
+  }, 5000);
 
-    return () => window.clearInterval(interval);
-  }, [viewMode, isAuthed, adminTab]);
+  return () => window.clearInterval(interval);
+}, [viewMode, isAuthed, adminTab]);
+
 
   useEffect(() => {
     (async () => {
@@ -1723,7 +1724,7 @@ export default function App() {
                     </div>
 
                     <p className="mt-4 text-sm text-slate-500">
-                      หน้านี้รีเฟรชอัตโนมัติทุก 15 วินาทีเมื่อเปิดแท็บสถิติอยู่
+                      หน้านี้รีเฟรชอัตโนมัติทุก 5 วินาทีเมื่อเปิดแท็บสถิติอยู่
                     </p>
                   </div>
                 </div>
