@@ -663,7 +663,7 @@ function StaticPage({
           <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
             นโยบายความเป็นส่วนตัว
           </h1>
-          <p className="input-shan mt-3 text-sm leading-7 text-slate-500 sm:text-base">
+          <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
             อัปเดตล่าสุด: 21/4/2026
           </p>
         </div>

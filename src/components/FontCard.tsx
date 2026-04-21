@@ -108,7 +108,7 @@ const downloadHref = font.isCustom
           </div>
 
           {font.details && (
-            <p className="mt-3 text-sm italic text-slate-500">{font.details}</p>
+            <p className="input-shan mt-3 text-sm italic text-slate-500">{font.details}</p>
           )}
         </div>
 
