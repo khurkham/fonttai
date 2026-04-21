@@ -876,12 +876,12 @@ function StaticPage({
                 value={contactForm.firstName}
                 onChange={(e) => updateContactField("firstName", e.target.value)}
                 placeholder="กรอกชื่อ"
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+                className="w-full input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700">
+              <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
                 นามสกุล <span className="text-red-500">*</span>
               </label>
               <input
@@ -889,7 +889,7 @@ function StaticPage({
                 value={contactForm.lastName}
                 onChange={(e) => updateContactField("lastName", e.target.value)}
                 placeholder="กรอกนามสกุล"
-                className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+                className="w-full input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
             </div>
           </div>
@@ -908,7 +908,7 @@ function StaticPage({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
+            <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
               หัวข้อ <span className="text-red-500">*</span>
             </label>
             <input
@@ -916,12 +916,12 @@ function StaticPage({
               value={contactForm.subject}
               onChange={(e) => updateContactField("subject", e.target.value)}
               placeholder="หัวข้อที่ต้องการติดต่อ"
-              className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+              className="input-shan w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
+            <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
               ข้อความ <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -929,7 +929,7 @@ function StaticPage({
               value={contactForm.message}
               onChange={(e) => updateContactField("message", e.target.value)}
               placeholder="กรอกรายละเอียดที่ต้องการติดต่อ"
-              className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+              className="input-shan w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
 
@@ -1835,10 +1835,10 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="mb-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
+              <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+  <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
                   <input
-                    className="input-shan rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
+                    className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
                     value={previewText}
                     onChange={(e) => setPreviewText(e.target.value)}
                     placeholder="พิมพ์ข้อความสำหรับพรีวิว"
@@ -1865,9 +1865,9 @@ export default function App() {
                   />
                 </div>
 
-                <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto]">
+                <div className="mt-4 grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
                   <input
-                    className="rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
+                    className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="ค้นหาฟอนต์"
