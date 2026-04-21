@@ -253,7 +253,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
   onClick={openCookieSettings}
   className="transition hover:text-blue-600"
 >
-  จัดการคุกกี้
+  CookieSettings
 </button>
 
               <button
