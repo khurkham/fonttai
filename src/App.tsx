@@ -21,7 +21,7 @@ type PublicPage =
   | "notfound";
 
 const DEFAULT_PREVIEW =
-  "สวัสดีชาวโลก ၵေႃႈမိူင်းတႆး 👋 The quick brown fox jumps over the lazy dog.";
+  "ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ยินดีต้อนรับ Welcome!";
 
 const GOOGLE_FONTS: FontItem[] = [
   {
