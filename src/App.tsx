@@ -412,7 +412,7 @@ function AddFontModal({
           />
 
           <textarea
-            className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            className="input-shan min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="รายละเอียด"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
