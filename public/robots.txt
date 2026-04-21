@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://font-tai-cloudflare.bejaitai.workers.dev/sitemap.xml
+Sitemap: https://fonttai.com/sitemap.xml
