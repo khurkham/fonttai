@@ -88,14 +88,14 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
                   Font Tai
                 </h3>
                 <p className="text-sm text-slate-500">
-                  Thai &amp; Tai Font Preview Platform
+                  Tai Font Preview Platform
                 </p>
               </div>
             </div>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์
-              รองรับการใช้งานบนทุกอุปกรณ์ และพร้อมต่อยอดสู่ระบบเว็บไซต์เชิงพาณิชย์ในอนาคต
+              เว็บไซต์รวมฟอนต์ไตสำหรับพรีวิว ดาวน์โหลด มีโค้ดสำหรับฝังในเว็บไซต์
+              เพื่อให้สามารถอ่านภาษาไตได้ง่าย
             </p>
           </div>
 
