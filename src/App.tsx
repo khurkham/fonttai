@@ -1822,12 +1822,12 @@ export default function App() {
                   </div>
 
                   <div className="flex items-end">
-                    <AdSlot
+                    {SHOW_AD_PLACEHOLDERS ? (<AdSlot
                       label="พื้นที่โฆษณา Hero Banner"
                       variant="banner"
                       slotId="hero-banner"
                       className="min-h-[160px]"
-                    />
+                    />) : null}
                   </div>
                 </div>
               </section>
@@ -1882,12 +1882,12 @@ export default function App() {
                 </div>
               </section>
 
-              <AdSlot
+              {SHOW_AD_PLACEHOLDERS ? (<AdSlot
                 label="พื้นที่โฆษณาเหนือรายการฟอนต์"
                 variant="banner"
                 slotId="top-font-list"
                 className="mb-8 min-h-[140px]"
-              />
+              />) : null}
 
               {loading ? (
                 <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
@@ -1910,12 +1910,12 @@ export default function App() {
                       {(index + 1) % 5 === 0 &&
                       index !== paginatedFonts.length - 1 ? (
                         <div className="mt-6">
-                          <AdSlot
+                          {SHOW_AD_PLACEHOLDERS ? (<AdSlot
                             label="พื้นที่โฆษณาคั่นรายการฟอนต์"
                             variant="inline"
                             slotId={`inline-${index + 1}`}
                             className="min-h-[120px]"
-                          />
+                          />) : null}
                         </div>
                       ) : null}
                     </div>
@@ -1929,12 +1929,12 @@ export default function App() {
                 onChange={setPage}
               />
 
-              <AdSlot
+              {SHOW_AD_PLACEHOLDERS ? (<AdSlot
                 label="พื้นที่โฆษณาก่อนส่วนท้ายเว็บไซต์"
                 variant="banner"
                 slotId="before-footer"
                 className="mt-10 min-h-[140px]"
-              />
+              />) : null}
             </>
           )}
         </main>

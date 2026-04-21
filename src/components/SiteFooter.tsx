@@ -186,7 +186,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
 
     <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-slate-400">
       <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-      ระบบนับผู้เข้าชมจริงจากฐานข้อมูล D1
+      ระบบนับผู้เข้าชมจริงจากฐานข้อมูล
     </div>
   </div>
 </div>
