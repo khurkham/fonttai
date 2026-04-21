@@ -74,8 +74,8 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           className="mb-8 min-h-[140px]"
         />
 
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-[1.2fr_0.9fr_0.95fr_0.95fr]">
-          <div>
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.15fr_0.9fr_0.95fr_0.95fr] items-stretch">
+          <div className="flex h-full flex-col">
             <div className="flex items-center gap-3">
               <img
                 src="/logo.png"
@@ -98,7 +98,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             </p>
           </div>
 
-          <div>
+          <div className="flex h-full flex-col">
             <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
               เมนูเว็บไซต์
             </h4>
@@ -138,7 +138,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             </div>
           </div>
 
-          <div className="w-full max-w-[320px]">
+          <div className="flex h-full flex-col">
   <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.22em] text-slate-900">
     สถิติผู้เข้าใช้งาน
   </h4>
@@ -190,7 +190,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
   </div>
 </div>
 
-          <div>
+          <div className="flex h-full flex-col">
             <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
               ติดต่อ / ผู้ดูแลระบบ
             </h4>
