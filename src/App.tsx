@@ -1825,14 +1825,14 @@ const seoDescription =
                       Font Preview Platform
                     </p>
 
-                    <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-                      พรีวิวฟอนต์ไตและฟอนต์ไทย
+                    <h2 className="input-shan text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+                      ၽၢင်ႁၢင်ႈၾွၼ်ႉတႆး ယူႇၼီႇၶူတ်ႉ
                       <br />
-                      แบบมืออาชีพในเว็บเดียว
+                      ႁၼ်သႃႇတၢႆႇၵမ်းသိုဝ်ႈ မီးပႃးၶူတ်ႉၾွၼ်ႉတႃႇၽင်ၼႂ်းဝဵပ်ႉသၢႆႉ
                     </h2>
 
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                      รองรับทุกอุปกรณ์ ค้นหาฟอนต์ได้ง่าย รองรับฟอนต์อัปโหลดเอง และพร้อมต่อยอดเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
+                      พรีวิวฟอนต์ไต ค้นหาฟอนต์ได้ง่าย มีโค้ดสำหรับฝังฟอนต์ในเว็บไซต์ และสามารถโหลดฟอนต์ .ttf ไปใช้ได้
                     </p>
                   </div>
 
