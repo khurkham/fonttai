@@ -138,7 +138,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             </div>
           </div>
 
-          <div className="flex h-full w-full max-w-[285px] flex-col">
+          <div className="flex h-full w-full max-w-[250px] flex-col">
   
 
   <div className="rounded-[22px] border border-white/60 bg-white/85 p-3.5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
@@ -157,18 +157,18 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
     </div>
 
     <div className="space-y-1.5">
-      <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
+      <div className="flex min-h-[40px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
         <span className="text-[13px] font-medium text-slate-500">
           ผู้เข้าชมทั้งหมด
         </span>
-        <span className="text-base font-black tracking-tight text-slate-900">
+        <span className="text-[15px] font-black tracking-tight text-slate-900">
           {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
         </span>
       </div>
 
       <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
         <span className="text-[13px] font-medium text-slate-500">วันนี้</span>
-        <span className="text-base font-black tracking-tight text-slate-900">
+        <span className="text-[15px] font-black tracking-tight text-slate-900">
           {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
         </span>
       </div>
@@ -177,7 +177,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
         <span className="text-[13px] font-medium text-slate-500">
           ออนไลน์ตอนนี้
         </span>
-        <span className="text-base font-black tracking-tight text-emerald-600">
+        <span className="text-[15px] font-black tracking-tight text-emerald-600">
           {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
         </span>
       </div>
