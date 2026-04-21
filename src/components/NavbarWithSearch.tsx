@@ -66,7 +66,7 @@ export function NavbarWithSearch({
   className="h-11 w-auto max-w-[44px] object-contain"
 />
             <div>
-              <div className="text-2xl font-black tracking-tight text-slate-900">
+              <div className="font-en text-2xl font-black tracking-tight text-slate-900">
                 Font Tai
               </div>
             </div>

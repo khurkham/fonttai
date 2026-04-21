@@ -44,3 +44,91 @@
     @apply flex min-h-[120px] w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-500;
   }
 }
+
+@font-face {
+  font-family: "Panglong";
+  src: url("/fonts/panglong.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  --font-th: "Sarabun", sans-serif;
+  --font-en: "Inter", sans-serif;
+  --font-shan: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+html,
+body {
+  font-family: "Sarabun", "Inter", sans-serif;
+}
+
+.font-en {
+  font-family: "Inter", sans-serif;
+}
+
+.shan-placeholder::placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.shan-placeholder::-webkit-input-placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.shan-placeholder::-moz-placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.shan-placeholder:-ms-input-placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.shan-placeholder::-ms-input-placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.font-th {
+  font-family: "Sarabun", "Inter", sans-serif;
+}
+
+.font-shan {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.placeholder-shan::placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.input-shan {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+.input-shan::placeholder {
+  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+@font-face {
+  font-family: "Panglong";
+  src: url("/fonts/panglong.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  --font-main: "Sarabun", "Inter", sans-serif;
+  --font-shan: "Panglong", "Tai Heritage Pro", sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+}
+
+.shan-text {
+  font-family: var(--font-shan);
+}
+
+.shan-placeholder::placeholder,
+.shan-placeholder::-webkit-input-placeholder,
+.shan-placeholder::-moz-placeholder,
+.shan-placeholder:-ms-input-placeholder,
+.shan-placeholder::-ms-input-placeholder {
+  font-family: var(--font-shan);
+}
