@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AdSlot } from "./AdSlot";
 import { api } from "../api";
 import type { VisitorCounter } from "../types";
+import { openCookieSettings } from "../utils/cookieConsent";
 
 type Props = {
   onNavigate: (
@@ -247,6 +248,13 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
               >
                 Cookies
               </button>
+              <button
+  type="button"
+  onClick={openCookieSettings}
+  className="transition hover:text-blue-600"
+>
+  จัดการคุกกี้
+</button>
 
               <button
                 type="button"

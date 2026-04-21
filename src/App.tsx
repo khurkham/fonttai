@@ -9,6 +9,7 @@ import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
+import { bindConsentScriptLoader } from "./utils/consentScripts";
 
 type ViewMode = "home" | "admin";
 type PublicPage =
@@ -1279,6 +1280,11 @@ export default function App() {
   useEffect(() => {
     setPage(1);
   }, [search, pageSize]);
+
+  useEffect(() => {
+  const cleanup = bindConsentScriptLoader();
+  return cleanup;
+}, []);
 
   const totalPages = Math.max(1, Math.ceil(allFonts.length / pageSize));
   const paginatedFonts = allFonts.slice((page - 1) * pageSize, page * pageSize);
