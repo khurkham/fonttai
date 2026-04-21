@@ -1,4 +1,4 @@
-import { Eye, Mail, MapPin, Phone, Settings } from "lucide-react";
+import { Mail, MapPin, Phone, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdSlot } from "./AdSlot";
 import { api } from "../api";
@@ -24,13 +24,16 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
     todayVisitors: 0,
     onlineNow: 0,
   });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
 
     async function loadStats() {
       try {
+        setStatsLoading(true);
         const res = await api.getVisitorCounter();
+
         if (active) {
           setStats(res.stats);
         }
@@ -42,13 +45,22 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             onlineNow: 0,
           });
         }
+      } finally {
+        if (active) {
+          setStatsLoading(false);
+        }
       }
     }
 
     loadStats();
 
+    const interval = window.setInterval(() => {
+      loadStats();
+    }, 5000);
+
     return () => {
       active = false;
+      window.clearInterval(interval);
     };
   }, []);
 
@@ -126,41 +138,51 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             </div>
           </div>
 
-          <div>
-            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
+          <div className="w-full max-w-[340px]">
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
               สถิติผู้เข้าใช้งาน
             </h4>
 
-            <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-              <div className="mb-4 flex items-center gap-2 text-slate-900">
-                <Eye size={18} className="text-blue-600" />
-                <span className="text-sm font-bold">Visitor Counter</span>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+              <div className="mb-4 flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                  👁️
+                </div>
+                <h5 className="text-lg font-extrabold text-slate-900">
+                  Visitor Counter
+                </h5>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
-                  <span className="text-sm text-slate-500">ผู้เข้าชมทั้งหมด</span>
-                  <span className="text-base font-bold text-slate-900">
-                    {stats.totalVisitors.toLocaleString()}
+                  <span className="text-sm font-medium text-slate-500">
+                    ผู้เข้าชมทั้งหมด
+                  </span>
+                  <span className="text-xl font-black text-slate-900">
+                    {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
-                  <span className="text-sm text-slate-500">วันนี้</span>
-                  <span className="text-base font-bold text-slate-900">
-                    {stats.todayVisitors.toLocaleString()}
+                  <span className="text-sm font-medium text-slate-500">
+                    วันนี้
+                  </span>
+                  <span className="text-xl font-black text-slate-900">
+                    {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-2xl bg-white px-4 py-3">
-                  <span className="text-sm text-slate-500">ออนไลน์ตอนนี้</span>
-                  <span className="text-base font-bold text-emerald-600">
-                    {stats.onlineNow.toLocaleString()}
+                  <span className="text-sm font-medium text-slate-500">
+                    ออนไลน์ตอนนี้
+                  </span>
+                  <span className="text-xl font-black text-emerald-600">
+                    {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
                   </span>
                 </div>
               </div>
 
-              <p className="mt-4 text-xs leading-5 text-slate-400">
+              <p className="mt-4 text-xs text-slate-400">
                 ระบบนับผู้เข้าชมจริงจากฐานข้อมูล D1
               </p>
             </div>
