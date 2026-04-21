@@ -3,13 +3,6 @@ import { useMemo, useState, useEffect } from "react";
 import type { CookieConsentSettings } from "../utils/cookieConsent";
 
 
-export type CookieConsentSettings = {
-  necessary: true;
-  analytics: boolean;
-  functional: boolean;
-  marketing: boolean;
-};
-
 type Props = {
   open: boolean;
   settings: CookieConsentSettings;
