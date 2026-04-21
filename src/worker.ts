@@ -1,17 +1,19 @@
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
-type Env = {
-  Bindings: {
-    ASSETS?: Fetcher;
-    DB: D1Database;
-    FONT_BUCKET: R2Bucket;
-    APP_NAME?: string;
+type Bindings = {
+  ASSETS?: Fetcher;
+  DB: D1Database;
+  FONT_BUCKET: R2Bucket;
+  APP_NAME?: string;
 
-    ADMIN_USERNAME?: string;
-    ADMIN_PASSWORD_HASH?: string;
-    SESSION_SECRET?: string;
-  };
+  ADMIN_USERNAME?: string;
+  ADMIN_PASSWORD_HASH?: string;
+  SESSION_SECRET?: string;
+};
+
+type Env = {
+  Bindings: Bindings;
 };
 
 type FontRow = {
@@ -54,22 +56,12 @@ type ContactBody = {
 
 const app = new Hono<Env>();
 
-function okJson(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-    },
-  });
+function okJson(c: any, data: Record<string, unknown>, status = 200) {
+  return c.json(data, status);
 }
 
-function errJson(message: string, status = 400) {
-  return new Response(JSON.stringify({ ok: false, message }), {
-    status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-    },
-  });
+function errJson(c: any, message: string, status = 400) {
+  return c.json({ ok: false, message }, status);
 }
 
 async function sha256Hex(input: string): Promise<string> {
@@ -80,9 +72,9 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
-function getAdminConfig(env: Env["Bindings"]) {
+function getAdminConfig(env: Bindings) {
   const username = env.ADMIN_USERNAME?.trim() || "";
-  const passwordHash = env.ADMIN_PASSWORD_HASH?.trim() || "";
+  const passwordHash = env.ADMIN_PASSWORD_HASH?.trim().toLowerCase() || "";
   const sessionSecret = env.SESSION_SECRET?.trim() || "";
 
   return {
@@ -93,13 +85,14 @@ function getAdminConfig(env: Env["Bindings"]) {
   };
 }
 
-async function createSessionToken(env: Env["Bindings"]) {
+async function createSessionToken(env: Bindings) {
   const { username, passwordHash, sessionSecret } = getAdminConfig(env);
   return sha256Hex(`${username}|${passwordHash}|${sessionSecret}`);
 }
 
-async function isAuthenticated(env: Env["Bindings"], token?: string | null) {
+async function isAuthenticated(env: Bindings, token?: string | null) {
   if (!token) return false;
+
   const config = getAdminConfig(env);
   if (!config.configured) return false;
 
@@ -109,13 +102,13 @@ async function isAuthenticated(env: Env["Bindings"], token?: string | null) {
 
 async function requireAuth(c: any, next: () => Promise<void>) {
   const token = getCookie(c, "admin_session");
-  console.log("admin_session cookie:", token ? "FOUND" : "MISSING");
-
   const authed = await isAuthenticated(c.env, token);
-  console.log("authenticated:", authed);
+
+  console.log("requireAuth cookie:", token ? "FOUND" : "MISSING");
+  console.log("requireAuth authed:", authed);
 
   if (!authed) {
-    return errJson("Unauthorized", 401);
+    return errJson(c, "Unauthorized", 401);
   }
 
   await next();
@@ -233,20 +226,20 @@ app.get("/api/fonts", async (c) => {
     ).all<FontRow>();
 
     const items = (result.results ?? []).map((row) => mapFontRow(c, row));
-    return okJson({ ok: true, items });
+    return okJson(c, { ok: true, items });
   } catch (error) {
     console.error("/api/fonts error", error);
-    return errJson("ไม่สามารถโหลดรายการฟอนต์ได้", 500);
+    return errJson(c, "ไม่สามารถโหลดรายการฟอนต์ได้", 500);
   }
 });
 
 app.get("/api/font-file/:key", async (c) => {
   try {
     const key = c.req.param("key");
-    if (!key) return errJson("Missing font key", 400);
+    if (!key) return errJson(c, "Missing font key", 400);
 
     const object = await c.env.FONT_BUCKET.get(key);
-    if (!object) return errJson("ไม่พบไฟล์ฟอนต์", 404);
+    if (!object) return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
 
     const headers = new Headers();
     headers.set(
@@ -265,7 +258,7 @@ app.get("/api/font-file/:key", async (c) => {
     });
   } catch (error) {
     console.error("/api/font-file/:key error", error);
-    return errJson("ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
+    return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
 
@@ -292,7 +285,7 @@ app.get("/api/visitor-counter", async (c) => {
        WHERE last_seen_at < datetime('now', '-15 minutes')`
     ).run();
 
-    return okJson({
+    return okJson(c, {
       ok: true,
       stats: {
         totalVisitors: Number(totalResult?.count ?? 0),
@@ -302,7 +295,7 @@ app.get("/api/visitor-counter", async (c) => {
     });
   } catch (error) {
     console.error("/api/visitor-counter error", error);
-    return errJson("ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
+    return errJson(c, "ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
   }
 });
 
@@ -313,10 +306,10 @@ app.post("/api/visitor-heartbeat", async (c) => {
 
     await upsertActiveVisitor(c, pathname);
 
-    return okJson({ ok: true });
+    return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/visitor-heartbeat error", error);
-    return errJson("ไม่สามารถอัปเดตสถานะผู้ใช้งานได้", 500);
+    return errJson(c, "ไม่สามารถอัปเดตสถานะผู้ใช้งานได้", 500);
   }
 });
 
@@ -331,12 +324,12 @@ app.post("/api/contact", async (c) => {
     const message = body.message?.trim() ?? "";
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      return errJson("กรุณากรอกข้อมูลให้ครบทุกช่อง", 400);
+      return errJson(c, "กรุณากรอกข้อมูลให้ครบทุกช่อง", 400);
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      return errJson("กรุณากรอกอีเมลให้ถูกต้อง", 400);
+      return errJson(c, "กรุณากรอกอีเมลให้ถูกต้อง", 400);
     }
 
     const id = crypto.randomUUID();
@@ -349,14 +342,14 @@ app.post("/api/contact", async (c) => {
       .bind(id, firstName, lastName, email, subject, message)
       .run();
 
-    return okJson({
+    return okJson(c, {
       ok: true,
       message: "ส่งข้อมูลเรียบร้อยแล้ว",
       id,
     });
   } catch (error) {
     console.error("/api/contact error", error);
-    return errJson("ไม่สามารถส่งข้อมูลติดต่อได้", 500);
+    return errJson(c, "ไม่สามารถส่งข้อมูลติดต่อได้", 500);
   }
 });
 
@@ -364,7 +357,7 @@ app.post("/api/contact", async (c) => {
 
 app.get("/api/check-secrets", async (c) => {
   const config = getAdminConfig(c.env);
-  return okJson({
+  return okJson(c, {
     ok: true,
     hasAdminUsername: Boolean(config.username),
     hasAdminPasswordHash: Boolean(config.passwordHash),
@@ -379,7 +372,7 @@ app.post("/api/admin/login", async (c) => {
   try {
     const config = getAdminConfig(c.env);
     if (!config.configured) {
-      return errJson("Admin environment is not configured", 500);
+      return errJson(c, "Admin environment is not configured", 500);
     }
 
     const body = await c.req.json<LoginBody>();
@@ -387,48 +380,50 @@ app.post("/api/admin/login", async (c) => {
     const password = body.password ?? "";
 
     if (!username || !password) {
-      return errJson("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", 400);
+      return errJson(c, "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", 400);
     }
 
-    const passwordHash = await sha256Hex(password);
+    const passwordHash = (await sha256Hex(password)).toLowerCase();
 
-    if (
-      username !== config.username ||
-      passwordHash !== config.passwordHash
-    ) {
-      return errJson("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", 401);
+    if (username !== config.username || passwordHash !== config.passwordHash) {
+      return errJson(c, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", 401);
     }
 
     const token = await createSessionToken(c.env);
 
-   setCookie(c, "admin_session", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "None",
-  path: "/",
-  maxAge: 60 * 60 * 24 * 7,
-});
+    setCookie(c, "admin_session", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
-    return okJson({
+    return okJson(c, {
       ok: true,
       authenticated: true,
     });
   } catch (error) {
     console.error("/api/admin/login error", error);
-    return errJson("ไม่สามารถเข้าสู่ระบบได้", 500);
+    return errJson(c, "ไม่สามารถเข้าสู่ระบบได้", 500);
   }
 });
 
 app.post("/api/admin/logout", async (c) => {
-  deleteCookie(c, "admin_session", { path: "/" });
-  return okJson({ ok: true, authenticated: false });
+  deleteCookie(c, "admin_session", {
+    path: "/",
+    secure: true,
+    sameSite: "Lax",
+  });
+
+  return okJson(c, { ok: true, authenticated: false });
 });
 
 app.get("/api/admin/me", async (c) => {
   const token = getCookie(c, "admin_session");
   const authenticated = await isAuthenticated(c.env, token);
 
-  return okJson({
+  return okJson(c, {
     ok: true,
     authenticated,
     hasCookie: Boolean(token),
@@ -454,8 +449,14 @@ app.post("/api/admin/fonts", async (c) => {
     const details = String(form.get("details") || "").trim();
     const file = form.get("file");
 
-    if (!name || !style || !owner || !characteristics || !(file instanceof File)) {
-      return errJson("กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์", 400);
+    if (
+      !name ||
+      !style ||
+      !owner ||
+      !characteristics ||
+      !(file instanceof File)
+    ) {
+      return errJson(c, "กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์", 400);
     }
 
     const id = crypto.randomUUID();
@@ -477,10 +478,10 @@ app.post("/api/admin/fonts", async (c) => {
       .bind(id, name, style, owner, characteristics, details, fileKey, mimeType)
       .run();
 
-    return okJson({ ok: true, id }, 201);
+    return okJson(c, { ok: true, id }, 201);
   } catch (error) {
     console.error("/api/admin/fonts POST error", error);
-    return errJson("ไม่สามารถเพิ่มฟอนต์ได้", 500);
+    return errJson(c, "ไม่สามารถเพิ่มฟอนต์ได้", 500);
   }
 });
 
@@ -502,7 +503,7 @@ app.patch("/api/admin/fonts/:id", async (c) => {
     const details = body.details?.trim() ?? "";
 
     if (!id || !name || !style || !owner || !characteristics) {
-      return errJson("กรุณากรอกข้อมูลให้ครบ", 400);
+      return errJson(c, "กรุณากรอกข้อมูลให้ครบ", 400);
     }
 
     await c.env.DB.prepare(
@@ -513,17 +514,17 @@ app.patch("/api/admin/fonts/:id", async (c) => {
       .bind(name, style, owner, characteristics, details, id)
       .run();
 
-    return okJson({ ok: true });
+    return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/fonts/:id PATCH error", error);
-    return errJson("ไม่สามารถแก้ไขฟอนต์ได้", 500);
+    return errJson(c, "ไม่สามารถแก้ไขฟอนต์ได้", 500);
   }
 });
 
 app.delete("/api/admin/fonts/:id", async (c) => {
   try {
     const id = c.req.param("id");
-    if (!id) return errJson("Missing font id", 400);
+    if (!id) return errJson(c, "Missing font id", 400);
 
     const font = await c.env.DB.prepare(
       `SELECT id, file_key, is_custom FROM fonts WHERE id = ? LIMIT 1`
@@ -532,11 +533,11 @@ app.delete("/api/admin/fonts/:id", async (c) => {
       .first<{ id: string; file_key: string | null; is_custom: number }>();
 
     if (!font) {
-      return errJson("ไม่พบฟอนต์", 404);
+      return errJson(c, "ไม่พบฟอนต์", 404);
     }
 
     if (!font.is_custom) {
-      return errJson("ไม่สามารถลบฟอนต์ระบบได้", 400);
+      return errJson(c, "ไม่สามารถลบฟอนต์ระบบได้", 400);
     }
 
     if (font.file_key) {
@@ -545,10 +546,10 @@ app.delete("/api/admin/fonts/:id", async (c) => {
 
     await c.env.DB.prepare(`DELETE FROM fonts WHERE id = ?`).bind(id).run();
 
-    return okJson({ ok: true });
+    return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/fonts/:id DELETE error", error);
-    return errJson("ไม่สามารถลบฟอนต์ได้", 500);
+    return errJson(c, "ไม่สามารถลบฟอนต์ได้", 500);
   }
 });
 
@@ -558,13 +559,13 @@ app.get("/api/admin/contact-messages", async (c) => {
       `SELECT * FROM contact_messages ORDER BY created_at DESC`
     ).all<ContactRow>();
 
-    return okJson({
+    return okJson(c, {
       ok: true,
       items: (result.results ?? []).map(mapContactRow),
     });
   } catch (error) {
     console.error("/api/admin/contact-messages error", error);
-    return errJson("ไม่สามารถดึงข้อมูลข้อความติดต่อได้", 500);
+    return errJson(c, "ไม่สามารถดึงข้อมูลข้อความติดต่อได้", 500);
   }
 });
 
@@ -578,10 +579,10 @@ app.patch("/api/admin/contact-messages/:id/read", async (c) => {
       .bind(id)
       .run();
 
-    return okJson({ ok: true });
+    return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/contact-messages/:id/read error", error);
-    return errJson("ไม่สามารถอัปเดตสถานะข้อความได้", 500);
+    return errJson(c, "ไม่สามารถอัปเดตสถานะข้อความได้", 500);
   }
 });
 
@@ -589,16 +590,14 @@ app.delete("/api/admin/contact-messages/:id", async (c) => {
   try {
     const id = c.req.param("id");
 
-    await c.env.DB.prepare(
-      `DELETE FROM contact_messages WHERE id = ?`
-    )
+    await c.env.DB.prepare(`DELETE FROM contact_messages WHERE id = ?`)
       .bind(id)
       .run();
 
-    return okJson({ ok: true });
+    return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/contact-messages/:id delete error", error);
-    return errJson("ไม่สามารถลบข้อความได้", 500);
+    return errJson(c, "ไม่สามารถลบข้อความได้", 500);
   }
 });
 
@@ -647,7 +646,7 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
     });
   } catch (error) {
     console.error("/api/admin/contact-messages/export.csv error", error);
-    return errJson("ไม่สามารถ export CSV ได้", 500);
+    return errJson(c, "ไม่สามารถ export CSV ได้", 500);
   }
 });
 
@@ -692,4 +691,3 @@ app.all("*", async (c) => {
 });
 
 export default app;
-
