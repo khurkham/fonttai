@@ -139,9 +139,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           </div>
 
           <div className="flex h-full w-full max-w-[285px] flex-col">
-  <h4 className="mb-2.5 text-sm font-bold uppercase tracking-[0.18em] text-slate-900">
-    สถิติผู้เข้าใช้งาน
-  </h4>
+  
 
   <div className="rounded-[22px] border border-white/60 bg-white/85 p-3.5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
     <div className="mb-2.5 flex items-center gap-2">
