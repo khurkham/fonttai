@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Panglong";
-  src: url("/fonts/panglong.ttf") format("truetype");
+  font-family: "namtengwebpro";
+  src: url("/fonts/namtengwebpro.ttf") format("truetype");
   font-display: swap;
 }
 
