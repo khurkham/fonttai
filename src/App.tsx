@@ -660,7 +660,7 @@ function StaticPage({
             นโยบายความเป็นส่วนตัว
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            อัปเดตล่าสุด: [ใส่วันที่]
+            อัปเดตล่าสุด: 21/4/2026
           </p>
         </div>
 
@@ -736,7 +736,7 @@ function StaticPage({
             นโยบายคุกกี้
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            อัปเดตล่าสุด: [ใส่วันที่]
+            อัปเดตล่าสุด: 21/4/2026
           </p>
         </div>
 
