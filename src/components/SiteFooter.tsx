@@ -138,57 +138,55 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             </div>
           </div>
 
-          <div className="flex h-full w-full max-w-[300px] flex-col">
-  <h4 className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-slate-900">
+          <div className="flex h-full w-full max-w-[285px] flex-col">
+  <h4 className="mb-2.5 text-sm font-bold uppercase tracking-[0.18em] text-slate-900">
     สถิติผู้เข้าใช้งาน
   </h4>
 
-  <div className="flex flex-col rounded-[24px] border border-white/60 bg-white/80 p-4 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-sm">
-    <div className="mb-3 flex items-center gap-2.5">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shadow-sm">
+  <div className="rounded-[22px] border border-white/60 bg-white/85 p-3.5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+    <div className="mb-2.5 flex items-center gap-2">
+      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-[13px] text-blue-600 shadow-sm">
         👁️
       </div>
       <div>
-        <h5 className="text-base font-extrabold text-slate-900">
+        <h5 className="text-[15px] font-extrabold leading-none text-slate-900">
           Visitor Counter
         </h5>
-        <p className="text-[11px] text-slate-400">
+        <p className="mt-1 text-[10px] leading-none text-slate-400">
           อัปเดตอัตโนมัติแบบเรียลไทม์
         </p>
       </div>
     </div>
 
-    <div className="space-y-2">
-      <div className="flex min-h-[50px] items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-2.5">
-        <span className="text-sm font-medium text-slate-500">
+    <div className="space-y-1.5">
+      <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
+        <span className="text-[13px] font-medium text-slate-500">
           ผู้เข้าชมทั้งหมด
         </span>
-        <span className="text-lg font-black tracking-tight text-slate-900">
+        <span className="text-base font-black tracking-tight text-slate-900">
           {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
         </span>
       </div>
 
-      <div className="flex min-h-[50px] items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-2.5">
-        <span className="text-sm font-medium text-slate-500">
-          วันนี้
-        </span>
-        <span className="text-lg font-black tracking-tight text-slate-900">
+      <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
+        <span className="text-[13px] font-medium text-slate-500">วันนี้</span>
+        <span className="text-base font-black tracking-tight text-slate-900">
           {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
         </span>
       </div>
 
-      <div className="flex min-h-[50px] items-center justify-between rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-4 py-2.5">
-        <span className="text-sm font-medium text-slate-500">
+      <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-3 py-2">
+        <span className="text-[13px] font-medium text-slate-500">
           ออนไลน์ตอนนี้
         </span>
-        <span className="text-lg font-black tracking-tight text-emerald-600">
+        <span className="text-base font-black tracking-tight text-emerald-600">
           {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
         </span>
       </div>
     </div>
 
-    <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
-      <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+    <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-slate-400">
+      <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
       ระบบนับผู้เข้าชมจริงจากฐานข้อมูล D1
     </div>
   </div>
