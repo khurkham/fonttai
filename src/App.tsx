@@ -22,6 +22,7 @@ type PublicPage =
   | "contact"
   | "notfound";
 
+ 
 const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
 
@@ -1367,29 +1368,40 @@ export default function App() {
     setViewMode("home");
   }
 
-  const seoTitle =
-    publicPage === "privacy"
-      ? "Privacy Policy | Font Tai"
-      : publicPage === "cookie"
-      ? "Cookie Policy | Font Tai"
-      : publicPage === "about"
-      ? "About Us | Font Tai"
-      : publicPage === "services"
-      ? "Services | Font Tai"
-      : publicPage === "contact"
-      ? "Contact | Font Tai"
-      : publicPage === "notfound"
-      ? "404 Not Found | Font Tai"
-      : "Font Tai - แหล่งรวมฟอนต์ไต ฟอนต์ไทย พรีวิวฟอนต์ออนไลน์";
 
-  const seoDescription =
-    publicPage === "home"
-      ? "เว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ รองรับมือถือ เดสก์ท็อป และพร้อมต่อยอด SEO"
-      : publicPage === "contact"
-      ? "ติดต่อทีมงาน Font Tai ผ่านแบบฟอร์มติดต่อบนเว็บไซต์"
-      : publicPage === "notfound"
-      ? "ไม่พบหน้าที่คุณต้องการ"
-      : "ข้อมูลสำคัญของเว็บไซต์ Font Tai";
+
+  const seoTitle =
+  publicPage === "privacy"
+    ? "Privacy Policy - นโยบายความเป็นส่วนตัว | Font Tai"
+    : publicPage === "cookie"
+    ? "Cookie Policy - นโยบายคุกกี้ | Font Tai"
+    : publicPage === "about"
+    ? "About Font Tai - เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
+    : publicPage === "services"
+    ? "Services - Preview, Download & Font Embed Code | Font Tai"
+    : publicPage === "contact"
+    ? "Contact Font Tai - ติดต่อสอบถาม แนะนำฟอนต์ และแจ้งปัญหา"
+    : publicPage === "notfound"
+    ? "404 Not Found | Font Tai"
+    : "Font Tai ၾွၼ်ႉတႆး - ฟอนต์ไต ฟอนต์ไทใหญ่ Shan Font Preview & Download";
+
+const seoDescription =
+  publicPage === "home"
+    ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับการแสดงผลภาษาไต ภาษาไทย และทุกอุปกรณ์ Font Tai ၾွၼ်ႉတႆး รวม Tai font, Shan font และ Thai font สำหรับ font preview, font download และ embed font code บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และการใช้งานทุกอุปกรณ์"
+    : publicPage === "about"
+    ? "รู้จัก Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Tai font ที่ช่วยให้พรีวิวฟอนต์ ดาวน์โหลดฟอนต์ และนำฟอนต์ไปใช้งานบนเว็บไซต์ได้ง่ายขึ้น"
+    : publicPage === "services"
+    ? "บริการของ Font Tai ครอบคลุมการพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ ดูโค้ดฝังฟอนต์ และจัดการฟอนต์สำหรับใช้งานบนเว็บไซต์ทั้งภาษาไต ภาษาไทย และภาษาอังกฤษ"
+    : publicPage === "contact"
+    ? "ติดต่อทีมงาน Font Tai เพื่อสอบถามการใช้งานเว็บไซต์ แนะนำฟอนต์ แจ้งปัญหาการดาวน์โหลดฟอนต์ หรือพูดคุยเรื่องการใช้งานฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
+    : publicPage === "privacy"
+    ? "อ่านนโยบายความเป็นส่วนตัวของ Font Tai เพื่อดูแนวทางการเก็บ ใช้ และคุ้มครองข้อมูลผู้ใช้งาน รวมถึงข้อมูลการใช้งานเว็บไซต์ คุกกี้ และแบบฟอร์มติดต่อ"
+    : publicPage === "cookie"
+    ? "อ่านนโยบายคุกกี้ของ Font Tai เพื่อทำความเข้าใจประเภทของคุกกี้ที่ใช้ วัตถุประสงค์ในการใช้งาน และวิธีจัดการการตั้งค่าคุกกี้บนเว็บไซต์"
+    : publicPage === "notfound"
+    ? "ไม่พบหน้าที่คุณค้นหาบนเว็บไซต์ Font Tai กรุณากลับไปยังหน้าแรก ค้นหาฟอนต์ หรือไปยังหน้าติดต่อเพื่อสอบถามข้อมูลเพิ่มเติม"
+    : "Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Shan font สำหรับพรีวิวออนไลน์ ดาวน์โหลด และฝังฟอนต์บนเว็บไซต์";
+
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
