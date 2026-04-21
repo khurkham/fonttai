@@ -25,6 +25,13 @@ export const api = {
   getVisitorCounter: () =>
     request<{ ok: boolean; stats: VisitorCounter }>("/api/visitor-counter"),
 
+  visitorHeartbeat: (path: string) =>
+    request<{ ok: boolean }>("/api/visitor-heartbeat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+    }),
+
   login: (username: string, password: string) =>
     request<AuthResponse>("/api/admin/login", {
       method: "POST",

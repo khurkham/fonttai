@@ -118,6 +118,40 @@ async function requireAuth(c: any, next: () => Promise<void>) {
   await next();
 }
 
+async function upsertActiveVisitor(c: any, pathname: string) {
+  const ip = getClientIp(c);
+  const ipHash = await sha256Hex(ip);
+  const userAgent = c.req.header("user-agent") || "";
+
+  await c.env.DB.prepare(
+    `INSERT INTO active_visitors (ip_hash, path, user_agent, last_seen_at, first_seen_at)
+     VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+     ON CONFLICT(ip_hash) DO UPDATE SET
+       path = excluded.path,
+       user_agent = excluded.user_agent,
+       last_seen_at = CURRENT_TIMESTAMP`
+  )
+    .bind(ipHash, pathname, userAgent)
+    .run();
+
+  return { ipHash, userAgent };
+}
+
+app.post("/api/visitor-heartbeat", async (c) => {
+  try {
+    const body = await c.req.json<{ path?: string }>().catch(() => ({}));
+    const pathname = (body.path || "/").trim() || "/";
+
+    await upsertActiveVisitor(c, pathname);
+
+    return okJson({ ok: true });
+  } catch (error) {
+    console.error("/api/visitor-heartbeat error", error);
+    return errJson("ไม่สามารถอัปเดตสถานะผู้ใช้งานได้", 500);
+  }
+});
+
+
 function mapFontRow(c: any, row: FontRow) {
   const fileUrl =
     row.file_key && row.is_custom
@@ -260,10 +294,15 @@ app.get("/api/visitor-counter", async (c) => {
     ).first<{ count: number }>();
 
     const onlineResult = await c.env.DB.prepare(
-      `SELECT COUNT(DISTINCT ip_hash) AS count
-       FROM visitor_stats
-       WHERE visited_at >= datetime('now', '-10 minutes')`
+      `SELECT COUNT(*) AS count
+       FROM active_visitors
+       WHERE last_seen_at >= datetime('now', '-1 minute')`
     ).first<{ count: number }>();
+
+    await c.env.DB.prepare(
+      `DELETE FROM active_visitors
+       WHERE last_seen_at < datetime('now', '-15 minutes')`
+    ).run();
 
     return okJson({
       ok: true,
@@ -616,9 +655,7 @@ app.all("*", async (c) => {
     const pathname = new URL(c.req.url).pathname;
 
     if (shouldTrackPath(pathname)) {
-      const ip = getClientIp(c);
-      const ipHash = await sha256Hex(ip);
-      const userAgent = c.req.header("user-agent") || "";
+      const { ipHash, userAgent } = await upsertActiveVisitor(c, pathname);
 
       const recent = await c.env.DB.prepare(
         `SELECT id

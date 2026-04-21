@@ -20,8 +20,6 @@ export type AuthResponse = {
   message?: string;
 };
 
-
-
 export type ContactMessage = {
   id: string;
   firstName: string;

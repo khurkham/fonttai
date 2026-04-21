@@ -1139,6 +1139,14 @@ export default function App() {
     }
   }
 
+  async function sendHeartbeat() {
+    try {
+      await api.visitorHeartbeat(window.location.pathname);
+    } catch {
+      // เงียบไว้ ไม่ต้องรบกวนผู้ใช้
+    }
+  }
+
   async function handleExportContactCsv() {
     try {
       const blob = await api.exportContactMessagesCsv();
@@ -1261,6 +1269,16 @@ export default function App() {
   useEffect(() => {
     setPage(1);
   }, [search, pageSize]);
+
+    useEffect(() => {
+    sendHeartbeat();
+
+    const interval = window.setInterval(() => {
+      sendHeartbeat();
+    }, 25000);
+
+    return () => window.clearInterval(interval);
+  }, [publicPage]);
 
   const totalPages = Math.max(1, Math.ceil(allFonts.length / pageSize));
   const paginatedFonts = allFonts.slice((page - 1) * pageSize, page * pageSize);
