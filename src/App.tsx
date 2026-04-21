@@ -11,6 +11,7 @@ import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
 import { bindConsentScriptLoader } from "./utils/consentScripts";
 
+
 type ViewMode = "home" | "admin";
 type PublicPage =
   | "home"
@@ -23,6 +24,8 @@ type PublicPage =
 
 const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
+
+const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
 
 const GOOGLE_FONTS: FontItem[] = [
   {
