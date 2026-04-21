@@ -2,10 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Panglong";
+  src: url("/fonts/panglong.ttf") format("truetype");
+  font-display: swap;
+}
+
 @layer base {
   :root {
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, Helvetica, Arial, sans-serif;
+    --font-main: "Sarabun", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-en: "Inter", sans-serif;
+    --font-shan: "Panglong", "Tai Heritage Pro", sans-serif;
+
     color: #0f172a;
     background: #f8fafc;
   }
@@ -14,6 +23,11 @@
   body,
   #root {
     min-height: 100%;
+  }
+
+  html,
+  body {
+    font-family: var(--font-main);
   }
 
   body {
@@ -45,83 +59,20 @@
   }
 }
 
-@font-face {
-  font-family: "Panglong";
-  src: url("/fonts/panglong.ttf") format("truetype");
-  font-display: swap;
-}
-
-:root {
-  --font-th: "Sarabun", sans-serif;
-  --font-en: "Inter", sans-serif;
-  --font-shan: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-html,
-body {
-  font-family: "Sarabun", "Inter", sans-serif;
-}
-
-.font-en {
-  font-family: "Inter", sans-serif;
-}
-
-.shan-placeholder::placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-.shan-placeholder::-webkit-input-placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-.shan-placeholder::-moz-placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-.shan-placeholder:-ms-input-placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-.shan-placeholder::-ms-input-placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
 .font-th {
   font-family: "Sarabun", "Inter", sans-serif;
 }
 
-.font-shan {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+.font-en {
+  font-family: var(--font-en);
 }
 
-.placeholder-shan::placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
+.font-shan,
+.shan-text {
+  font-family: var(--font-shan);
 }
 
 .input-shan {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-.input-shan::placeholder {
-  font-family: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-@font-face {
-  font-family: "Panglong";
-  src: url("/fonts/panglong.ttf") format("truetype");
-  font-display: swap;
-}
-
-:root {
-  --font-main: "Sarabun", "Inter", sans-serif;
-  --font-shan: "Panglong", "Tai Heritage Pro", sans-serif;
-}
-
-body {
-  font-family: var(--font-main);
-}
-
-.shan-text {
   font-family: var(--font-shan);
 }
 
@@ -129,6 +80,11 @@ body {
 .shan-placeholder::-webkit-input-placeholder,
 .shan-placeholder::-moz-placeholder,
 .shan-placeholder:-ms-input-placeholder,
-.shan-placeholder::-ms-input-placeholder {
+.shan-placeholder::-ms-input-placeholder,
+.input-shan::placeholder,
+.input-shan::-webkit-input-placeholder,
+.input-shan::-moz-placeholder,
+.input-shan:-ms-input-placeholder,
+.input-shan::-ms-input-placeholder {
   font-family: var(--font-shan);
 }
