@@ -74,7 +74,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           className="mb-8 min-h-[140px]"
         />
 
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.15fr_0.9fr_0.95fr_0.95fr] items-stretch">
+        <div className="grid items-stretch gap-8 md:grid-cols-2 xl:grid-cols-[1.15fr_0.9fr_0.95fr_0.95fr]">
           <div className="flex h-full flex-col">
             <div className="flex items-center gap-3">
               <img
@@ -138,57 +138,61 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
             </div>
           </div>
 
-          <div className="flex h-full flex-col">
-  <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.22em] text-slate-900">
-    สถิติผู้เข้าใช้งาน
-  </h4>
+          <div className="flex h-full w-full max-w-[320px] flex-col">
+            <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.22em] text-slate-900">
+              สถิติผู้เข้าใช้งาน
+            </h4>
 
-  <div className="rounded-[28px] border border-white/60 bg-white/80 p-4 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-sm">
-    <div className="mb-4 flex items-center gap-2.5">
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shadow-sm">
-        👁️
-      </div>
-      <div>
-        <h5 className="text-base font-extrabold text-slate-900">
-          Visitor Counter
-        </h5>
-        <p className="text-xs text-slate-400">อัปเดตอัตโนมัติแบบเรียลไทม์</p>
-      </div>
-    </div>
+            <div className="flex h-full flex-col rounded-[28px] border border-white/60 bg-white/80 p-4 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-sm">
+              <div className="mb-4 flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shadow-sm">
+                  👁️
+                </div>
+                <div>
+                  <h5 className="text-base font-extrabold text-slate-900">
+                    Visitor Counter
+                  </h5>
+                  <p className="text-xs text-slate-400">
+                    อัปเดตอัตโนมัติแบบเรียลไทม์
+                  </p>
+                </div>
+              </div>
 
-    <div className="space-y-2.5">
-      <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3">
-        <span className="text-sm font-medium text-slate-500">
-          ผู้เข้าชมทั้งหมด
-        </span>
-        <span className="text-lg font-black tracking-tight text-slate-900">
-          {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
-        </span>
-      </div>
+              <div className="space-y-2.5">
+                <div className="flex min-h-[66px] items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3">
+                  <span className="text-sm font-medium text-slate-500">
+                    ผู้เข้าชมทั้งหมด
+                  </span>
+                  <span className="text-lg font-black tracking-tight text-slate-900">
+                    {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
+                  </span>
+                </div>
 
-      <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3">
-        <span className="text-sm font-medium text-slate-500">วันนี้</span>
-        <span className="text-lg font-black tracking-tight text-slate-900">
-          {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
-        </span>
-      </div>
+                <div className="flex min-h-[66px] items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3">
+                  <span className="text-sm font-medium text-slate-500">
+                    วันนี้
+                  </span>
+                  <span className="text-lg font-black tracking-tight text-slate-900">
+                    {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
+                  </span>
+                </div>
 
-      <div className="flex items-center justify-between rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-4 py-3">
-        <span className="text-sm font-medium text-slate-500">
-          ออนไลน์ตอนนี้
-        </span>
-        <span className="text-lg font-black tracking-tight text-emerald-600">
-          {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
-        </span>
-      </div>
-    </div>
+                <div className="flex min-h-[66px] items-center justify-between rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-4 py-3">
+                  <span className="text-sm font-medium text-slate-500">
+                    ออนไลน์ตอนนี้
+                  </span>
+                  <span className="text-lg font-black tracking-tight text-emerald-600">
+                    {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
+                  </span>
+                </div>
+              </div>
 
-    <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-400">
-      <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-      ระบบนับผู้เข้าชมจริงจากฐานข้อมูล D1
-    </div>
-  </div>
-</div>
+              <div className="mt-auto flex items-center gap-2 pt-4 text-[11px] text-slate-400">
+                <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                ระบบนับผู้เข้าชมจริงจากฐานข้อมูล D1
+              </div>
+            </div>
+          </div>
 
           <div className="flex h-full flex-col">
             <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
@@ -212,14 +216,16 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={onAdminClick}
-              className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
-            >
-              <Settings size={16} />
-              เข้าหลังบ้าน
-            </button>
+            <div className="mt-auto pt-5">
+              <button
+                type="button"
+                onClick={onAdminClick}
+                className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                <Settings size={16} />
+                เข้าหลังบ้าน
+              </button>
+            </div>
           </div>
         </div>
 
