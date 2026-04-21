@@ -109,7 +109,10 @@ async function isAuthenticated(env: Env["Bindings"], token?: string | null) {
 
 async function requireAuth(c: any, next: () => Promise<void>) {
   const token = getCookie(c, "admin_session");
+  console.log("admin_session cookie:", token ? "FOUND" : "MISSING");
+
   const authed = await isAuthenticated(c.env, token);
+  console.log("authenticated:", authed);
 
   if (!authed) {
     return errJson("Unauthorized", 401);
@@ -398,13 +401,13 @@ app.post("/api/admin/login", async (c) => {
 
     const token = await createSessionToken(c.env);
 
-    setCookie(c, "admin_session", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+   setCookie(c, "admin_session", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+  maxAge: 60 * 60 * 24 * 7,
+});
 
     return okJson({
       ok: true,
@@ -428,6 +431,7 @@ app.get("/api/admin/me", async (c) => {
   return okJson({
     ok: true,
     authenticated,
+    hasCookie: Boolean(token),
   });
 });
 
