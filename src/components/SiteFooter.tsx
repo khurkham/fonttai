@@ -74,7 +74,7 @@ export function SiteFooter({ onNavigate, onAdminClick }: Props) {
           className="mb-8 min-h-[140px]"
         />
 
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-[1.2fr_0.9fr_0.95fr_0.95fr]">
           <div>
             <div className="flex items-center gap-3">
               <img
