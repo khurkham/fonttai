@@ -1838,7 +1838,7 @@ export default function App() {
               <section className="mb-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
                   <input
-                    className="shan-placeholder rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
+                    className="input-shan rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
                     value={previewText}
                     onChange={(e) => setPreviewText(e.target.value)}
                     placeholder="พิมพ์ข้อความสำหรับพรีวิว"
