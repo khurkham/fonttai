@@ -21,7 +21,7 @@ type PublicPage =
   | "notfound";
 
 const DEFAULT_PREVIEW =
-  "ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ยินดีต้อนรับ Welcome!";
+  "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
 
 const GOOGLE_FONTS: FontItem[] = [
   {
