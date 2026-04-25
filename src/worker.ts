@@ -233,23 +233,24 @@ app.get("/api/fonts", async (c) => {
   }
 });
 
-app.get("/api/font-file/:key", async (c) => {
+app.get("/api/font-file/*", async (c) => {
   try {
-    const key = c.req.param("key");
+    const key = c.req.path.replace(/^\/api\/font-file\//, "");
     if (!key) return errJson(c, "Missing font key", 400);
 
-    const object = await c.env.FONT_BUCKET.get(key);
+    const decodedKey = decodeURIComponent(key);
+    const object = await c.env.FONT_BUCKET.get(decodedKey);
     if (!object) return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
 
     const headers = new Headers();
     headers.set(
       "content-type",
-      object.httpMetadata?.contentType || getMimeType(key)
+      object.httpMetadata?.contentType || getMimeType(decodedKey)
     );
     headers.set("cache-control", "public, max-age=31536000, immutable");
     headers.set(
       "content-disposition",
-      `attachment; filename="${key.split("/").pop() || "font"}"`
+      `attachment; filename="${decodedKey.split("/").pop() || "font"}"`
     );
 
     return new Response(object.body, {
@@ -257,7 +258,7 @@ app.get("/api/font-file/:key", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/:key error", error);
+    console.error("/api/font-file/* error", error);
     return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
