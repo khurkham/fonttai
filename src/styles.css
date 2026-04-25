@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "NamTeng2017";
+  src: url("/fonts/NamTeng2017.ttf") format("truetype");
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --font-main: "Sarabun", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-en: "Inter", sans-serif;
+    --font-shan: "NamTeng2017", "Tai Heritage Pro", sans-serif;
+
+    color: #0f172a;
+    background: #f8fafc;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  html,
+  body {
+    font-family: var(--font-main);
+  }
+
+  body {
+    margin: 0;
+    background: #f8fafc;
+    color: #0f172a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .ad-slot {
+    @apply flex min-h-[120px] w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-500;
+  }
+}
+
+.font-th {
+  font-family: "Sarabun", "Inter", sans-serif;
+}
+
+.font-en {
+  font-family: var(--font-en);
+}
+
+.font-shan,
+.shan-text {
+  font-family: var(--font-shan);
+}
+
+.input-shan {
+  font-family: var(--font-shan);
+}
+
+.shan-placeholder::placeholder,
+.shan-placeholder::-webkit-input-placeholder,
+.shan-placeholder::-moz-placeholder,
+.shan-placeholder:-ms-input-placeholder,
+.shan-placeholder::-ms-input-placeholder,
+.input-shan::placeholder,
+.input-shan::-webkit-input-placeholder,
+.input-shan::-moz-placeholder,
+.input-shan:-ms-input-placeholder,
+.input-shan::-ms-input-placeholder {
+  font-family: var(--font-shan);
+}
