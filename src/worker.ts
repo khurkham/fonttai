@@ -303,7 +303,7 @@ app.get("/api/font-file", async (c) => {
   }
 });
 
-app.head("/api/font-file", async (c) => {
+app.on("HEAD", "/api/font-file", async (c) => {
   try {
     const rawKey = c.req.query("key") || "";
     const key = decodeURIComponent(rawKey);
