@@ -271,11 +271,9 @@ app.get("/api/fonts", async (c) => {
   }
 });
 
-app.get("/api/font-file/*", async (c) => {
+app.get("/api/font-file/:key{.+}", async (c) => {
   try {
-    const rawKey = c.req.path.replace(/^\/api\/font-file\//, "");
-    const key = decodeURIComponent(rawKey);
-
+    const key = decodeURIComponent(c.req.param("key"));
     if (!key) return errJson(c, "Missing font key", 400);
 
     const object = await c.env.FONT_BUCKET.get(key);
@@ -298,16 +296,14 @@ app.get("/api/font-file/*", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/* error", error);
+    console.error("/api/font-file/:key{.+} GET error", error);
     return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
 
-app.get("/api/font-file/*", async (c) => {
+app.get("/api/font-file/:key{.+}", async (c) => {
   try {
-    const rawKey = c.req.path.replace(/^\/api\/font-file\//, "");
-    const key = decodeURIComponent(rawKey);
-
+    const key = decodeURIComponent(c.req.param("key"));
     if (!key) return new Response(null, { status: 400 });
 
     const object = await c.env.FONT_BUCKET.head(key);
@@ -330,7 +326,7 @@ app.get("/api/font-file/*", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/* HEAD error", error);
+    console.error("/api/font-file/:key{.+} HEAD error", error);
     return new Response(null, { status: 500 });
   }
 });
