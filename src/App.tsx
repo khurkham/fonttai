@@ -27,6 +27,23 @@ const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
 
 const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
+const FONT_CHARACTERISTIC_OPTIONS = [
+  { value: "official", label: "ทางการ" },
+  { value: "modern", label: "ทันสมัย" },
+  { value: "display", label: "พาดหัว / โปสเตอร์" },
+  { value: "body", label: "เนื้อหา อ่านยาว" },
+  { value: "handwriting", label: "ลายมือ" },
+  { value: "decorative", label: "ตกแต่ง" },
+  { value: "traditional", label: "ดั้งเดิม" },
+  { value: "Regular", label: "ทางการ" },
+  { value: "Bold", label: "พาดหัว / โปสเตอร์" },
+  { value: "Italic", label: "ลายมือ" },
+] as const;
+
+function getCharacteristicLabel(value: string) {
+  const found = FONT_CHARACTERISTIC_OPTIONS.find((item) => item.value === value);
+  return found?.label || value;
+}
 
 const GOOGLE_FONTS: FontItem[] = [
   {
@@ -120,6 +137,8 @@ const GOOGLE_FONTS: FontItem[] = [
     downloadUrl: "",
   },
 ];
+
+
 
 function pageToPath(page: PublicPage): string {
   switch (page) {
@@ -316,7 +335,7 @@ function AddFontModal({
   const [name, setName] = useState("");
   const [style, setStyle] = useState("Regular");
   const [owner, setOwner] = useState("");
-  const [characteristics, setCharacteristics] = useState("");
+  const [characteristics, setCharacteristics] = useState("official");
   const [details, setDetails] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -349,7 +368,7 @@ function AddFontModal({
       setName("");
       setStyle("Regular");
       setOwner("");
-      setCharacteristics("");
+      setCharacteristics("official");
       setDetails("");
       setFile(null);
 
@@ -404,12 +423,17 @@ function AddFontModal({
             onChange={(e) => setOwner(e.target.value)}
           />
 
-          <input
-            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ลักษณะ"
-            value={characteristics}
-            onChange={(e) => setCharacteristics(e.target.value)}
-          />
+          <select
+  className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+  value={characteristics}
+  onChange={(e) => setCharacteristics(e.target.value)}
+>
+  {FONT_CHARACTERISTIC_OPTIONS.map((option) => (
+    <option key={option.value} value={option.value}>
+      {option.label}
+    </option>
+  ))}
+</select>
 
           <textarea
             className="input-shan min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
@@ -456,7 +480,7 @@ function EditFontModal({
   const [name, setName] = useState("");
   const [style, setStyle] = useState("Regular");
   const [owner, setOwner] = useState("");
-  const [characteristics, setCharacteristics] = useState("");
+const [characteristics, setCharacteristics] = useState("official");
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -466,7 +490,7 @@ function EditFontModal({
     setName(font.name || "");
     setStyle(font.style || "Regular");
     setOwner(font.owner || "");
-    setCharacteristics(font.characteristics || "");
+setCharacteristics(font.characteristics || "official");
     setDetails(font.details || "");
     setError("");
   }, [font]);
@@ -542,12 +566,17 @@ function EditFontModal({
             onChange={(e) => setOwner(e.target.value)}
           />
 
-          <input
-            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ลักษณะ"
-            value={characteristics}
-            onChange={(e) => setCharacteristics(e.target.value)}
-          />
+          <select
+  className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+  value={characteristics}
+  onChange={(e) => setCharacteristics(e.target.value)}
+>
+  {FONT_CHARACTERISTIC_OPTIONS.map((option) => (
+    <option key={option.value} value={option.value}>
+      {option.label}
+    </option>
+  ))}
+</select>
 
           <textarea
             className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
@@ -1533,7 +1562,7 @@ const seoDescription =
                           <td className="px-4 py-4 font-semibold">{font.name}</td>
                           <td className="px-4 py-4">{font.style}</td>
                           <td className="px-4 py-4">{font.owner}</td>
-                          <td className="px-4 py-4">{font.characteristics}</td>
+                          <td className="px-4 py-4">{getCharacteristicLabel(font.characteristics)}</td>
                           <td className="px-4 py-4">
                             {font.isCustom ? "Custom" : "Google"}
                           </td>

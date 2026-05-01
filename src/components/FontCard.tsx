@@ -11,6 +11,19 @@ type Props = {
   onShowCode: (font: FontItem) => void;
 };
 
+const CHARACTERISTIC_LABELS: Record<string, string> = {
+  official: "ทางการ",
+  modern: "ทันสมัย",
+  display: "พาดหัว / โปสเตอร์",
+  body: "เนื้อหา อ่านยาว",
+  handwriting: "ลายมือ",
+  decorative: "ตกแต่ง",
+  traditional: "ดั้งเดิม",
+  Regular: "ทางการ",
+  Bold: "พาดหัว / โปสเตอร์",
+  Italic: "ลายมือ",
+};
+
 export function FontCard({
   font,
   previewText,
@@ -21,13 +34,14 @@ export function FontCard({
   const [fontLoaded, setFontLoaded] = useState(!font.isCustom);
 
   const fontFamily = getFamily(font.name, font.isCustom);
-const fileHref = font.isCustom
-  ? normalizeFontUrl(font.fileUrl)
-  : `https://fonts.google.com/specimen/${font.name.replace(/\s+/g, "+")}`;
+  const fileHref = font.isCustom
+    ? normalizeFontUrl(font.fileUrl)
+    : `https://fonts.google.com/specimen/${font.name.replace(/\s+/g, "+")}`;
 
-const downloadHref = font.isCustom
-  ? normalizeFontUrl(font.downloadUrl)
-  : fileHref;
+  const downloadHref = font.isCustom
+    ? normalizeFontUrl(font.downloadUrl)
+    : fileHref;
+
   useEffect(() => {
     let cancelled = false;
 
@@ -103,12 +117,14 @@ const downloadHref = font.isCustom
             </p>
             <p>
               <span className="font-semibold text-slate-800">ลักษณะ:</span>{" "}
-              {font.characteristics}
+              {CHARACTERISTIC_LABELS[font.characteristics] || font.characteristics}
             </p>
           </div>
 
           {font.details && (
-            <p className="input-shan mt-3 text-sm italic text-slate-500">{font.details}</p>
+            <p className="input-shan mt-3 text-sm italic text-slate-500">
+              {font.details}
+            </p>
           )}
         </div>
 
@@ -124,19 +140,23 @@ const downloadHref = font.isCustom
 
           {downloadHref ? (
             <a
-  href={downloadHref}
-  download={font.isCustom ? `${font.name}.${font.fileKey.split(".").pop() || "ttf"}` : undefined}
-  target={font.isCustom ? "_self" : "_blank"}
-  rel="noreferrer"
-  className={`inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ${
-    font.isCustom
-      ? "border border-blue-200 bg-blue-50 text-blue-700"
-      : "border border-slate-300 bg-white text-slate-700"
-  }`}
->
-  <Download size={16} />
-  {font.isCustom ? "ดาวน์โหลดฟอนต์" : "รับจาก Google"}
-</a>
+              href={downloadHref}
+              download={
+                font.isCustom
+                  ? `${font.name}.${font.fileKey.split(".").pop() || "ttf"}`
+                  : undefined
+              }
+              target={font.isCustom ? "_self" : "_blank"}
+              rel="noreferrer"
+              className={`inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ${
+                font.isCustom
+                  ? "border border-blue-200 bg-blue-50 text-blue-700"
+                  : "border border-slate-300 bg-white text-slate-700"
+              }`}
+            >
+              <Download size={16} />
+              {font.isCustom ? "ดาวน์โหลดฟอนต์" : "รับจาก Google"}
+            </a>
           ) : (
             <button
               type="button"

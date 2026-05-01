@@ -56,6 +56,19 @@ type ContactBody = {
 
 const app = new Hono<Env>();
 
+const ALLOWED_FONT_CHARACTERISTICS = new Set([
+  "official",
+  "modern",
+  "display",
+  "body",
+  "handwriting",
+  "decorative",
+  "traditional",
+  "Regular",
+  "Bold",
+  "Italic",
+]);
+
 function okJson(
   c: any,
   data: Record<string, unknown>,
@@ -123,9 +136,6 @@ async function isAuthenticated(env: Bindings, token?: string | null) {
 async function requireAuth(c: any, next: () => Promise<void>) {
   const token = getCookie(c, "admin_session");
   const authed = await isAuthenticated(c.env, token);
-
-  console.log("requireAuth cookie:", token ? "FOUND" : "MISSING");
-  console.log("requireAuth authed:", authed);
 
   if (!authed) {
     return errJson(c, "Unauthorized", 401);
@@ -271,113 +281,6 @@ app.get("/api/fonts", async (c) => {
   }
 });
 
-app.get("/api/font-file", async (c) => {
-  try {
-    const rawKey = c.req.query("key") || "";
-    const key = decodeURIComponent(rawKey);
-
-    console.log("font-file route hit");
-    console.log("rawKey:", rawKey);
-    console.log("decoded key:", key);
-
-    if (!key) return errJson(c, "Missing font key", 400);
-
-    const object = await c.env.FONT_BUCKET.get(key);
-    console.log("r2 object found:", Boolean(object));
-
-    if (!object) return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
-
-    const filename = key.split("/").pop() || "font";
-    const contentType = object.httpMetadata?.contentType || getMimeType(key);
-
-    const headers = new Headers();
-    headers.set("content-type", contentType);
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-    headers.set("content-disposition", `attachment; filename="${filename}"`);
-
-    if (object.size !== undefined) {
-      headers.set("content-length", String(object.size));
-    }
-
-    return new Response(object.body, {
-      status: 200,
-      headers,
-    });
-  } catch (error) {
-    console.error("/api/font-file GET error", error);
-    return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
-  }
-});
-
-app.on("HEAD", "/api/font-file", async (c) => {
-  try {
-    const rawKey = c.req.query("key") || "";
-    const key = decodeURIComponent(rawKey);
-
-    if (!key) return new Response(null, { status: 400 });
-
-    const object = await c.env.FONT_BUCKET.head(key);
-    if (!object) return new Response(null, { status: 404 });
-
-    const filename = key.split("/").pop() || "font";
-    const contentType = object.httpMetadata?.contentType || getMimeType(key);
-
-    const headers = new Headers();
-    headers.set("content-type", contentType);
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-    headers.set("content-disposition", `attachment; filename="${filename}"`);
-
-    if (object.size !== undefined) {
-      headers.set("content-length", String(object.size));
-    }
-
-    return new Response(null, {
-      status: 200,
-      headers,
-    });
-  } catch (error) {
-    console.error("/api/font-file HEAD error", error);
-    return new Response(null, { status: 500 });
-  }
-});
-
-app.get("/api/visitor-counter", async (c) => {
-  try {
-    const totalResult = await c.env.DB.prepare(
-      `SELECT COUNT(DISTINCT ip_hash) AS count FROM visitor_stats`
-    ).first<{ count: number }>();
-
-    const todayResult = await c.env.DB.prepare(
-      `SELECT COUNT(DISTINCT ip_hash) AS count
-       FROM visitor_stats
-       WHERE date(visited_at, 'localtime') = date('now', 'localtime')`
-    ).first<{ count: number }>();
-
-    const onlineResult = await c.env.DB.prepare(
-      `SELECT COUNT(*) AS count
-       FROM active_visitors
-       WHERE last_seen_at >= datetime('now', '-1 minute')`
-    ).first<{ count: number }>();
-
-    await c.env.DB.prepare(
-      `DELETE FROM active_visitors
-       WHERE last_seen_at < datetime('now', '-15 minutes')`
-    ).run();
-
-    return okJson(c, {
-      ok: true,
-      stats: {
-        totalVisitors: Number(totalResult?.count ?? 0),
-        todayVisitors: Number(todayResult?.count ?? 0),
-        onlineNow: Number(onlineResult?.count ?? 0),
-      },
-    });
-  } catch (error) {
-    console.error("/api/visitor-counter error", error);
-    return errJson(c, "ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
-  }
-});
-
 app.get("/api/font-file-by-id/:id", async (c) => {
   try {
     const id = c.req.param("id");
@@ -429,6 +332,43 @@ app.get("/api/font-file-by-id/:id", async (c) => {
   } catch (error) {
     console.error("/api/font-file-by-id/:id error", error);
     return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
+  }
+});
+
+app.get("/api/visitor-counter", async (c) => {
+  try {
+    const totalResult = await c.env.DB.prepare(
+      `SELECT COUNT(DISTINCT ip_hash) AS count FROM visitor_stats`
+    ).first<{ count: number }>();
+
+    const todayResult = await c.env.DB.prepare(
+      `SELECT COUNT(DISTINCT ip_hash) AS count
+       FROM visitor_stats
+       WHERE date(visited_at, 'localtime') = date('now', 'localtime')`
+    ).first<{ count: number }>();
+
+    const onlineResult = await c.env.DB.prepare(
+      `SELECT COUNT(*) AS count
+       FROM active_visitors
+       WHERE last_seen_at >= datetime('now', '-1 minute')`
+    ).first<{ count: number }>();
+
+    await c.env.DB.prepare(
+      `DELETE FROM active_visitors
+       WHERE last_seen_at < datetime('now', '-15 minutes')`
+    ).run();
+
+    return okJson(c, {
+      ok: true,
+      stats: {
+        totalVisitors: Number(totalResult?.count ?? 0),
+        todayVisitors: Number(todayResult?.count ?? 0),
+        onlineNow: Number(onlineResult?.count ?? 0),
+      },
+    });
+  } catch (error) {
+    console.error("/api/visitor-counter error", error);
+    return errJson(c, "ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
   }
 });
 
@@ -594,6 +534,10 @@ app.post("/api/admin/fonts", async (c) => {
       return errJson(c, "กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์", 400);
     }
 
+    if (!ALLOWED_FONT_CHARACTERISTICS.has(characteristics)) {
+      return errJson(c, "ลักษณะฟอนต์ไม่ถูกต้อง", 400);
+    }
+
     if (!isAllowedFontFile(file)) {
       return errJson(c, "รองรับเฉพาะไฟล์ .ttf, .otf, .woff, .woff2", 400);
     }
@@ -662,6 +606,10 @@ app.patch("/api/admin/fonts/:id", async (c) => {
 
     if (!id || !name || !style || !owner || !characteristics) {
       return errJson(c, "กรุณากรอกข้อมูลให้ครบ", 400);
+    }
+
+    if (!ALLOWED_FONT_CHARACTERISTICS.has(characteristics)) {
+      return errJson(c, "ลักษณะฟอนต์ไม่ถูกต้อง", 400);
     }
 
     await c.env.DB.prepare(
@@ -813,8 +761,6 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
 app.all("*", async (c) => {
   const pathname = new URL(c.req.url).pathname;
 
-  // ถ้าเป็น API แต่ไม่มี route ไหน match ให้จบที่ 404 ทันที
-  // ห้ามปล่อยไปตกที่ SPA assets
   if (pathname.startsWith("/api/")) {
     return errJson(c, "API route not found", 404);
   }
