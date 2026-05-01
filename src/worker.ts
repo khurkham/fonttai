@@ -137,7 +137,7 @@ async function requireAuth(c: any, next: () => Promise<void>) {
 function mapFontRow(c: any, row: FontRow) {
   const fileUrl =
     row.file_key && row.is_custom
-      ? `${new URL(c.req.url).origin}/api/font-file/${encodeURIComponent(
+      ? `${new URL(c.req.url).origin}/api/font-file?key=${encodeURIComponent(
           row.file_key
         )}`
       : undefined;
@@ -271,9 +271,11 @@ app.get("/api/fonts", async (c) => {
   }
 });
 
-app.get("/api/font-file/:key{.+}", async (c) => {
+app.get("/api/font-file", async (c) => {
   try {
-    const key = decodeURIComponent(c.req.param("key"));
+    const rawKey = c.req.query("key") || "";
+    const key = decodeURIComponent(rawKey);
+
     if (!key) return errJson(c, "Missing font key", 400);
 
     const object = await c.env.FONT_BUCKET.get(key);
@@ -296,14 +298,16 @@ app.get("/api/font-file/:key{.+}", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/:key{.+} GET error", error);
+    console.error("/api/font-file GET error", error);
     return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
 
-app.get("/api/font-file/:key{.+}", async (c) => {
+app.head("/api/font-file", async (c) => {
   try {
-    const key = decodeURIComponent(c.req.param("key"));
+    const rawKey = c.req.query("key") || "";
+    const key = decodeURIComponent(rawKey);
+
     if (!key) return new Response(null, { status: 400 });
 
     const object = await c.env.FONT_BUCKET.head(key);
@@ -326,7 +330,7 @@ app.get("/api/font-file/:key{.+}", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/:key{.+} HEAD error", error);
+    console.error("/api/font-file HEAD error", error);
     return new Response(null, { status: 500 });
   }
 });
