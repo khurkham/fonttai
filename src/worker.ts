@@ -301,7 +301,7 @@ app.get("/api/font-file/:key", async (c) => {
   }
 });
 
-app.head("/api/font-file/:key", async (c) => {
+app.get("/api/font-file/:key", async (c) => {
   try {
     const key = c.req.param("key");
     if (!key) return new Response(null, { status: 400 });
