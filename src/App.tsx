@@ -1854,7 +1854,7 @@ const seoDescription =
                       Font Preview Platform
                     </p>
 
-                    <h2 className="input-shan text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+                    <h2 className="input-shan text-3xl font-black tracking-tight leading-[1.45] text-slate-900 sm:text-4xl sm:leading-[1.5]">
                       ၽၢင်ႁၢင်ႈၾွၼ်ႉတႆး ယူႇၼီႇၶူတ်ႉ
                       <br />
                       ႁၼ်သႃႇတၢႆႇၵမ်းသိုဝ်ႈ မီးပႃးၶူတ်ႉၾွၼ်ႉတႃႇၽင်ၼႂ်းဝဵပ်ႉသၢႆႉ
