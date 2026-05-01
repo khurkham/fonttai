@@ -137,8 +137,8 @@ async function requireAuth(c: any, next: () => Promise<void>) {
 function mapFontRow(c: any, row: FontRow) {
   const fileUrl =
     row.file_key && row.is_custom
-      ? `${new URL(c.req.url).origin}/api/font-file?key=${encodeURIComponent(
-          row.file_key
+      ? `${new URL(c.req.url).origin}/api/font-file-by-id/${encodeURIComponent(
+          row.id
         )}`
       : undefined;
 
@@ -375,6 +375,60 @@ app.get("/api/visitor-counter", async (c) => {
   } catch (error) {
     console.error("/api/visitor-counter error", error);
     return errJson(c, "ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
+  }
+});
+
+app.get("/api/font-file-by-id/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    if (!id) return errJson(c, "Missing font id", 400);
+
+    const font = await c.env.DB.prepare(
+      `SELECT id, name, file_key, mime_type
+       FROM fonts
+       WHERE id = ? AND is_custom = 1
+       LIMIT 1`
+    )
+      .bind(id)
+      .first<{
+        id: string;
+        name: string;
+        file_key: string | null;
+        mime_type: string | null;
+      }>();
+
+    if (!font || !font.file_key) {
+      return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
+    }
+
+    const object = await c.env.FONT_BUCKET.get(font.file_key);
+    if (!object) {
+      return errJson(c, "ไม่พบไฟล์ฟอนต์ในที่เก็บข้อมูล", 404);
+    }
+
+    const ext = font.file_key.split(".").pop() || "ttf";
+    const downloadName = `${font.name}.${ext}`;
+    const contentType =
+      object.httpMetadata?.contentType ||
+      font.mime_type ||
+      getMimeType(font.file_key);
+
+    const headers = new Headers();
+    headers.set("content-type", contentType);
+    headers.set("cache-control", "public, max-age=31536000, immutable");
+    headers.set("content-disposition", `attachment; filename="${downloadName}"`);
+
+    if (object.size !== undefined) {
+      headers.set("content-length", String(object.size));
+    }
+
+    return new Response(object.body, {
+      status: 200,
+      headers,
+    });
+  } catch (error) {
+    console.error("/api/font-file-by-id/:id error", error);
+    return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
 
