@@ -276,9 +276,15 @@ app.get("/api/font-file", async (c) => {
     const rawKey = c.req.query("key") || "";
     const key = decodeURIComponent(rawKey);
 
+    console.log("font-file route hit");
+    console.log("rawKey:", rawKey);
+    console.log("decoded key:", key);
+
     if (!key) return errJson(c, "Missing font key", 400);
 
     const object = await c.env.FONT_BUCKET.get(key);
+    console.log("r2 object found:", Boolean(object));
+
     if (!object) return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
 
     const filename = key.split("/").pop() || "font";
@@ -751,9 +757,15 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
 // ---------- SPA assets + visitor tracking ----------
 
 app.all("*", async (c) => {
-  try {
-    const pathname = new URL(c.req.url).pathname;
+  const pathname = new URL(c.req.url).pathname;
 
+  // ถ้าเป็น API แต่ไม่มี route ไหน match ให้จบที่ 404 ทันที
+  // ห้ามปล่อยไปตกที่ SPA assets
+  if (pathname.startsWith("/api/")) {
+    return errJson(c, "API route not found", 404);
+  }
+
+  try {
     if (shouldTrackPath(pathname)) {
       const { ipHash, userAgent } = await upsertActiveVisitor(c, pathname);
 
