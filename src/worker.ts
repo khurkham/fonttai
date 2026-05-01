@@ -271,9 +271,11 @@ app.get("/api/fonts", async (c) => {
   }
 });
 
-app.get("/api/font-file/:key", async (c) => {
+app.get("/api/font-file/*", async (c) => {
   try {
-    const key = c.req.param("key");
+    const rawKey = c.req.path.replace(/^\/api\/font-file\//, "");
+    const key = decodeURIComponent(rawKey);
+
     if (!key) return errJson(c, "Missing font key", 400);
 
     const object = await c.env.FONT_BUCKET.get(key);
@@ -296,14 +298,16 @@ app.get("/api/font-file/:key", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/:key error", error);
+    console.error("/api/font-file/* error", error);
     return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
   }
 });
 
-app.get("/api/font-file/:key", async (c) => {
+app.head("/api/font-file/*", async (c) => {
   try {
-    const key = c.req.param("key");
+    const rawKey = c.req.path.replace(/^\/api\/font-file\//, "");
+    const key = decodeURIComponent(rawKey);
+
     if (!key) return new Response(null, { status: 400 });
 
     const object = await c.env.FONT_BUCKET.head(key);
@@ -316,6 +320,7 @@ app.get("/api/font-file/:key", async (c) => {
     headers.set("content-type", contentType);
     headers.set("cache-control", "public, max-age=31536000, immutable");
     headers.set("content-disposition", `attachment; filename="${filename}"`);
+
     if (object.size !== undefined) {
       headers.set("content-length", String(object.size));
     }
@@ -325,7 +330,7 @@ app.get("/api/font-file/:key", async (c) => {
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/:key HEAD error", error);
+    console.error("/api/font-file/* HEAD error", error);
     return new Response(null, { status: 500 });
   }
 });
@@ -542,7 +547,10 @@ app.post("/api/admin/fonts", async (c) => {
     const fileKey = `fonts/${id}-${safeFilename}`;
     uploadedKey = fileKey;
 
-    const mimeType = getMimeType(file.name, file.type || "application/octet-stream");
+    const mimeType = getMimeType(
+      file.name,
+      file.type || "application/octet-stream"
+    );
     const buffer = await file.arrayBuffer();
 
     await c.env.FONT_BUCKET.put(fileKey, buffer, {
