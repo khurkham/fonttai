@@ -56,11 +56,31 @@ type ContactBody = {
 
 const app = new Hono<Env>();
 
-function okJson(c: any, data: Record<string, unknown>, status = 200) {
+function okJson(
+  c: any,
+  data: Record<string, unknown>,
+  status = 200,
+  extraHeaders?: HeadersInit
+) {
+  if (extraHeaders) {
+    Object.entries(extraHeaders).forEach(([key, value]) => {
+      if (value !== undefined) c.header(key, String(value));
+    });
+  }
   return c.json(data, status);
 }
 
-function errJson(c: any, message: string, status = 400) {
+function errJson(
+  c: any,
+  message: string,
+  status = 400,
+  extraHeaders?: HeadersInit
+) {
+  if (extraHeaders) {
+    Object.entries(extraHeaders).forEach(([key, value]) => {
+      if (value !== undefined) c.header(key, String(value));
+    });
+  }
   return c.json({ ok: false, message }, status);
 }
 
@@ -211,6 +231,24 @@ function getMimeType(filename: string, fallback = "application/octet-stream") {
   return fallback;
 }
 
+function isAllowedFontFile(file: File) {
+  const lower = file.name.toLowerCase();
+  return (
+    lower.endsWith(".ttf") ||
+    lower.endsWith(".otf") ||
+    lower.endsWith(".woff") ||
+    lower.endsWith(".woff2")
+  );
+}
+
+function sanitizeFilename(name: string) {
+  return name
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}._-]+/gu, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 // ---------- public routes ----------
 
 app.get("/api/fonts", async (c) => {
@@ -233,33 +271,62 @@ app.get("/api/fonts", async (c) => {
   }
 });
 
-app.get("/api/font-file/*", async (c) => {
+app.get("/api/font-file/:key", async (c) => {
   try {
-    const key = c.req.path.replace(/^\/api\/font-file\//, "");
+    const key = c.req.param("key");
     if (!key) return errJson(c, "Missing font key", 400);
 
-    const decodedKey = decodeURIComponent(key);
-    const object = await c.env.FONT_BUCKET.get(decodedKey);
+    const object = await c.env.FONT_BUCKET.get(key);
     if (!object) return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
 
+    const filename = key.split("/").pop() || "font";
+    const contentType = object.httpMetadata?.contentType || getMimeType(key);
+
     const headers = new Headers();
-    headers.set(
-      "content-type",
-      object.httpMetadata?.contentType || getMimeType(decodedKey)
-    );
+    headers.set("content-type", contentType);
     headers.set("cache-control", "public, max-age=31536000, immutable");
-    headers.set(
-      "content-disposition",
-      `attachment; filename="${decodedKey.split("/").pop() || "font"}"`
-    );
+    headers.set("content-disposition", `attachment; filename="${filename}"`);
+
+    if (object.size !== undefined) {
+      headers.set("content-length", String(object.size));
+    }
 
     return new Response(object.body, {
       status: 200,
       headers,
     });
   } catch (error) {
-    console.error("/api/font-file/* error", error);
+    console.error("/api/font-file/:key error", error);
     return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
+  }
+});
+
+app.head("/api/font-file/:key", async (c) => {
+  try {
+    const key = c.req.param("key");
+    if (!key) return new Response(null, { status: 400 });
+
+    const object = await c.env.FONT_BUCKET.head(key);
+    if (!object) return new Response(null, { status: 404 });
+
+    const filename = key.split("/").pop() || "font";
+    const contentType = object.httpMetadata?.contentType || getMimeType(key);
+
+    const headers = new Headers();
+    headers.set("content-type", contentType);
+    headers.set("cache-control", "public, max-age=31536000, immutable");
+    headers.set("content-disposition", `attachment; filename="${filename}"`);
+    if (object.size !== undefined) {
+      headers.set("content-length", String(object.size));
+    }
+
+    return new Response(null, {
+      status: 200,
+      headers,
+    });
+  } catch (error) {
+    console.error("/api/font-file/:key HEAD error", error);
+    return new Response(null, { status: 500 });
   }
 });
 
@@ -440,6 +507,8 @@ app.use("/api/admin/contact-messages/*", requireAuth);
 app.use("/api/admin/contact-messages/export.csv", requireAuth);
 
 app.post("/api/admin/fonts", async (c) => {
+  let uploadedKey: string | null = null;
+
   try {
     const form = await c.req.formData();
 
@@ -460,12 +529,23 @@ app.post("/api/admin/fonts", async (c) => {
       return errJson(c, "กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์", 400);
     }
 
-    const id = crypto.randomUUID();
-    const safeFilename = file.name.replace(/\s+/g, "-");
-    const fileKey = `fonts/${id}-${safeFilename}`;
-    const mimeType = file.type || getMimeType(file.name);
+    if (!isAllowedFontFile(file)) {
+      return errJson(c, "รองรับเฉพาะไฟล์ .ttf, .otf, .woff, .woff2", 400);
+    }
 
-    await c.env.FONT_BUCKET.put(fileKey, await file.arrayBuffer(), {
+    if (file.size <= 0) {
+      return errJson(c, "ไฟล์ฟอนต์ว่างเปล่าหรือไม่ถูกต้อง", 400);
+    }
+
+    const id = crypto.randomUUID();
+    const safeFilename = sanitizeFilename(file.name) || "font-file";
+    const fileKey = `fonts/${id}-${safeFilename}`;
+    uploadedKey = fileKey;
+
+    const mimeType = getMimeType(file.name, file.type || "application/octet-stream");
+    const buffer = await file.arrayBuffer();
+
+    await c.env.FONT_BUCKET.put(fileKey, buffer, {
       httpMetadata: {
         contentType: mimeType,
       },
@@ -482,6 +562,15 @@ app.post("/api/admin/fonts", async (c) => {
     return okJson(c, { ok: true, id }, 201);
   } catch (error) {
     console.error("/api/admin/fonts POST error", error);
+
+    if (uploadedKey) {
+      try {
+        await c.env.FONT_BUCKET.delete(uploadedKey);
+      } catch (cleanupError) {
+        console.error("cleanup uploaded font failed", cleanupError);
+      }
+    }
+
     return errJson(c, "ไม่สามารถเพิ่มฟอนต์ได้", 500);
   }
 });
