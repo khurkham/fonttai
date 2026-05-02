@@ -1430,9 +1430,7 @@ function ArticleDetailPage({
                 </h2>
 
                 <div className="mt-4 space-y-5 whitespace-pre-wrap leading-8 text-slate-700">
-                  {section.body.split("
-
-").map((paragraph, index) => (
+                  {section.body.split("").map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
                 </div>
