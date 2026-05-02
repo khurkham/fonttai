@@ -1198,32 +1198,66 @@ function Breadcrumbs({
   );
 }
 
+function ArticleTableOfContents({
+  headings,
+}: {
+  headings: Array<{ id: string; label: string }>;
+}) {
+  if (!headings.length) return null;
+
+  return (
+    <aside className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+      <h2 className="text-lg font-black text-slate-900">สารบัญ</h2>
+      <nav className="mt-4">
+        <ul className="space-y-2">
+          {headings.map((heading) => (
+            <li key={heading.id}>
+              <a
+                href={`#${heading.id}`}
+                className="block rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-blue-600"
+              >
+                {heading.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  );
+}
+
 function ArticlesPage({
   onOpenArticle,
+  onNavigateHome,
 }: {
   onOpenArticle: (slug: string) => void;
+  onNavigateHome: () => void;
 }) {
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="mb-8">
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <Breadcrumbs
+        items={[{ label: "หน้าแรก", onClick: onNavigateHome }, { label: "บทความ" }]}
+      />
+
+      <div className="mb-10">
         <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
           Articles
         </p>
-        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
+        <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
           บทความและคู่มือการใช้งานฟอนต์ไต
         </h1>
-        <p className="mt-4 max-w-3xl leading-7 text-slate-600">
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
           {ARTICLES_INTRO}
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {ARTICLE_CATEGORIES.map((category) => (
           <div
             key={category.key}
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+            className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
           >
-            <h2 className="text-xl font-bold text-slate-900">{category.label}</h2>
+            <h2 className="text-base font-bold text-slate-900">{category.label}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               {category.description}
             </p>
@@ -1231,29 +1265,72 @@ function ArticlesPage({
         ))}
       </div>
 
-      <div className="mt-10 space-y-4">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {ARTICLES.map((article) => (
           <article
             key={article.slug}
-            className="rounded-2xl border border-slate-200 p-5"
+            className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
           >
-            <p className="text-xs font-bold text-blue-600">
-              {article.categoryLabel}
-            </p>
-            <h2 className="mt-2 text-2xl font-black text-slate-900">
-              {article.title}
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              {article.description}
-            </p>
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => onOpenArticle(article.slug)}
-                className="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
-              >
-                อ่านบทความ
-              </button>
+            <div className="relative h-52 overflow-hidden bg-slate-100">
+              <img
+                src={article.coverImage}
+                alt={article.title}
+                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 to-transparent p-4">
+                <span className="inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
+                  {article.categoryLabel}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-1 flex-col p-5">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <span>{article.updatedAt}</span>
+                <span>•</span>
+                <span>{article.readingTime}</span>
+                <span>•</span>
+                <span>{article.author}</span>
+              </div>
+
+              <h2 className="mt-4 text-2xl font-black leading-tight tracking-tight text-slate-900 transition group-hover:text-blue-700">
+                {article.title}
+              </h2>
+
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                {article.description}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {article.keywords.slice(0, 3).map((keyword) => (
+                  <span
+                    key={keyword}
+                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600"
+                  >
+                    #{keyword}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    บทความแนะนำ
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">
+                    อ่านคู่มือฉบับเต็ม
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenArticle(article.slug)}
+                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
+                >
+                  อ่านต่อ
+                </button>
+              </div>
             </div>
           </article>
         ))}
@@ -1296,7 +1373,7 @@ function ArticleDetailPage({
   const relatedArticles = getRelatedArticles(article.slug, 3);
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
       <Breadcrumbs
         items={[
           { label: "หน้าแรก", onClick: onNavigateHome },
@@ -1318,46 +1395,104 @@ function ArticleDetailPage({
           {article.categoryLabel}
         </p>
 
-        <h1 className="mt-3 text-4xl font-black tracking-tight leading-[1.35] text-slate-900">
+        <h1 className="mt-3 text-3xl font-black tracking-tight leading-[1.35] text-slate-900 sm:text-4xl">
           {article.title}
         </h1>
 
-        <p className="mt-3 text-sm leading-6 text-slate-500">
-          อัปเดตล่าสุด: {article.updatedAt}
-        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+          <span>{article.updatedAt}</span>
+          <span>•</span>
+          <span>{article.readingTime}</span>
+          <span>•</span>
+          <span>{article.author}</span>
+        </div>
 
-        <div className="mt-5 space-y-5 whitespace-pre-wrap leading-8 text-slate-700">
-          {article.content.split("\n\n").map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+        <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
+          <img
+            src={article.coverImage}
+            alt={article.title}
+            className="h-[280px] w-full object-cover sm:h-[360px]"
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <article className="min-w-0">
+          <p className="mb-8 text-base leading-8 text-slate-700">
+            {article.description}
+          </p>
+
+          <div className="space-y-10">
+            {article.sections.map((section) => (
+              <section key={section.id} id={section.id} className="scroll-mt-28">
+                <h2 className="text-2xl font-black tracking-tight text-slate-900">
+                  {section.heading}
+                </h2>
+
+                <div className="mt-4 space-y-5 whitespace-pre-wrap leading-8 text-slate-700">
+                  {section.body.split("
+
+").map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </article>
+
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <ArticleTableOfContents headings={article.headings} />
         </div>
       </div>
 
       {relatedArticles.length > 0 && (
-        <div className="border-t border-slate-200 pt-8">
+        <div className="mt-12 border-t border-slate-200 pt-8">
           <h2 className="text-2xl font-black text-slate-900">บทความที่เกี่ยวข้อง</h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+
+          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {relatedArticles.map((item) => (
               <article
                 key={item.slug}
-                className="rounded-2xl border border-slate-200 p-5"
+                className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
               >
-                <p className="text-xs font-bold text-blue-600">
-                  {item.categoryLabel}
-                </p>
-                <h3 className="mt-2 text-xl font-bold text-slate-900">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {item.description}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => onOpenArticle(item.slug)}
-                  className="mt-4 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
-                >
-                  อ่านต่อ
-                </button>
+                <div className="relative h-44 overflow-hidden bg-slate-100">
+                  <img
+                    src={item.coverImage}
+                    alt={item.title}
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 to-transparent p-4">
+                    <span className="inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
+                      {item.categoryLabel}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                    <span>{item.updatedAt}</span>
+                    <span>•</span>
+                    <span>{item.readingTime}</span>
+                  </div>
+
+                  <h3 className="mt-3 text-xl font-black leading-tight text-slate-900 transition group-hover:text-blue-700">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    {item.description}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => onOpenArticle(item.slug)}
+                    className="mt-6 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
+                  >
+                    อ่านต่อ
+                  </button>
+                </div>
               </article>
             ))}
           </div>
@@ -2096,7 +2231,10 @@ const seoDescription =
               )}
             </section>
           ) : publicPage === "articles" ? (
-  <ArticlesPage onOpenArticle={openArticle} />
+  <ArticlesPage
+              onOpenArticle={openArticle}
+              onNavigateHome={() => navigateToPage("home")}
+            />
 ) : publicPage === "article-detail" ? (
  <ArticleDetailPage
   slug={articleSlug}
