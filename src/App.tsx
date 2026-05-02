@@ -10,6 +10,14 @@ import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
 import { bindConsentScriptLoader } from "./utils/consentScripts";
+import {
+  ARTICLES,
+  ARTICLES_INTRO,
+  ARTICLE_CATEGORIES,
+  getArticleBySlug,
+  getArticlesByCategory,
+  getRelatedArticles,
+} from "./data/articles";
 
 
 type ViewMode = "home" | "admin";
@@ -20,6 +28,8 @@ type PublicPage =
   | "privacy"
   | "cookie"
   | "contact"
+  | "articles"
+  | "article-detail"
   | "notfound";
 
  
@@ -140,7 +150,7 @@ const GOOGLE_FONTS: FontItem[] = [
 
 
 
-function pageToPath(page: PublicPage): string {
+function pageToPath(page: PublicPage, slug?: string): string {
   switch (page) {
     case "about":
       return "/about/";
@@ -152,6 +162,10 @@ function pageToPath(page: PublicPage): string {
       return "/cookie/";
     case "contact":
       return "/contact/";
+    case "articles":
+      return "/articles/";
+    case "article-detail":
+      return slug ? `/articles/${slug}/` : "/articles/";
     case "notfound":
       return "/404/";
     case "home":
@@ -162,6 +176,9 @@ function pageToPath(page: PublicPage): string {
 
 function pathToPage(pathname: string): PublicPage {
   const path = pathname.replace(/\/+$/, "") || "/";
+
+  if (path === "/articles") return "articles";
+  if (path.startsWith("/articles/")) return "article-detail";
 
   switch (path) {
     case "/":
@@ -1153,7 +1170,212 @@ function ContactDetailModal({
   );
 }
 
+function Breadcrumbs({
+  items,
+}: {
+  items: Array<{ label: string; onClick?: () => void }>;
+}) {
+  return (
+    <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+      {items.map((item, index) => (
+        <div key={`${item.label}-${index}`} className="flex items-center gap-2">
+          {item.onClick ? (
+            <button
+              type="button"
+              onClick={item.onClick}
+              className="font-medium text-slate-600 hover:text-blue-600"
+            >
+              {item.label}
+            </button>
+          ) : (
+            <span className="font-medium text-slate-900">{item.label}</span>
+          )}
+
+          {index < items.length - 1 ? <span>/</span> : null}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function ArticlesPage({
+  onOpenArticle,
+}: {
+  onOpenArticle: (slug: string) => void;
+}) {
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div className="mb-8">
+        <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+          Articles
+        </p>
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
+          บทความและคู่มือการใช้งานฟอนต์ไต
+        </h1>
+        <p className="mt-4 max-w-3xl leading-7 text-slate-600">
+          {ARTICLES_INTRO}
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {ARTICLE_CATEGORIES.map((category) => (
+          <div
+            key={category.key}
+            className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+          >
+            <h2 className="text-xl font-bold text-slate-900">{category.label}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {category.description}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-10 space-y-4">
+        {ARTICLES.map((article) => (
+          <article
+            key={article.slug}
+            className="rounded-2xl border border-slate-200 p-5"
+          >
+            <p className="text-xs font-bold text-blue-600">
+              {article.categoryLabel}
+            </p>
+            <h2 className="mt-2 text-2xl font-black text-slate-900">
+              {article.title}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              {article.description}
+            </p>
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => onOpenArticle(article.slug)}
+                className="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
+              >
+                อ่านบทความ
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ArticleDetailPage({
+  slug,
+  onOpenArticle,
+  onBackToArticles,
+  onNavigateHome,
+}: {
+  slug: string | null;
+  onOpenArticle: (slug: string) => void;
+  onBackToArticles: () => void;
+  onNavigateHome: () => void;
+}) {
+  const article = slug ? getArticleBySlug(slug) : undefined;
+
+  if (!article) {
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-3xl font-black text-slate-900">ไม่พบบทความ</h1>
+        <p className="mt-3 text-slate-600">
+          บทความที่คุณต้องการอาจถูกลบ เปลี่ยนลิงก์ หรือยังไม่ได้เผยแพร่
+        </p>
+        <button
+          type="button"
+          onClick={onBackToArticles}
+          className="mt-6 rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
+        >
+          กลับหน้าบทความ
+        </button>
+      </section>
+    );
+  }
+
+  const relatedArticles = getRelatedArticles(article.slug, 3);
+
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <Breadcrumbs
+        items={[
+          { label: "หน้าแรก", onClick: onNavigateHome },
+          { label: "บทความ", onClick: onBackToArticles },
+          { label: article.title },
+        ]}
+      />
+
+      <div className="mb-8">
+        <button
+          type="button"
+          onClick={onBackToArticles}
+          className="text-sm font-semibold text-blue-600"
+        >
+          ← กลับหน้าบทความ
+        </button>
+
+        <p className="mt-4 text-xs font-bold uppercase tracking-wide text-blue-600">
+          {article.categoryLabel}
+        </p>
+
+        <h1 className="mt-3 text-4xl font-black tracking-tight leading-[1.35] text-slate-900">
+          {article.title}
+        </h1>
+
+        <p className="mt-3 text-sm leading-6 text-slate-500">
+          อัปเดตล่าสุด: {article.updatedAt}
+        </p>
+
+        <div className="mt-5 space-y-5 whitespace-pre-wrap leading-8 text-slate-700">
+          {article.content.split("\n\n").map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+      </div>
+
+      {relatedArticles.length > 0 && (
+        <div className="border-t border-slate-200 pt-8">
+          <h2 className="text-2xl font-black text-slate-900">บทความที่เกี่ยวข้อง</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {relatedArticles.map((item) => (
+              <article
+                key={item.slug}
+                className="rounded-2xl border border-slate-200 p-5"
+              >
+                <p className="text-xs font-bold text-blue-600">
+                  {item.categoryLabel}
+                </p>
+                <h3 className="mt-2 text-xl font-bold text-slate-900">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {item.description}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => onOpenArticle(item.slug)}
+                  className="mt-4 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
+                >
+                  อ่านต่อ
+                </button>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function App() {
+  const [articleSlug, setArticleSlug] = useState<string | null>(() => {
+  const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (pathname.startsWith("/articles/")) {
+    const slug = pathname.replace("/articles/", "").replace(/\/+$/, "");
+    return slug || null;
+  }
+  return null;
+});
   const [selectedContact, setSelectedContact] =
     useState<ContactMessage | null>(null);
   const [adminTab, setAdminTab] = useState<"fonts" | "contacts" | "stats">(
@@ -1332,14 +1554,24 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const handlePopState = () => {
-      setPublicPage(pathToPage(window.location.pathname));
-      setViewMode("home");
-    };
+  const handlePopState = () => {
+    const pathname = window.location.pathname;
+    const nextPage = pathToPage(pathname);
 
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+    setPublicPage(nextPage);
+    setViewMode("home");
+
+    if (nextPage === "article-detail") {
+      const slug = pathname.replace(/\/+$/, "").replace("/articles/", "");
+      setArticleSlug(slug || null);
+    } else {
+      setArticleSlug(null);
+    }
+  };
+
+  window.addEventListener("popstate", handlePopState);
+  return () => window.removeEventListener("popstate", handlePopState);
+}, []);
 
   const allFonts = useMemo(() => {
     const merged = [...customFonts, ...GOOGLE_FONTS];
@@ -1389,18 +1621,35 @@ export default function App() {
   }
 
   function navigateToPage(page: PublicPage) {
-    const nextPath = pageToPath(page);
-    if (window.location.pathname !== nextPath) {
-      window.history.pushState({}, "", nextPath);
-    }
-    setPublicPage(page);
-    setViewMode("home");
+  const nextPath = pageToPath(page);
+  if (window.location.pathname !== nextPath) {
+    window.history.pushState({}, "", nextPath);
   }
+  setPublicPage(page);
+  if (page !== "article-detail") {
+    setArticleSlug(null);
+  }
+  setViewMode("home");
+}
+
+  function openArticle(slug: string) {
+  const nextPath = pageToPath("article-detail", slug);
+  if (window.location.pathname !== nextPath) {
+    window.history.pushState({}, "", nextPath);
+  }
+  setArticleSlug(slug);
+  setPublicPage("article-detail");
+  setViewMode("home");
+}
 
 
-
+const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
   const seoTitle =
-  publicPage === "privacy"
+  publicPage === "article-detail" && currentArticle
+    ? `${currentArticle.title} | Font Tai`
+    : publicPage === "articles"
+    ? "บทความและคู่มือการใช้งานฟอนต์ไต | Font Tai"
+    : publicPage === "privacy"
     ? "Privacy Policy - นโยบายความเป็นส่วนตัว | Font Tai"
     : publicPage === "cookie"
     ? "Cookie Policy - นโยบายคุกกี้ | Font Tai"
@@ -1415,8 +1664,12 @@ export default function App() {
     : "Font Tai ၾွၼ်ႉတႆး - ฟอนต์ไต ฟอนต์ไทใหญ่ Shan Font Preview & Download";
 
 const seoDescription =
-  publicPage === "home"
-    ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับการแสดงผลภาษาไต ภาษาไทย และทุกอุปกรณ์ Font Tai ၾွၼ်ႉတႆး รวม Tai font, Shan font และ Thai font สำหรับ font preview, font download และ embed font code บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และการใช้งานทุกอุปกรณ์"
+  publicPage === "article-detail" && currentArticle
+    ? currentArticle.description
+    : publicPage === "articles"
+    ? ARTICLES_INTRO
+    : publicPage === "home"
+    ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และทุกอุปกรณ์"
     : publicPage === "about"
     ? "รู้จัก Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Tai font ที่ช่วยให้พรีวิวฟอนต์ ดาวน์โหลดฟอนต์ และนำฟอนต์ไปใช้งานบนเว็บไซต์ได้ง่ายขึ้น"
     : publicPage === "services"
@@ -1424,20 +1677,19 @@ const seoDescription =
     : publicPage === "contact"
     ? "ติดต่อทีมงาน Font Tai เพื่อสอบถามการใช้งานเว็บไซต์ แนะนำฟอนต์ แจ้งปัญหาการดาวน์โหลดฟอนต์ หรือพูดคุยเรื่องการใช้งานฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
     : publicPage === "privacy"
-    ? "อ่านนโยบายความเป็นส่วนตัวของ Font Tai เพื่อดูแนวทางการเก็บ ใช้ และคุ้มครองข้อมูลผู้ใช้งาน รวมถึงข้อมูลการใช้งานเว็บไซต์ คุกกี้ และแบบฟอร์มติดต่อ"
+    ? "อ่านนโยบายความเป็นส่วนตัวของ Font Tai เพื่อดูแนวทางการเก็บ ใช้ และคุ้มครองข้อมูลผู้ใช้งาน"
     : publicPage === "cookie"
-    ? "อ่านนโยบายคุกกี้ของ Font Tai เพื่อทำความเข้าใจประเภทของคุกกี้ที่ใช้ วัตถุประสงค์ในการใช้งาน และวิธีจัดการการตั้งค่าคุกกี้บนเว็บไซต์"
+    ? "อ่านนโยบายคุกกี้ของ Font Tai เพื่อทำความเข้าใจประเภทของคุกกี้ที่ใช้"
     : publicPage === "notfound"
-    ? "ไม่พบหน้าที่คุณค้นหาบนเว็บไซต์ Font Tai กรุณากลับไปยังหน้าแรก ค้นหาฟอนต์ หรือไปยังหน้าติดต่อเพื่อสอบถามข้อมูลเพิ่มเติม"
+    ? "ไม่พบหน้าที่คุณค้นหาบนเว็บไซต์ Font Tai"
     : "Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Shan font สำหรับพรีวิวออนไลน์ ดาวน์โหลด และฝังฟอนต์บนเว็บไซต์";
-
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <SeoHead
         title={seoTitle}
         description={seoDescription}
-        path={pageToPath(publicPage)}
+        path={pageToPath(publicPage, articleSlug || undefined)}
         image="/og-image.jpg"
       />
 
@@ -1843,9 +2095,18 @@ const seoDescription =
                 </div>
               )}
             </section>
-          ) : publicPage !== "home" ? (
-            <StaticPage page={publicPage} onNavigate={navigateToPage} />
-          ) : (
+          ) : publicPage === "articles" ? (
+  <ArticlesPage onOpenArticle={openArticle} />
+) : publicPage === "article-detail" ? (
+ <ArticleDetailPage
+  slug={articleSlug}
+  onOpenArticle={openArticle}
+  onBackToArticles={() => navigateToPage("articles")}
+  onNavigateHome={() => navigateToPage("home")}
+/>
+) : publicPage !== "home" ? (
+  <StaticPage page={publicPage} onNavigate={navigateToPage} />
+) : (
             <>
               <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
                 <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">

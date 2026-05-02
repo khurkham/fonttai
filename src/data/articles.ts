@@ -76,7 +76,7 @@ export const ARTICLES: ArticleItem[] = [
     categoryLabel: "การติดตั้งฟอนต์",
     updatedAt: "2026-05-02",
     keywords: ["ติดตั้งฟอนต์", "Windows", "ฟอนต์ไต", "ฟอนต์ไทใหญ่", "Shan font"],
-    coverImage: "/images/articles/install-windows.jpg",
+    coverImage: "/images/articles/install-windows.png",
     readingTime: "อ่าน 4 นาที",
     author: "ทีมงาน Font Tai",
     headings: [
@@ -181,7 +181,7 @@ export const ARTICLES: ArticleItem[] = [
     categoryLabel: "การใช้งานบนเว็บไซต์",
     updatedAt: "2026-05-02",
     keywords: ["CSS", "@font-face", "embed font", "ฟอนต์ไต", "เว็บ"],
-    coverImage: "/images/articles/embed-css.jpg",
+    coverImage: "/images/articles/embed-css.png",
     readingTime: "อ่าน 5 นาที",
     author: "ทีมงาน Font Tai",
     headings: [
@@ -299,7 +299,7 @@ font-family: "ShanUnicode", "Sarabun", sans-serif;
     categoryLabel: "การเลือกฟอนต์",
     updatedAt: "2026-05-02",
     keywords: ["เลือกฟอนต์", "เอกสาร", "พาดหัว", "งานออกแบบ", "ฟอนต์ไต"],
-    coverImage: "/images/articles/font-selection.jpg",
+    coverImage: "/images/articles/font-selection.png",
     readingTime: "อ่าน 5 นาที",
     author: "ทีมงาน Font Tai",
     headings: [
@@ -376,7 +376,7 @@ font-family: "ShanUnicode", "Sarabun", sans-serif;
     categoryLabel: "ปัญหาและวิธีแก้",
     updatedAt: "2026-05-02",
     keywords: ["ปัญหาฟอนต์", "วรรณยุกต์ลอย", "ติดตั้งไม่ได้", "โหลดไม่ได้"],
-    coverImage: "/images/articles/troubleshooting.jpg",
+    coverImage: "/images/articles/troubleshooting.png",
     readingTime: "อ่าน 5 นาที",
     author: "ทีมงาน Font Tai",
     headings: [
@@ -462,7 +462,7 @@ font-family: "ShanUnicode", "Sarabun", sans-serif;
     categoryLabel: "ความรู้พื้นฐาน",
     updatedAt: "2026-05-02",
     keywords: ["Unicode", "ภาษาไต", "มาตรฐานตัวอักษร", "ฟอนต์ไต"],
-    coverImage: "/images/articles/unicode.jpg",
+    coverImage: "/images/articles/unicode.png",
     readingTime: "อ่าน 5 นาที",
     author: "ทีมงาน Font Tai",
     headings: [
@@ -538,7 +538,7 @@ font-family: "ShanUnicode", "Sarabun", sans-serif;
     categoryLabel: "การติดตั้งฟอนต์",
     updatedAt: "2026-05-02",
     keywords: ["macOS", "iPhone", "Android", "ติดตั้งฟอนต์", "ฟอนต์ไต"],
-    coverImage: "/images/articles/macos-mobile.jpg",
+    coverImage: "/images/articles/macos-mobile.png",
     readingTime: "อ่าน 5 นาที",
     author: "ทีมงาน Font Tai",
     headings: [
@@ -611,7 +611,7 @@ font-family: "ShanUnicode", "Sarabun", sans-serif;
     categoryLabel: "การใช้งานบนเว็บไซต์",
     updatedAt: "2026-05-02",
     keywords: ["เว็บไซต์สองภาษา", "ฟอนต์ไต", "ฟอนต์ไทย", "bilingual website"],
-    coverImage: "/images/articles/bilingual-websites.jpg",
+    coverImage: "/images/articles/bilingual-websites.png",
     readingTime: "อ่าน 5 นาที",
     author: "ทีมงาน Font Tai",
     headings: [

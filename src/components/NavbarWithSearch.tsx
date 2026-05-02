@@ -1,24 +1,27 @@
 import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 
 type PublicPage =
-  | "home"
+ | "home"
   | "about"
   | "services"
   | "privacy"
   | "cookie"
   | "contact"
+  | "articles"
+  | "article-detail"
   | "notfound";
 
 type Props = {
   search: string;
   onSearchChange: (value: string) => void;
   publicPage: PublicPage;
-  onNavigate: (page: PublicPage) => void;
+   onNavigate: (page: Exclude<PublicPage, "article-detail">) => void;
 };
 
 type NavItem = {
-  key: PublicPage;
+  key: Exclude<PublicPage, "article-detail">;
   label: string;
 };
 
@@ -26,6 +29,7 @@ const MAIN_NAV_ITEMS: NavItem[] = [
   { key: "home", label: "Home" },
   { key: "about", label: "About" },
   { key: "services", label: "Services" },
+  { key: "articles", label: "Articles" },
   { key: "contact", label: "Contact" },
 ];
 
@@ -41,6 +45,10 @@ export function NavbarWithSearch({
   onNavigate,
 }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
+    const activePage = publicPage === "article-detail" ? "articles" : publicPage;
+function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
+    onSearchChange(e.target.value);
+  }
 
   useEffect(() => {
     setMobileOpen(false);
