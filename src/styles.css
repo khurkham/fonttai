@@ -25,7 +25,9 @@
     min-height: 100%;
   }
 
-  html,
+  html {
+  scroll-behavior: smooth;
+}
   body {
     font-family: var(--font-main);
   }
