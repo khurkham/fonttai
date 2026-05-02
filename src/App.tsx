@@ -1418,25 +1418,31 @@ function ArticleDetailPage({
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
         <article className="min-w-0">
-          <p className="mb-8 text-base leading-8 text-slate-700">
-            {article.description}
-          </p>
+<p className="mb-8 text-base leading-8 text-slate-700 whitespace-normal break-words">
+  {article.description}
+</p>
 
-          <div className="space-y-10">
-            {article.sections.map((section) => (
-              <section key={section.id} id={section.id} className="scroll-mt-28">
-                <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                  {section.heading}
-                </h2>
+<div className="space-y-10">
+  {article.sections.map((section) => (
+    <section key={section.id} id={section.id} className="scroll-mt-28">
+      <h2 className="text-2xl font-black tracking-tight text-slate-900">
+        {section.heading}
+      </h2>
 
-                <div className="mt-4 space-y-5 whitespace-pre-wrap leading-8 text-slate-700">
-                  {section.body.split("").map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+      <div className="mt-4 space-y-5 leading-8 text-slate-700">
+        {section.body
+          .split("\n\n")
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+          .map((paragraph, index) => (
+            <p key={index} className="whitespace-normal break-words">
+              {paragraph}
+            </p>
+          ))}
+      </div>
+    </section>
+  ))}
+</div>
         </article>
 
         <div className="lg:sticky lg:top-28 lg:self-start">
