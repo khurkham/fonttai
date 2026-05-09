@@ -202,10 +202,18 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
                 <span>bejaitai@gmail.com</span>
               </div>
 
-              <div className="flex items-start gap-3">
-                <UserRoundPlus size={16} className="mt-0.5 text-blue-600" />
-                <span>ID Line: bejaitai</span>
-              </div>
+           <div className="flex items-start gap-3">
+  <UserRoundPlus size={16} className="mt-0.5 text-blue-600" />
+
+  <a
+    href="https://line.me/ti/p/bejaitai"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:text-green-600 transition-colors"
+  >
+    ID Line: bejaitai
+  </a>
+</div>
 
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="mt-0.5 text-blue-600" />
