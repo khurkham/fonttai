@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone, Settings } from "lucide-react";
+import { Mail, MapPin, UserRoundPlus, Settings, } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AdSlot } from "./AdSlot";
 import { api } from "../api";
@@ -199,12 +199,12 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
             <div className="mt-4 space-y-3 text-sm text-slate-600">
               <div className="flex items-start gap-3">
                 <Mail size={16} className="mt-0.5 text-blue-600" />
-                <span>bejaitai@email.com</span>
+                <span>bejaitai@gmail.com</span>
               </div>
 
               <div className="flex items-start gap-3">
-                <Phone size={16} className="mt-0.5 text-blue-600" />
-                <span>+66 94-624-8370</span>
+                <UserRoundPlus size={16} className="mt-0.5 text-blue-600" />
+                <span>ID Line: bejaitai</span>
               </div>
 
               <div className="flex items-start gap-3">
