@@ -1,5 +1,4 @@
 import { Mail, MapPin, UserRoundPlus, Settings, } from "lucide-react";
-import { useEffect } from "react";
 import { AdSlot } from "./AdSlot";
 
 
@@ -21,24 +20,7 @@ type Props = {
 
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
 const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
-useEffect(() => {
-  const container = document.getElementById("gnr-counter");
 
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  const script = document.createElement("script");
-
-  script.src =
-    "https://gnrcounter.com/counter.php?accId=def174d608afd0037aa6dfb313e8e603";
-
-  script.type = "text/javascript";
-
-  script.async = true;
-
-  container.appendChild(script);
-}, []);
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10">
@@ -135,13 +117,33 @@ useEffect(() => {
   </div>
 
   <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
+<div className="rounded-[22px] border border-white/60 bg-white/85 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
 
-    <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
- <div
-  id="gnr-counter"
-  className="flex justify-center items-center min-h-[80px]"
-/>
+  <div className="mb-3 flex items-center gap-2">
+    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-[13px] text-blue-600 shadow-sm">
+      👁️
+    </div>
+
+    <div>
+      <h5 className="text-[15px] font-extrabold leading-none text-slate-900">
+        Visitor Counter
+      </h5>
+
+      <p className="mt-1 text-[10px] leading-none text-slate-400">
+        Live Website Visitors
+      </p>
+    </div>
+  </div>
+
+  <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
+    <img
+      src="https://api.visitorbadge.io/api/visitors?path=fonttai.com&label=Visitors&countColor=%230f172a"
+      alt="Visitor Counter"
+      className="h-[32px]"
+    />
+  </div>
 </div>
+    
 
   </div>
 </div>
