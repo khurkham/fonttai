@@ -20,20 +20,7 @@ type Props = {
 };
 
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
-  useEffect(() => {
-  const script = document.createElement("script");
-
-  script.src =
-    "https://gnrcounter.com/counter.php?accId=def174d608afd0037aa6dfb313e8e603";
-
-  script.async = true;
-
-  document.body.appendChild(script);
-
-  return () => {
-    document.body.removeChild(script);
-  };
-}, []);
+ 
 const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
@@ -132,16 +119,13 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
 
   <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
 
-    <div
-      dangerouslySetInnerHTML={{
-        __html: `
-<script language="JavaScript" type="text/javascript" src="https://gnrcounter.com/counter.php?accId=def174d608afd0037aa6dfb313e8e603"></script>
-<noscript>
-<a href="https://gnrcounter.com" title="Web Analytics">Web Analytics</a>
-</noscript>
-        `,
-      }}
-    />
+    <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
+  <iframe
+    src="https://gnrcounter.com/counter.php?accId=def174d608afd0037aa6dfb313e8e603"
+    title="Visitor Counter"
+    className="h-[80px] w-full border-0"
+  />
+</div>
 
   </div>
 </div>
