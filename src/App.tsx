@@ -1538,16 +1538,7 @@ export default function App() {
   const [showEditFont, setShowEditFont] = useState(false);
   const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-  if (typeof window === "undefined") return "home";
-  const saved = sessionStorage.getItem("fonttai_view_mode");
-  return saved === "admin" ? "admin" : "home";
-});
-
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  sessionStorage.setItem("fonttai_view_mode", viewMode);
-}, [viewMode]);
+  const [viewMode, setViewMode] = useState<ViewMode>("home");
   const [publicPage, setPublicPage] = useState<PublicPage>(() =>
     pathToPage(window.location.pathname)
   );
@@ -2267,11 +2258,9 @@ const seoDescription =
                     </p>
 
                     <h2 className="input-shan text-3xl font-black tracking-tight leading-[1.45] text-slate-900 sm:text-4xl sm:leading-[1.5]">
-                      ၽၢင်ႁၢင်ႈၾွၼ်ႉတႆးယူႇၼီႇၶူတ်ႉ
+                      ၽၢင်ႁၢင်ႈၾွၼ်ႉတႆး ယူႇၼီႇၶူတ်ႉ
                       <br />
-                      ႁၼ်သႃႇတၢႆႇၵမ်းသိုဝ်ႈ 
-                      <br />
-                      မီးပႃးၶူတ်ႉၾွၼ်ႉတႃႇၽင်ၼႂ်းဝဵပ်ႉသၢႆႉ
+                      ႁၼ်သႃႇတၢႆႇၵမ်းသိုဝ်ႈ မီးပႃးၶူတ်ႉၾွၼ်ႉတႃႇၽင်ၼႂ်းဝဵပ်ႉသၢႆႉ
                     </h2>
 
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -2432,7 +2421,7 @@ const seoDescription =
         onClose={() => setShowAddFont(false)}
         onCreated={async () => {
           await loadFonts();
-
+          navigateToPage("home");
         }}
       />
 
