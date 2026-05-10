@@ -25,12 +25,19 @@ const [visitorCount, setVisitorCount] = useState<number | null>(null);
 
 useEffect(() => {
   const fetchCounter = async () => {
-  const res = await fetch("http://fonttai.com/api/counter");
-  const data = await res.json();
-  setVisitorCount(data.count);
-};
+    try {
+      const res = await fetch("/api/counter");
+      const data = await res.json();
+      setVisitorCount(data.count);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   fetchCounter();
+
+  const interval = setInterval(fetchCounter, 10000); // ทุก 10 วิ
+  return () => clearInterval(interval);
 }, []);
 
   return (
@@ -123,7 +130,7 @@ useEffect(() => {
       </h5>
 
       <p className="mt-1 text-[10px] leading-none text-slate-400">
-        Powered by gnrcounter.com
+        Powered by CounterAPI
       </p>
       <p className="mt-2 text-lg font-bold text-blue-600">
   {visitorCount !== null ? visitorCount.toLocaleString() : "Loading..."}
