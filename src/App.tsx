@@ -37,6 +37,12 @@ const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
 
 const SHOW_AD_PLACEHOLDERS = true;
+
+const ALPHABET = [
+  "ALL",
+  "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+  "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+];
 const FONT_CHARACTERISTIC_OPTIONS = [
   { value: "official", label: "ทางการ" },
   { value: "modern", label: "ทันสมัย" },
@@ -1685,6 +1691,7 @@ export default function App() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [letterFilter, setLetterFilter] = useState<string>("ALL");
 
   const [codeFont, setCodeFont] = useState<FontItem | null>(null);
   const [showLogin, setShowLogin] = useState(false);
@@ -1856,19 +1863,27 @@ export default function App() {
     const merged = [...customFonts, ...GOOGLE_FONTS];
     const q = search.trim().toLowerCase();
 
-    if (!q) return merged;
+    let result = merged;
 
-    return merged.filter((font) =>
+    if (letterFilter !== "ALL") {
+      result = result.filter((font) =>
+        font.name.trim().toUpperCase().startsWith(letterFilter)
+      );
+    }
+
+    if (!q) return result;
+
+    return result.filter((font) =>
       [font.name, font.owner, font.characteristics, font.style, font.details]
         .join(" ")
         .toLowerCase()
         .includes(q)
     );
-  }, [customFonts, search]);
+  }, [customFonts, search, letterFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, pageSize, letterFilter]);
 
   useEffect(() => {
   const cleanup = bindConsentScriptLoader();
@@ -2470,6 +2485,37 @@ const seoDescription =
                   </select>
                 </div>
               </section>
+
+              <div className="sticky top-[88px] z-30 -mx-4 mb-6 border-b border-slate-200/70 bg-slate-50/85 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-slate-50/70">
+                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                  {ALPHABET.map((letter) => {
+                    const isActive = letterFilter === letter;
+                    const isAll = letter === "ALL";
+                    return (
+                      <button
+                        key={letter}
+                        type="button"
+                        onClick={() => setLetterFilter(letter)}
+                        aria-pressed={isActive}
+                        className={`min-w-[36px] rounded-xl px-2.5 py-1.5 text-sm font-bold transition sm:min-w-[40px] sm:px-3 sm:py-2 ${
+                          isActive
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "border border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                        } ${isAll ? "px-3 sm:px-4" : ""}`}
+                      >
+                        {letter}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {letterFilter !== "ALL" ? (
+                  <p className="mt-2 text-center text-xs text-slate-500">
+                    แสดงเฉพาะฟอนต์ที่ขึ้นต้นด้วยตัวอักษร {letterFilter} (
+                    {allFonts.length} รายการ)
+                  </p>
+                ) : null}
+              </div>
 
               {SHOW_AD_PLACEHOLDERS ? (<AdSlot
                 label="พื้นที่โฆษณาเหนือรายการฟอนต์"
