@@ -1,8 +1,8 @@
 import { Mail, MapPin, UserRoundPlus, Settings, } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AdSlot } from "./AdSlot";
-import { api } from "../api";
-import type { VisitorCounter } from "../types";
+
+
 import { openCookieSettings } from "../utils/cookieConsent";
 
 type Props = {
@@ -20,50 +20,20 @@ type Props = {
 };
 
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
-  const [stats, setStats] = useState<VisitorCounter>({
-    totalVisitors: 0,
-    todayVisitors: 0,
-    onlineNow: 0,
-  });
-  const [statsLoading, setStatsLoading] = useState(true);
-
   useEffect(() => {
-    let active = true;
+  const script = document.createElement("script");
 
-    async function loadStats() {
-      try {
-        setStatsLoading(true);
-        const res = await api.getVisitorCounter();
+  script.src =
+    "https://gnrcounter.com/counter.php?accId=def174d608afd0037aa6dfb313e8e603";
 
-        if (active) {
-          setStats(res.stats);
-        }
-      } catch {
-        if (active) {
-          setStats({
-            totalVisitors: 0,
-            todayVisitors: 0,
-            onlineNow: 0,
-          });
-        }
-      } finally {
-        if (active) {
-          setStatsLoading(false);
-        }
-      }
-    }
+  script.async = true;
 
-    loadStats();
+  document.body.appendChild(script);
 
-    const interval = window.setInterval(() => {
-      loadStats();
-    }, 5000);
-
-    return () => {
-      active = false;
-      window.clearInterval(interval);
-    };
-  }, []);
+  return () => {
+    document.body.removeChild(script);
+  };
+}, []);
 const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
@@ -142,53 +112,39 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
           <div className="flex h-full w-full max-w-[250px] flex-col">
   
 
-  <div className="rounded-[22px] border border-white/60 bg-white/85 p-3.5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-    <div className="mb-2.5 flex items-center gap-2">
-      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-[13px] text-blue-600 shadow-sm">
-        👁️
-      </div>
-      <div>
-        <h5 className="text-[15px] font-extrabold leading-none text-slate-900">
-          Visitor Counter
-        </h5>
-        <p className="mt-1 text-[10px] leading-none text-slate-400">
-          อัปเดตอัตโนมัติแบบเรียลไทม์
-        </p>
-      </div>
+  <div className="rounded-[22px] border border-white/60 bg-white/85 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+
+  <div className="mb-3 flex items-center gap-2">
+    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-[13px] text-blue-600 shadow-sm">
+      👁️
     </div>
 
-    <div className="space-y-1.5">
-      <div className="flex min-h-[40px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
-        <span className="text-[13px] font-medium text-slate-500">
-          ผู้เข้าชมทั้งหมด
-        </span>
-        <span className="text-[15px] font-black tracking-tight text-slate-900">
-          {statsLoading ? "..." : stats.totalVisitors.toLocaleString()}
-        </span>
-      </div>
+    <div>
+      <h5 className="text-[15px] font-extrabold leading-none text-slate-900">
+        Visitor Counter
+      </h5>
 
-      <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-3 py-2">
-        <span className="text-[13px] font-medium text-slate-500">วันนี้</span>
-        <span className="text-[15px] font-black tracking-tight text-slate-900">
-          {statsLoading ? "..." : stats.todayVisitors.toLocaleString()}
-        </span>
-      </div>
-
-      <div className="flex min-h-[48px] items-center justify-between rounded-xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-3 py-2">
-        <span className="text-[13px] font-medium text-slate-500">
-          ออนไลน์ตอนนี้
-        </span>
-        <span className="text-[15px] font-black tracking-tight text-emerald-600">
-          {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
-        </span>
-      </div>
-    </div>
-
-    <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-slate-400">
-      <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
-      ระบบนับผู้เข้าชมจริงจากฐานข้อมูล
+      <p className="mt-1 text-[10px] leading-none text-slate-400">
+        Powered by gnrcounter.com
+      </p>
     </div>
   </div>
+
+  <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
+
+    <div
+      dangerouslySetInnerHTML={{
+        __html: `
+<script language="JavaScript" type="text/javascript" src="https://gnrcounter.com/counter.php?accId=def174d608afd0037aa6dfb313e8e603"></script>
+<noscript>
+<a href="https://gnrcounter.com" title="Web Analytics">Web Analytics</a>
+</noscript>
+        `,
+      }}
+    />
+
+  </div>
+</div>
 </div>
 
           <div className="flex h-full flex-col">
