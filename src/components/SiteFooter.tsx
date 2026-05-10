@@ -125,7 +125,9 @@ useEffect(() => {
       <p className="mt-1 text-[10px] leading-none text-slate-400">
         Powered by gnrcounter.com
       </p>
-      
+      <p className="mt-2 text-lg font-bold text-blue-600">
+  {visitorCount !== null ? visitorCount.toLocaleString() : "Loading..."}
+</p>
     </div>
   </div>
 
