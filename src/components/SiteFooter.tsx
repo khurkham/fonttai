@@ -1,6 +1,5 @@
 import { Mail, MapPin, UserRoundPlus, Settings, } from "lucide-react";
 import { AdSlot } from "./AdSlot";
-import { useEffect, useState } from "react";
 
 import { openCookieSettings } from "../utils/cookieConsent";
 
@@ -21,24 +20,7 @@ type Props = {
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
 const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
 
-const [visitorCount, setVisitorCount] = useState<number | null>(null);
 
-useEffect(() => {
-  const fetchCounter = async () => {
-    try {
-      const res = await fetch("/api/counter");
-      const data = await res.json();
-      setVisitorCount(data.count);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  fetchCounter();
-
-  const interval = setInterval(fetchCounter, 10000); // ทุก 10 วิ
-  return () => clearInterval(interval);
-}, []);
 
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
@@ -130,11 +112,9 @@ useEffect(() => {
       </h5>
 
       <p className="mt-1 text-[10px] leading-none text-slate-400">
-        Powered by CounterAPI
+        Powered by Fonttai
       </p>
-      <p className="mt-2 text-lg font-bold text-blue-600">
-  {visitorCount !== null ? visitorCount.toLocaleString() : "Loading..."}
-</p>
+      
     </div>
   </div>
 
