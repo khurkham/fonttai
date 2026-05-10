@@ -149,7 +149,9 @@ const GOOGLE_FONTS: FontItem[] = [
   },
 ];
 
+const [selectedLetter, setSelectedLetter] = useState("ALL");
 
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 function pageToPath(page: PublicPage, slug?: string): string {
   switch (page) {

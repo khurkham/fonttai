@@ -27,7 +27,7 @@ export default function BackToTop() {
       aria-label="Back to top"
       title="Back to top"
     >
-      ↑
+      ⮉
     </button>
   );
 }
