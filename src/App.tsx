@@ -1538,7 +1538,16 @@ export default function App() {
   const [showEditFont, setShowEditFont] = useState(false);
   const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("home");
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+  if (typeof window === "undefined") return "home";
+  const saved = sessionStorage.getItem("fonttai_view_mode");
+  return saved === "admin" ? "admin" : "home";
+});
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem("fonttai_view_mode", viewMode);
+}, [viewMode]);
   const [publicPage, setPublicPage] = useState<PublicPage>(() =>
     pathToPage(window.location.pathname)
   );
@@ -2421,7 +2430,7 @@ const seoDescription =
         onClose={() => setShowAddFont(false)}
         onCreated={async () => {
           await loadFonts();
-          navigateToPage("home");
+
         }}
       />
 
