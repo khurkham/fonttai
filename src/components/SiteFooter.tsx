@@ -100,6 +100,7 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
   
 
   <div className="rounded-[22px] border border-white/60 bg-white/85 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+
   <div className="mb-3 flex items-center gap-2">
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-[13px] text-blue-600 shadow-sm">
       👁️
@@ -123,9 +124,6 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
       className="h-[32px]"
     />
   </div>
-</div>
-
-  
 </div>
 </div>
 
