@@ -1,6 +1,6 @@
 import { Mail, MapPin, UserRoundPlus, Settings, } from "lucide-react";
 import { AdSlot } from "./AdSlot";
-
+import { useEffect, useState } from "react";
 
 import { openCookieSettings } from "../utils/cookieConsent";
 
@@ -20,6 +20,18 @@ type Props = {
 
 export function SiteFooter({ onNavigate, onAdminClick }: Props) {
 const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
+
+const [visitorCount, setVisitorCount] = useState<number | null>(null);
+
+useEffect(() => {
+  const fetchCounter = async () => {
+  const res = await fetch("http://fonttai.com/api/counter");
+  const data = await res.json();
+  setVisitorCount(data.count);
+};
+
+  fetchCounter();
+}, []);
 
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
@@ -113,6 +125,7 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
       <p className="mt-1 text-[10px] leading-none text-slate-400">
         Powered by gnrcounter.com
       </p>
+      
     </div>
   </div>
 
