@@ -10,6 +10,7 @@ import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
 import { bindConsentScriptLoader } from "./utils/consentScripts";
+import BackToTop from "./components/BackToTop";
 import {
   ARTICLES,
   ARTICLES_INTRO,
@@ -1514,6 +1515,7 @@ export default function App() {
     return slug || null;
   }
   return null;
+  
 });
   const [selectedContact, setSelectedContact] =
     useState<ContactMessage | null>(null);
@@ -2433,6 +2435,7 @@ const seoDescription =
       />
 
       <CookieBanner onNavigate={(page) => navigateToPage(page)} />
+        <BackToTop />
     </div>
   );
 }
