@@ -100,7 +100,6 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
   
 
   <div className="rounded-[22px] border border-white/60 bg-white/85 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-
   <div className="mb-3 flex items-center gap-2">
     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 text-[13px] text-blue-600 shadow-sm">
       👁️
@@ -112,11 +111,19 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
       </h5>
 
       <p className="mt-1 text-[10px] leading-none text-slate-400">
-        Powered by Fonttai
+        Live Website Visitors
       </p>
-      
     </div>
   </div>
+
+  <div className="flex justify-center rounded-xl border border-slate-100 bg-white p-4">
+    <img
+      src="https://api.visitorbadge.io/api/visitors?path=fonttai.com&label=Visitors&countColor=%230f172a"
+      alt="Visitor Counter"
+      className="h-[32px]"
+    />
+  </div>
+</div>
 
   
 </div>
