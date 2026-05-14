@@ -1,5 +1,4 @@
 import { Mail, MapPin, UserRoundPlus, Settings, } from "lucide-react";
-import { AdSlot } from "./AdSlot";
 
 import { openCookieSettings } from "../utils/cookieConsent";
 
@@ -25,12 +24,7 @@ const SHOW_AD_PLACEHOLDERS = import.meta.env.DEV;
   return (
     <footer className="mt-16 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10">
-        {SHOW_AD_PLACEHOLDERS ? (<AdSlot
-          label="พื้นที่โฆษณาด้านล่างเว็บไซต์"
-          variant="banner"
-          slotId="footer-banner"
-          className="mb-8 min-h-[140px]"
-        />) : null}
+        
 
         <div className="grid items-stretch gap-8 md:grid-cols-2 xl:grid-cols-[1.15fr_0.9fr_0.95fr_0.95fr]">
           <div className="flex h-full flex-col">

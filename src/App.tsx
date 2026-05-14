@@ -4,7 +4,6 @@ import { api } from "./api";
 import { FontCard } from "./components/FontCard";
 import { Pagination } from "./components/Pagination";
 import { SiteFooter } from "./components/SiteFooter";
-import { AdSlot } from "./components/AdSlot";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
@@ -2425,14 +2424,7 @@ const seoDescription =
                     </p>
                   </div>
 
-                  <div className="flex items-end">
-                    {SHOW_AD_PLACEHOLDERS ? (<AdSlot
-                      label="พื้นที่โฆษณา Hero Banner"
-                      variant="banner"
-                      slotId="hero-banner"
-                      className="min-h-[160px]"
-                    />) : null}
-                  </div>
+                
                 </div>
               </section>
 
@@ -2517,12 +2509,7 @@ const seoDescription =
                 ) : null}
               </div>
 
-              {SHOW_AD_PLACEHOLDERS ? (<AdSlot
-                label="พื้นที่โฆษณาเหนือรายการฟอนต์"
-                variant="banner"
-                slotId="top-font-list"
-                className="mb-8 min-h-[140px]"
-              />) : null}
+              
 
               {loading ? (
                 <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
@@ -2542,17 +2529,6 @@ const seoDescription =
                         onShowCode={setCodeFont}
                       />
 
-                      {(index + 1) % 5 === 0 &&
-                      index !== paginatedFonts.length - 1 ? (
-                        <div className="mt-6">
-                          {SHOW_AD_PLACEHOLDERS ? (<AdSlot
-                            label="พื้นที่โฆษณาคั่นรายการฟอนต์"
-                            variant="inline"
-                            slotId={`inline-${index + 1}`}
-                            className="min-h-[120px]"
-                          />) : null}
-                        </div>
-                      ) : null}
                     </div>
                   ))}
                 </section>
@@ -2564,12 +2540,7 @@ const seoDescription =
                 onChange={setPage}
               />
 
-              {SHOW_AD_PLACEHOLDERS ? (<AdSlot
-                label="พื้นที่โฆษณาก่อนส่วนท้ายเว็บไซต์"
-                variant="banner"
-                slotId="before-footer"
-                className="mt-10 min-h-[140px]"
-              />) : null}
+              
             </>
           )}
         </main>
