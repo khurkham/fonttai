@@ -94,10 +94,19 @@ export function SiteFooter({
 
               <button
                 type="button"
-                onClick={() => onNavigate("home")}
+                onClick={() => {
+  onNavigate("home");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+
+  window.location.reload();
+}}
                 className="text-left text-sm font-medium text-slate-600 transition hover:text-blue-600"
               >
-                หน้าแรก
+                HOME
               </button>
 
               <button

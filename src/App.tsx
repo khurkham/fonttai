@@ -1179,7 +1179,16 @@ function StaticPage({
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
-            onClick={() => onNavigate("home")}
+            onClick={() => {
+  onNavigate("home");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+
+  window.location.reload();
+}}
             className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
             กลับหน้าแรก
