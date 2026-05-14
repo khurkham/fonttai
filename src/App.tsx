@@ -1691,7 +1691,7 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [letterFilter, setLetterFilter] = useState<string>("ALL");
-
+  const [ownerFilter, setOwnerFilter] = useState("ALL");
   const [codeFont, setCodeFont] = useState<FontItem | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [showAddFont, setShowAddFont] = useState(false);
@@ -1870,6 +1870,10 @@ export default function App() {
       );
     }
 
+    if (ownerFilter !== "ALL") {
+      result = result.filter((font) => font.owner === ownerFilter);
+    }
+
     if (!q) return result;
 
     return result.filter((font) =>
@@ -1878,11 +1882,11 @@ export default function App() {
         .toLowerCase()
         .includes(q)
     );
-  }, [customFonts, search, letterFilter]);
+  }, [customFonts, search, letterFilter, ownerFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize, letterFilter]);
+  }, [search, pageSize, letterFilter, ownerFilter]);
 
   useEffect(() => {
   const cleanup = bindConsentScriptLoader();
@@ -1934,6 +1938,19 @@ export default function App() {
   setPublicPage("article-detail");
   setViewMode("home");
 }
+
+  // === handler ที่ <SiteFooter> เรียกใช้ ===
+  function handleNavigate(page: PublicPage) {
+    navigateToPage(page);
+  }
+
+  function handleAdminClick() {
+    if (isAuthed) {
+      setViewMode("admin");
+    } else {
+      setShowLogin(true);
+    }
+  }
 
 
 const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
@@ -2508,14 +2525,30 @@ const seoDescription =
     </div>
   </div>
 
-  {letterFilter !== "ALL" ? (
+  {(letterFilter !== "ALL" || ownerFilter !== "ALL") ? (
     <div className="border-t border-slate-100 px-4 py-2">
       <p className="text-center text-xs font-medium text-slate-500">
-        แสดงฟอนต์ที่ขึ้นต้นด้วย{" "}
-        <span className="font-bold text-blue-600">
-          {letterFilter}
-        </span>{" "}
-        จำนวน {allFonts.length} รายการ
+        {letterFilter !== "ALL" ? (
+          <>
+            แสดงฟอนต์ที่ขึ้นต้นด้วย{" "}
+            <span className="font-bold text-blue-600">{letterFilter}</span>
+          </>
+        ) : null}
+        {letterFilter !== "ALL" && ownerFilter !== "ALL" ? " และ " : null}
+        {ownerFilter !== "ALL" ? (
+          <>
+            เจ้าของ{" "}
+            <span className="font-bold text-blue-600">{ownerFilter}</span>{" "}
+            <button
+              type="button"
+              onClick={() => setOwnerFilter("ALL")}
+              className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:bg-slate-300"
+            >
+              ล้าง
+            </button>
+          </>
+        ) : null}
+        {" "}จำนวน {allFonts.length} รายการ
       </p>
     </div>
   ) : null}
@@ -2559,8 +2592,10 @@ const seoDescription =
         </main>
 
         <SiteFooter
-          onNavigate={navigateToPage}
-          onAdminClick={() => setShowLogin(true)}
+          onNavigate={handleNavigate}
+          onAdminClick={handleAdminClick}
+          allFonts={allFonts}
+          setOwnerFilter={setOwnerFilter}
         />
       </div>
 
