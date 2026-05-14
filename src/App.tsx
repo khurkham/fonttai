@@ -2478,36 +2478,49 @@ const seoDescription =
                 </div>
               </section>
 
-              <div className="sticky top-[88px] z-30 -mx-4 mb-6 border-b border-slate-200/70 bg-slate-50/85 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-slate-50/70">
-                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                  {ALPHABET.map((letter) => {
-                    const isActive = letterFilter === letter;
-                    const isAll = letter === "ALL";
-                    return (
-                      <button
-                        key={letter}
-                        type="button"
-                        onClick={() => setLetterFilter(letter)}
-                        aria-pressed={isActive}
-                        className={`min-w-[36px] rounded-xl px-2.5 py-1.5 text-sm font-bold transition sm:min-w-[40px] sm:px-3 sm:py-2 ${
-                          isActive
-                            ? "bg-blue-600 text-white shadow-md"
-                            : "border border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
-                        } ${isAll ? "px-3 sm:px-4" : ""}`}
-                      >
-                        {letter}
-                      </button>
-                    );
-                  })}
-                </div>
+            <div className="mb-6 border-b border-slate-200/70 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 md:sticky md:top-[72px] md:z-30">
 
-                {letterFilter !== "ALL" ? (
-                  <p className="mt-2 text-center text-xs text-slate-500">
-                    แสดงเฉพาะฟอนต์ที่ขึ้นต้นด้วยตัวอักษร {letterFilter} (
-                    {allFonts.length} รายการ)
-                  </p>
-                ) : null}
-              </div>
+  <div className="overflow-x-auto px-2 py-3 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+    
+    <div className="flex min-w-max items-center gap-2">
+
+      {ALPHABET.map((letter) => {
+        const isActive = letterFilter === letter;
+        const isAll = letter === "ALL";
+
+        return (
+          <button
+            key={letter}
+            type="button"
+            onClick={() => setLetterFilter(letter)}
+            aria-pressed={isActive}
+            className={`flex h-10 min-w-[40px] items-center justify-center rounded-xl px-3 text-sm font-bold transition-all duration-200 ${
+              isActive
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+            } ${isAll ? "px-4" : ""}`}
+          >
+            {letter}
+          </button>
+        );
+      })}
+
+    </div>
+  </div>
+
+  {letterFilter !== "ALL" ? (
+    <div className="border-t border-slate-100 px-4 py-2">
+      <p className="text-center text-xs font-medium text-slate-500">
+        แสดงฟอนต์ที่ขึ้นต้นด้วย{" "}
+        <span className="font-bold text-blue-600">
+          {letterFilter}
+        </span>{" "}
+        จำนวน {allFonts.length} รายการ
+      </p>
+    </div>
+  ) : null}
+
+</div>
 
               
 
