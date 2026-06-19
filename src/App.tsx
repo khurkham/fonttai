@@ -551,7 +551,7 @@ setCharacteristics(font.characteristics || "official");
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">แก้ไขฟอนต์</h3>
+          <h3 className="text-2xl font-black text-slate-900">မူၼ်ႉမေးၾွၼ်ႉ</h3>
           <button
             type="button"
             onClick={onClose}
@@ -564,7 +564,7 @@ setCharacteristics(font.characteristics || "official");
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ၸိုဝ်ႈฟอนต์"
+            placeholder="ၸိုဝ်ႈၾွၼ်ႉ"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -617,7 +617,7 @@ setCharacteristics(font.characteristics || "official");
             type="submit"
             disabled={loading}
           >
-            {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
+            {loading ? "တိုၵ်ႉၵဵပ်းသိမ်း..." : "ၵဵပ်းသိမ်းလွင်ႈမႄးထတ်း"}
           </button>
         </form>
       </div>
@@ -666,13 +666,13 @@ function StaticPage({
     const message = contactForm.message.trim();
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      setContactError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      setContactError("ၶႅၼ်းတေႃႈတႅမ်ႈသႂ်ႇပၼ်တီႈဢၼ်လူဝ်ႇၼၼ်ႉတင်းမူတ်းသေၵမ်း");
       return;
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      setContactError("กรุณากรอกอีเมลให้ถูกต้อง");
+      setContactError("ၶႅၼ်းတေႃႈ သႂ်ႇပၼ် ဢီးမေးလ် ဢၼ်မၢၼ်ႇမႅၼ်ႈၼၼ်ႉလႄႈ။");
       return;
     }
 
@@ -687,7 +687,7 @@ function StaticPage({
         message,
       });
 
-      setContactSuccess(res.message || "ส่งข้อมูลเรียบร้อยแล้ว");
+      setContactSuccess(res.message || "သူင်ႇၶေႃႈမุၼ်းယဝ်ႉတူဝ်ႈလီယဝ်ႉ");
 
       setContactForm({
         firstName: "",
@@ -698,7 +698,7 @@ function StaticPage({
       });
     } catch (err) {
       setContactError(
-        err instanceof Error ? err.message : "ไม่สามารถส่งข้อมูลได้"
+        err instanceof Error ? err.message : "ဢမ်ႇၸၢင်ႈသူင်ႇၶေႃႈမုၼ်း။"
       );
     } finally {
       setContactSubmitting(false);
@@ -713,20 +713,16 @@ function StaticPage({
             Privacy Policy
           </p>
           <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-            นโยบายความเป็นส่วนตัว
+            ပိူင်ၵၢၼ်သုၼ်ႇတူဝ်
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            อัปเดตล่าสุด: 21/4/2026
+            ဢပ်ႉတဵတ်ႇလိုၼ်းသုတ်း : 21/4/2026
           </p>
         </div>
 
         <div className="space-y-6 leading-7 text-slate-600">
   <p>
-    เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งานทุกท่าน
-    นโยบายความเป็นส่วนตัวฉบับนี้อธิบายถึงแนวတၢင်းၵၢၼ်เก็บรวบรวม ใช้ เปิดเผย
-    และคุ้มครองข้อมูลที่เกี่ยวข้องกับการใช้งานเว็บไซต์ของเรา
-    รวมถึงการใช้บริการจากบุคคลที่สาม เช่น Google AdSense
-    เมื่อคุณเข้าใช้งานเว็บไซต์นี้ จะถือว่าคุณได้อ่านและรับทราบนโยบายฉบับนี้แล้ว
+   ဝႅပ်ႉသၢႆႉ Font Tai ပၼ်ၵႃႈၶၼ်လွင်ႈသุၼ်ႇတူဝ်ၶွင်ၽူႈၸႂ်ႉတိုဝ်းၵူႈၵေႃႉ။ ၼူဝ်ႇပၢႆႇၸီႇလွင်ႈသုၼ်ႇတူဝ်ၽိုၼ်ၼႆႉ လႅင်းၼႄပၼ်လွင်ႈၵဵပ်းႁူမ်တွမ်း၊ ၸႂ်ႉတိုဝ်း، ပိုတ်ႇၽူၺ်း လႄႈ ၵႅတ်ႇၶႄၶေႃႈမုၼ်းဢၼ်ၵဵဝ်ႇလူၺ်ႈၵၢၼ်ၸႂ်ႉတိုဝ်းဝႅပ်ႉသၢႆႉႁဝ်း၊ ၶဝ်ႈပႃးတၢင်းၵၢၼ်ၸႂ်ႉၵၢၼ်ၸွႆႈထႅမ်ၸၢၵ်ႇၵေႃႉသၢမ် မိူၼ်ၼင်ႇ Google AdSense။ မိူဝ်ႈသူၸဝ်ႈၶဝ်ႈၸႂ်ႉတိုဝ်းဝႅပ်ႉသၢႆႉၼႆႉ၊ တะၼပ်ႉဝႃႈသူၸဝ်ႈလႆႈဢၢၼ်ႇလႄႈႁူႉၸႅင်ႈၼူဝ်ႇပၢႆႇ<b>ၸ</b>ၽိုၼ်ၼႆႉယဝ်ႉ။
   </p>
 
   <div>
