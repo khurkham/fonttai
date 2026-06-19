@@ -1,3 +1,5 @@
+
+import BackToTop from "./components/BackToTop";
 import { useEffect, useMemo, useState } from "react";
 import { Edit, LogOut, Plus, Trash2, X } from "lucide-react";
 import { api } from "./api";
@@ -7,9 +9,9 @@ import { SiteFooter } from "./components/SiteFooter";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
-import BackToTop from "./components/BackToTop";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
 import { bindConsentScriptLoader } from "./utils/consentScripts";
+import { getPageMeta } from "./seoMeta";
 import {
   ARTICLES,
   ARTICLES_INTRO,
@@ -1964,45 +1966,12 @@ export default function App() {
 
 
 const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
-  const seoTitle =
-  publicPage === "article-detail" && currentArticle
-    ? `${currentArticle.title} | Font Tai`
-    : publicPage === "articles"
-    ? "บทความและคู่มือการใช้งานฟอนต์ไต | Font Tai"
-    : publicPage === "privacy"
-    ? "Privacy Policy - นโยบายความเป็นส่วนตัว | Font Tai"
-    : publicPage === "cookie"
-    ? "Cookie Policy - นโยบายคุกกี้ | Font Tai"
-    : publicPage === "about"
-    ? "About Font Tai - เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
-    : publicPage === "services"
-    ? "Services - Preview, Download & Font Embed Code | Font Tai"
-    : publicPage === "contact"
-    ? "Contact Font Tai - ติดต่อสอบถาม แนะนำฟอนต์ และแจ้งปัญหา"
-    : publicPage === "notfound"
-    ? "404 Not Found | Font Tai"
-    : "Font Tai ၾွၼ်ႉတႆး - ฟอนต์ไต ฟอนต์ไทใหญ่ Shan Font Preview & Download";
 
-const seoDescription =
-  publicPage === "article-detail" && currentArticle
-    ? currentArticle.description
-    : publicPage === "articles"
-    ? ARTICLES_INTRO
-    : publicPage === "home"
-    ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และทุกอุปกรณ์"
-    : publicPage === "about"
-    ? "รู้จัก Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Tai font ที่ช่วยให้พรีวิวฟอนต์ ดาวน์โหลดฟอนต์ และนำฟอนต์ไปใช้งานบนเว็บไซต์ได้ง่ายขึ้น"
-    : publicPage === "services"
-    ? "บริการของ Font Tai ครอบคลุมการพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ ดูโค้ดฝังฟอนต์ และจัดการฟอนต์สำหรับใช้งานบนเว็บไซต์ทั้งภาษาไต ภาษาไทย และภาษาอังกฤษ"
-    : publicPage === "contact"
-    ? "ติดต่อทีมงาน Font Tai เพื่อสอบถามการใช้งานเว็บไซต์ แนะนำฟอนต์ แจ้งปัญหาการดาวน์โหลดฟอนต์ หรือพูดคุยเรื่องการใช้งานฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
-    : publicPage === "privacy"
-    ? "อ่านนโยบายความเป็นส่วนตัวของ Font Tai เพื่อดูแนวทางการเก็บ ใช้ และคุ้มครองข้อมูลผู้ใช้งาน"
-    : publicPage === "cookie"
-    ? "อ่านนโยบายคุกกี้ของ Font Tai เพื่อทำความเข้าใจประเภทของคุกกี้ที่ใช้"
-    : publicPage === "notfound"
-    ? "ไม่พบหน้าที่คุณค้นหาบนเว็บไซต์ Font Tai"
-    : "Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Shan font สำหรับพรีวิวออนไลน์ ดาวน์โหลด และฝังฟอนต์บนเว็บไซต์";
+  // title/description มาจาก src/seoMeta.ts ไฟล์เดียว ใช้ร่วมกับ worker.ts
+  // (ฝั่ง server) เพื่อให้ Googlebot/AdSense bot เห็นค่าตรงกับที่ผู้ใช้เห็นเป๊ะ
+  const { title: seoTitle, description: seoDescription } = getPageMeta(
+    pageToPath(publicPage, articleSlug || undefined)
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -2653,3 +2622,4 @@ const seoDescription =
     </div>
   );
 }
+    
