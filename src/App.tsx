@@ -7,6 +7,7 @@ import { SiteFooter } from "./components/SiteFooter";
 import { SeoHead } from "./components/SeoHead";
 import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
+import BackToTop from "./components/BackToTop";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
 import { bindConsentScriptLoader } from "./utils/consentScripts";
 import {
@@ -2648,6 +2649,7 @@ const seoDescription =
       />
 
       <CookieBanner onNavigate={(page) => navigateToPage(page)} />
+      <BackToTop />
     </div>
   );
 }
