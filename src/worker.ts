@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import { getPageMeta, getCanonicalPath } from "./seoMeta";
 
 type Bindings = {
   ASSETS?: Fetcher;
@@ -257,6 +258,14 @@ function sanitizeFilename(name: string) {
     .replace(/[^\p{L}\p{N}._-]+/gu, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 // ---------- public routes ----------
@@ -794,7 +803,43 @@ app.all("*", async (c) => {
   }
 
   if (c.env.ASSETS) {
-    return c.env.ASSETS.fetch(c.req.raw);
+    const assetResponse = await c.env.ASSETS.fetch(c.req.raw);
+
+    const isHtmlPageNavigation =
+      c.req.method === "GET" &&
+      shouldTrackPath(pathname) &&
+      (assetResponse.headers.get("content-type") || "").includes("text/html");
+
+    if (!isHtmlPageNavigation) {
+      return assetResponse;
+    }
+
+    // หน้า HTML จริง (ไม่ใช่รูป/ฟอนต์/JS/CSS) -> ฝัง title/description/canonical
+    // ของหน้านั้นโดยเฉพาะลงใน HTML ก่อนส่งกลับ เพื่อให้ Googlebot และ AdSense bot
+    // เห็นค่าที่ถูกต้องตั้งแต่ HTML แรกที่โหลด ไม่ต้องรอ JavaScript รันก่อน
+    const html = await assetResponse.text();
+    const meta = getPageMeta(pathname);
+    const canonicalUrl = `${new URL(c.req.url).origin}${getCanonicalPath(pathname)}`;
+
+    const updatedHtml = html
+      .replace(
+        /<title>[\s\S]*?<\/title>/,
+        `<title>${escapeHtml(meta.title)}</title>\n    <link rel="canonical" href="${escapeHtml(
+          canonicalUrl
+        )}" />`
+      )
+      .replace(
+        /(<meta name="description" content=")[^"]*(")/,
+        `$1${escapeHtml(meta.description)}$2`
+      );
+
+    return new Response(updatedHtml, {
+      status: assetResponse.status,
+      headers: {
+        "content-type": "text/html; charset=UTF-8",
+        "cache-control": "no-cache",
+      },
+    });
   }
 
   return new Response("Not Found", { status: 404 });
