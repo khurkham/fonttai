@@ -2430,7 +2430,7 @@ const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
                     className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
                     value={previewText}
                     onChange={(e) => setPreviewText(e.target.value)}
-                    placeholder="พิมพ์ข้อความสำหรับพรีวิว"
+                    placeholder="တႅမ်ႈၶေႃႈၵႂၢမ်းတႃႇလီႇဝိဝ်း"
                   />
 
                   <div className="flex items-center gap-3">
@@ -2459,7 +2459,7 @@ const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
                     className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="ค้นหาฟอนต์"
+                    placeholder="သွၵ်ႈႁႃၾွၼ်ႉ"
                   />
 
                   <select
