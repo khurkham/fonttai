@@ -941,7 +941,7 @@ function StaticPage({
             ၽွမ်ႇၵပ်းသိုပ်းၸူးၶိုၼ်း
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-ပေႃးဝႃႈ ၶႂ်ႈၵပ်းသိုပ်ႇတွင်ႈထၢမ်၊ ပၼ်တၢင်းႁၼ်ထိုင်လွင်ႈၾွၼ်ႉ၊ တၢင်ႇလၢတ်ႈပၼ်ႁႃလွင်ႈၸႂ်ႉတိုဝ်း ဢမ်ႇၼၼ် တွင်ႈထၢမ်ၵူႈလွင်ႈလွင်ႈသူင်ႇၶေႃႈမူၼ်းမႃးၸူးႁဝ်းၶႃႈ ၽၢၼ်ႇတၢင်း ၽွမ်ႇ (Form) တီႈၽၢႆႇတႂ်ႈၼႆႉလႆႈယူႇၶႃႈဢေႃႈ။          </p>
+ပေႃးဝႃႈ ၶႂ်ႈၵပ်းသိုပ်ႇတွင်ႈထၢမ်၊ ပၼ်တၢင်းႁၼ်ထိုင်လွင်ႈၾွၼ်ႉ၊ တၢင်ႇလၢတ်ႈပၼ်ႁႃလွင်ႈၸႂ်ႉတိုဝ်း ဢမ်ႇၼၼ် တွင်ႈထၢမ်ၵူႈလွင်ႈလွင်ႈသူင်ႇၶေႃႈမုၼ်းမႃးၸူးႁဝ်းၶႃႈ ၽၢၼ်ႇတၢင်း ၽွမ်ႇ (Form) တီႈၽၢႆႇတႂ်ႈၼႆႉလႆႈယူႇၶႃႈဢေႃႈ။          </p>
         </div>
 
         <form className="space-y-5" onSubmit={handleContactSubmit} noValidate>
@@ -1357,10 +1357,10 @@ function ArticlesPage({
               <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    บทความแนะนำ
+                    ဢႃႇတီႇၶိူဝ်ႇဢၼ်လီႁု
                   </p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">
-                    อ่านคู่มือฉบับเต็ม
+                    လူဢၢၼ်ပပ်ႉၵႅမ်မိုဝ်းဢၼ်တဵမ်ထူၼ်ႈ
                   </p>
                 </div>
 
@@ -1369,7 +1369,7 @@ function ArticlesPage({
                   onClick={() => onOpenArticle(article.slug)}
                   className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
                 >
-                  อ่านต่อ
+                  သိုပ်ႇဢၢၼ်ႇ
                 </button>
               </div>
             </div>
