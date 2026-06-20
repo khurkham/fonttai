@@ -44,16 +44,16 @@ const ALPHABET = [
   "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 ];
 const FONT_CHARACTERISTIC_OPTIONS = [
-  { value: "official", label: "ทางการ" },
-  { value: "modern", label: "ทันสมัย" },
-  { value: "display", label: "พาดหัว / โปสเตอร์" },
-  { value: "body", label: "เนื้อหา อ่านยาว" },
-  { value: "handwriting", label: "ลายมือ" },
-  { value: "decorative", label: "ตกแต่ง" },
-  { value: "traditional", label: "ดั้งเดิม" },
-  { value: "Regular", label: "ทางการ" },
-  { value: "Bold", label: "พาดหัว / โปสเตอร์" },
-  { value: "Italic", label: "ลายมือ" },
+ { value: "official", label: "ပဵၼ်တၢင်းၵၢၼ်" },
+ { value: "modern", label: "ပၢၼ်မႂ်ႇ" },
+ { value: "display", label: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ" },
+ { value: "body", label: "ၼိူဝ်ႉလိၵ်ႈ လူဢၢၼ်ႇယၢဝ်း" },
+ { value: "handwriting", label: "လၢႆးမိုဝ်း" },
+ { value: "decorative", label: "ႁၢင်ႈၶိူင်ႈ" },
+ { value: "traditional", label: "မိူဝ်ႈၵဝ်ႇ" },
+ { value: "Regular", label: "ပဵၼ်တၢင်းၵၢၼ်" },
+ { value: "Bold", label: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ" },
+ { value: "Italic", label: "လၢႆးမိုဝ်း" },
 ] as const;
 
 function getCharacteristicLabel(value: string) {
@@ -68,7 +68,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "SIL International",
     characteristics: "Serif",
-    details: "ฟอนต์ไต (ไทใหญ่) มาตรฐาน รองรับอักขระครบถ้วน",
+    details: "လၵ်းၸဵင်ၾွၼ်ႉတႆး ႁွင်းႁပ်ႉဢၵ်ႉၶရႃႇတူဝ်လိၵ်ႈတဵမ်ထူၼ်ႈ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Tai+Heritage+Pro",
     fileKey: "",
@@ -83,7 +83,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Cadson Demak",
     characteristics: "Sans Serif",
-    details: "ฟอนต์ยอดนิยม ทันสมัย",
+    details: "ၾွၼ်ႉၵူၼ်းသူင်ၸႂ်ႉၼမ် ပၢၼ်မႂ်ႇ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Prompt",
     fileKey: "",
@@ -98,7 +98,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Suppon Srisawat",
     characteristics: "Serif",
-    details: "เหมาะกับเอกสารและงานราชการ",
+    details: "သၢင်ႇထုၵ်ႇတႃႇတႅမ်ႈလိၵ်ႈလႄႈၸႂ်ႉပၼ်တၢင်းၵၢၼ်",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Sarabun",
     fileKey: "",
@@ -113,7 +113,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Cadson Demak",
     characteristics: "Script",
-    details: "เป็นกันเอง อ่านง่าย",
+    details: "လူဢၢၼ်ႇငၢႆႈ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Mali",
     fileKey: "",
@@ -128,7 +128,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Bold",
     owner: "Cadson Demak",
     characteristics: "Sans Serif",
-    details: "หนา ชัด เหมาะกับหัวเรื่อง",
+    details: "တူဝ်လိၵ်ႈၼႃ ၸႅင်ႈလႅင်း သၢင်ႇထုၵ်ႇႁဵတ်းပဵၼ်ႁူဝ်ၶေႃႈ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Kanit",
     fileKey: "",
@@ -143,7 +143,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Cadson Demak",
     characteristics: "Display",
-    details: "โดดเด่นสำหรับงานดีไซน์",
+    details: "တွၼ်ႈတႃႇၵၢၼ်တီႇသၢႆး",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Chakra+Petch",
     fileKey: "",
@@ -241,7 +241,7 @@ function CodeModal({
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <h3 className="text-2xl font-black text-slate-900">
-            โค้ดใช้งาน: {font.name}
+           ၶူတ်ႉၸႂ်ႉၵၢၼ် : {font.name}
           </h3>
           <button
             type="button"
@@ -289,10 +289,10 @@ function LoginModal({
         await onSuccess();
         onClose();
       } else {
-        setError("เข้าสู่ระบบไม่สำเร็จ");
+        setError("ၶဝ်ႈၵႂႃႇၼႂ်းပိူင်ဢမ်ႇဢွင်ႇမၢၼ်");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "เข้าสู่ระบบไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : "ၶဝ်ႈၵႂႃႇၼႂ်းပိူင်ဢမ်ႇဢွင်ႇမၢၼ်");
     } finally {
       setLoading(false);
     }
@@ -303,7 +303,7 @@ function LoginModal({
       <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <h3 className="text-2xl font-black text-slate-900">
-            เข้าสู่ระบบหลังบ้าน
+            ၶဝ်ႈလင်ႁိူၼ်း
           </h3>
           <button
             type="button"
@@ -319,14 +319,14 @@ function LoginModal({
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="ชื่อผู้ใช้"
+            placeholder="ၸိုဝ်ႈၵူၼ်းၸႂ်ႉ"
           />
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="รหัสผ่าน"
+            placeholder="မၢႆလပ်ႉ"
           />
 
           {error && (
@@ -338,7 +338,7 @@ function LoginModal({
             className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-60"
             type="submit"
           >
-            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+            {loading ? "တိုၵ်ႉၶဝ်ႈၵႂႃႇၼႂ်းပိူင်..." : "ၶဝ်ႈၵႂႃႇၼႂ်းပိူင်"}
           </button>
         </form>
       </div>
@@ -371,7 +371,7 @@ function AddFontModal({
     setError("");
 
     if (!name || !owner || !characteristics || !file) {
-      setError("กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์");
+      setError("ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈမုၼ်းႁႂ်ႈတဵမ်ထူၼ်ႈလႄႈလိူၵ်ႈၾၢႆႇၾွၼ်ႉ");
       return;
     }
 
@@ -398,7 +398,7 @@ function AddFontModal({
       onCreated();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "เพิ่มฟอนต์ไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : "ထႅမ်ၾွၼ်ႉဢမ်ႇဢွင်ႇမၢၼ်");
     } finally {
       setLoading(false);
     }
@@ -408,7 +408,7 @@ function AddFontModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">เพิ่มฟอนต์ใหม่</h3>
+          <h3 className="text-2xl font-black text-slate-900">ထႅမ်ၾွၼ်ႉမႂ်ႇ</h3>
           <button
             type="button"
             onClick={onClose}
@@ -421,7 +421,7 @@ function AddFontModal({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ชื่อฟอนต์"
+            placeholder="ၸိုဝ်ႈၾွၼ်ႉ"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -441,7 +441,7 @@ function AddFontModal({
 
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="เจ้าของ"
+            placeholder="ၸဝ်ႈၶွင်"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
           />
@@ -460,7 +460,7 @@ function AddFontModal({
 
           <textarea
             className="input-shan min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="รายละเอียด"
+            placeholder="ႁူဝ်ယွႆႈ"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
           />
@@ -481,7 +481,7 @@ function AddFontModal({
             type="submit"
             disabled={loading}
           >
-            {loading ? "กำลังบันทึก..." : "บันทึกฟอนต์"}
+            {loading ? "တိုၵ်ႉသိမ်း..." : "သိမ်းၾွၼ်ႉ"}
           </button>
         </form>
       </div>
@@ -525,7 +525,7 @@ setCharacteristics(font.characteristics || "official");
     setError("");
 
     if (!name || !style || !owner || !characteristics) {
-      setError("กรุณากรอกข้อมูลให้ครบ");
+      setError("ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈမုၼ်းႁႂ်ႈတဵမ်ထူၼ်ႈ");
       return;
     }
 
@@ -541,7 +541,7 @@ setCharacteristics(font.characteristics || "official");
       await onUpdated();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "แก้ไขฟอนต์ไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : "မႄးထတ်းၾွၼ်ႉဢမ်ႇဢွင်ႇမၢၼ်");
     } finally {
       setLoading(false);
     }
@@ -551,7 +551,7 @@ setCharacteristics(font.characteristics || "official");
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">แก้ไขฟอนต์</h3>
+          <h3 className="text-2xl font-black text-slate-900">မႄးထတ်းၾွၼ်ႉ</h3>
           <button
             type="button"
             onClick={onClose}
@@ -564,7 +564,7 @@ setCharacteristics(font.characteristics || "official");
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ชื่อฟอนต์"
+            placeholder="ၸိုဝ်ႈၾွၼ်ႉ"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -584,7 +584,7 @@ setCharacteristics(font.characteristics || "official");
 
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="เจ้าของ"
+            placeholder="ၸဝ်ႈၶွင်"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
           />
@@ -603,7 +603,7 @@ setCharacteristics(font.characteristics || "official");
 
           <textarea
             className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="รายละเอียด"
+            placeholder="ႁူဝ်ယွႆႈ"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
           />
@@ -617,7 +617,7 @@ setCharacteristics(font.characteristics || "official");
             type="submit"
             disabled={loading}
           >
-            {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
+            {loading ? "တိုၵ်ႉသိမ်း..." : "သိမ်းၵၢၼ်မႄးထတ်း"}
           </button>
         </form>
       </div>
@@ -666,13 +666,13 @@ function StaticPage({
     const message = contactForm.message.trim();
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      setContactError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      setContactError("ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈမုၼ်းႁႂ်ႈတဵမ်ၵူႈလွၵ်း);
       return;
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      setContactError("กรุณากรอกอีเมลให้ถูกต้อง");
+      setContactError("ၶႅၼ်းတေႃႈတႅမ်ႈဢီႇမႄးလ်ႁႂ်ႈမၢၼ်ႇမႅၼ်ႈ");
       return;
     }
 
@@ -687,7 +687,7 @@ function StaticPage({
         message,
       });
 
-      setContactSuccess(res.message || "ส่งข้อมูลเรียบร้อยแล้ว");
+      setContactSuccess(res.message || "သူင်ႇၶေႃႈမုၼ်းယဝ်ႉတူဝ်ႈလီငၢမ်း");
 
       setContactForm({
         firstName: "",
@@ -698,7 +698,7 @@ function StaticPage({
       });
     } catch (err) {
       setContactError(
-        err instanceof Error ? err.message : "ไม่สามารถส่งข้อมูลได้"
+        err instanceof Error ? err.message : "ဢမ်ႇၸၢင်ႈသူင်ႇၶေႃႈမုၼ်းလႆႈ"
       );
     } finally {
       setContactSubmitting(false);
@@ -713,30 +713,29 @@ function StaticPage({
             Privacy Policy
           </p>
           <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-            นโยบายความเป็นส่วนตัว
+            ပေႃႇလႃႇသီႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ်
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            อัปเดตล่าสุด: 21/4/2026
+           မႄးပၼ်မႂ်ႇလိုၼ်းသုတ်း : 21/4/2026
           </p>
         </div>
 
         <div className="space-y-6 leading-7 text-slate-600">
   <p>
-    เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งานทุกท่าน
-    นโยบายความเป็นส่วนตัวฉบับนี้อธิบายถึงแนวทางการเก็บรวบรวม ใช้ เปิดเผย
-    และคุ้มครองข้อมูลที่เกี่ยวข้องกับการใช้งานเว็บไซต์ของเรา
-    เมื่อคุณเข้าใช้งานเว็บไซต์นี้ จะถือว่าคุณได้อ่านและรับทราบนโยบายฉบับนี้แล้ว
+   ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ဝႆႉၵႃႈၶၼ် တေႃႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ် တွၼ်ႈတႃႇၽူႈၸႂ်ႉတိုဝ်း တင်းသဵင်ႈယူႇဢေႃႈ။
+ပေႃႇလႃႇသီႇလွင်ႈႁႄႉၵၢင်ႈသုၼ်ႇတူဝ်ၼႆႉ တေသိုပ်ႇလၢတ်ႈၼႄပၼ် လၢႆးဢၼ်ႁဝ်းၶႃႈ သိမ်းႁွမ်၊ ၸႂ်ႉတိုဝ်း၊ ပိုတ်ႇႁႂ်ႈႁၼ် လႄႈ ႁႄႉၵၢင်ႈပၼ်ၶေႃႈမုၼ်း (Data) ဢၼ်ၵဵဝ်ႇလူၺ်ႈလွင်ႈၸႂ်ႉတိုဝ်းဝဵပ်ႉသၢႆႉႁဝ်းၶႃႈၼၼ်ႉယူႇဢေႃႈ။
+ပေႃးၸဝ်ႈၵဝ်ႇၶဝ်ႈၸႂ်ႉတိုဝ်းဝဵပ်ႉသၢႆႉဢၼ်ၼႆႉယဝ်ႉၸိုင် တေသွၼ်ႇဝႃႈ ၸဝ်ႈၵဝ်ႇလႆႈလူပေႃႇလႃႇသီႇ လႄႈ ပွင်ႇၸႂ်ပေႃႇလႃႇသီႇဢၼ်ၼႆႉလီငၢမ်းယဝ်ႉ။
   </p>
 
   <div>
     <h2 className="text-xl font-bold text-slate-900">
-      1. ข้อมูลที่เราอาจเก็บรวบรวม
+      1. ၶေႃႈမုၼ်းဢၼ်ႁဝ်းၸၢင်ႈၵဵပ်းႁွမ်
     </h2>
     <ul className="mt-3 list-disc space-y-2 pl-6">
-      <li>ข้อมูลทางเทคนิค เช่น IP address, ประเภทเบราว์เซอร์, ระบบปฏิบัติการ, ภาษา, วันที่และเวลาที่เข้าใช้งาน</li>
-      <li>ข้อมูลการใช้งานเว็บไซต์ เช่น หน้าที่เข้าชม การค้นหา การดูตัวอย่างฟอนต์ และการโต้ตอบกับส่วนต่าง ๆ ของเว็บไซต์</li>
-      <li>ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน เพื่อช่วยให้เว็บไซต์ทำงานได้อย่างมีประสิทธิภาพ</li>
-      <li>ข้อมูลที่ผู้ใช้งานส่งให้เราโดยตรง เช่น ข้อมูลจากแบบฟอร์มติดต่อ</li>
+       <li>ၶေႃႈမုၼ်းတၢင်းပၢႆးၸၢၵ်ႈ မိူၼ်ၼင်ႇ IP address, သႅၼ်းပရၢဝ်ႇသႃႇ, ပိူင်ၵၢၼ်သၢင်ႈ, ၽႃႇသႃႇ, ဝၼ်းထီႉလႄႈၶၢဝ်းယၢမ်းၶဝ်ႈၸႂ်ႉၵၢၼ်</li>
+      <li>ၶေႃႈမုၼ်းၵၢၼ်ၸႂ်ႉဝႅပ်ႉသၢႆႉ မိူၼ်ၼင်ႇ ၼႃႈလိၵ်ႈဢၼ်ၶဝ်ႈတူၺ်း, ၵၢၼ်ႁႃၶေႃႈမုၼ်း, ၵၢၼ်တူၺ်းပိူင်တႅၵ်ႇၾွၼ်ႉ လႄႈၵၢၼ်ၶဝ်ႈၸႂ်ႉတိုဝ်းဝႅပ်ႉသၢႆႉၵူႈလွင်ႈလွင်ႈ</li>
+      <li>ၶေႃႈမုၼ်းၶွင်ၶုၵ်ႉၵီႉလႄႈပၢႆးၸၢၵ်ႈဢၼ်ငၢႆးၵၼ် တွၼ်ႈတႃႇၸွႆႈႁႂ်ႈဝႅပ်ႉသၢႆႉႁဵတ်းၵၢၼ်လႆႈမီးလွင်ႈၶိုၵ်ႉတွၼ်းလီမႃး</li>
+      <li>ၶေႃႈမုၼ်းဢၼ်ၽူႈၸႂ်ႉၵၢၼ်သူင်ႇပၼ်ႁဝ်းၵမ်းသိုဝ်ႈၼၼ်ႉ မိူၼ်ၼင်ႇ ၶေႃႈမုၼ်းၾွမ်ႇၵပ်းသိုပ်ႇႁဝ်း</li>
     </ul>
   </div>
 
