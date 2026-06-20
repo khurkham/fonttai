@@ -1275,9 +1275,9 @@ function ArticlesPage({
   onNavigateHome: () => void;
 }) {
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section className="input-shan rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
       <Breadcrumbs
-        items={[{ label: "หน้าแรก", onClick: onNavigateHome }, { label: "บทความ" }]}
+        items={[{ label: "ၼႃႈႁိူၼ်း", onClick: onNavigateHome }, { label: "ဢႃႇတီႇၶိူဝ်ႇ" }]}
       />
 
       <div className="mb-10">
@@ -1285,7 +1285,7 @@ function ArticlesPage({
           Articles
         </p>
         <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-          บทความและคู่มือการใช้งานฟอนต์ไต
+          ဢႃႇတီႇၶိူဝ်ႇလႄႈပပ်ႉၵႅမ်မိုဝ်းၵၢၼ်ၸႂ်ႉၾွၼ်ႉတႆး
         </h1>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
           {ARTICLES_INTRO}
@@ -1396,16 +1396,16 @@ function ArticleDetailPage({
   if (!article) {
     return (
       <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-black text-slate-900">ไม่พบบทความ</h1>
+        <h1 className="text-3xl font-black text-slate-900">ဢမ်ႇႁၼ်ဢႃႇတီႇၶိူဝ်ႇ</h1>
         <p className="mt-3 text-slate-600">
-          บทความที่คุณต้องการอาจถูกลบ เปลี่ยนลิงก์ หรือยังไม่ได้เผยแพร่
+          ဢႃႇတီႇၶိူဝ်ႇတီႈသူလူဝ်ႇၼၼ်ႉမၼ်းၸၢင်ႈထုၵ်ႇမွတ်ႇပႅတ်ႈယဝ်ႉ ဢမ်ႇၼၼ်ထုၵ်ႇလၢႆႈၸိုဝ်ႈ လႄႈပႆႇလႆႈပိုၼ်ၽႄႈ
         </p>
         <button
           type="button"
           onClick={onBackToArticles}
           className="mt-6 rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
         >
-          กลับหน้าบทความ
+          ႁူၼ်ၶိုၼ်းၼႃႈဢႃႇတီႇၶိူဝ်ႇ
         </button>
       </section>
     );
@@ -1417,8 +1417,8 @@ function ArticleDetailPage({
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
       <Breadcrumbs
         items={[
-          { label: "หน้าแรก", onClick: onNavigateHome },
-          { label: "บทความ", onClick: onBackToArticles },
+          { label: "ၼႃႈႁိူၼ်း", onClick: onNavigateHome },
+          { label: "ဢႃႇတီႇၶိူဝ်ႇ", onClick: onBackToArticles },
           { label: article.title },
         ]}
       />
@@ -1429,7 +1429,7 @@ function ArticleDetailPage({
           onClick={onBackToArticles}
           className="text-sm font-semibold text-blue-600"
         >
-          ← กลับหน้าบทความ
+          ← ႁူၼ်ၶိုၼ်းၼႃႈဢႃႇတီႇၶိူဝ်ႇ
         </button>
 
         <p className="mt-4 text-xs font-bold uppercase tracking-wide text-blue-600">
@@ -2317,7 +2317,7 @@ const seoDescription =
   <StaticPage page={publicPage} onNavigate={navigateToPage} />
 ) : (
             <>
-              <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
+              <section className="input-shan mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
                 <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
                   <div>
                     <p className="mb-3 inline-flex rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">
@@ -2334,6 +2334,7 @@ const seoDescription =
 
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
                       พรีวิวฟอนต์ไต ค้นหาฟอนต์ได้ง่าย มีโค้ดสำหรับฝังฟอนต์ในเว็บไซต์ และสามารถโหลดฟอนต์ .ttf ไปใช้ได้
+                      တူၺ်းၽၢင်ႁၢင်ႈၾွၼ်ႉတႆး၊ သွၵ်ႈႁႃၾွၼ်ႉတႆးလႆႈငၢႆႈငၢႆႈ၊ မီးၶူတ်ႉ (Code) တွၼ်ႈတႃႇဢဝ်ၾွၼ်ႉၵႂႃႇၾင်ဝႆႉၼႂ်းဝဵပ်ႉသၢႆႉ လႄႈၸၼ်တၢဝ်းလူတ်ႇ (Download) ဢၼ်ၾွၼ်ႉပဵၼ်ၾၢႆႇ .ttf ၵႂႃႇၸႂ်ႉတိုဝ်းလႆႈယူႇၶႃႈဢေႃႈ။
                     </p>
                   </div>
 
@@ -2341,13 +2342,13 @@ const seoDescription =
                 </div>
               </section>
 
-              <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <section className="input-shan mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
   <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
                   <input
                     className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
                     value={previewText}
                     onChange={(e) => setPreviewText(e.target.value)}
-                    placeholder="พิมพ์ข้อความสำหรับพรีวิว"
+                    placeholder="တႅမ်ႈၶေႃႈၵႂၢမ်းပိူဝ်ႈတႃႇၼႄၽၢင်ႁၢင်ႈၾွၼ်ႉ"
                   />
 
                   <div className="flex items-center gap-3">
@@ -2376,17 +2377,17 @@ const seoDescription =
                     className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="ค้นหาฟอนต์"
+                    placeholder="သွၵ်ႈႁႃၾွၼ်ႉ"
                   />
 
                   <select
-                    className="rounded-2xl border border-slate-300 px-4 py-4 outline-none focus:border-blue-400"
+                    className="input-shan rounded-2xl border border-slate-300 px-4 py-4 outline-none focus:border-blue-400"
                     value={pageSize}
                     onChange={(e) => setPageSize(Number(e.target.value))}
                   >
-                    <option value={10}>แสดง 10 ฟอนต์</option>
-                    <option value={20}>แสดง 20 ฟอนต์</option>
-                    <option value={30}>แสดง 30 ฟอนต์</option>
+                    <option value={10}>ၼႄ 10 ၾွၼ်ႉ</option>
+                    <option value={20}>ၼႄ 20 ၾွၼ်ႉ</option>
+                    <option value={30}>ၼႄ 30 ၾွၼ်ႉ</option>
                   </select>
                 </div>
               </section>
@@ -2423,28 +2424,28 @@ const seoDescription =
 
   {(letterFilter !== "ALL" || ownerFilter !== "ALL") ? (
     <div className="border-t border-slate-100 px-4 py-2">
-      <p className="text-center text-xs font-medium text-slate-500">
+      <p className="input-shan text-center text-xs font-medium text-slate-500">
         {letterFilter !== "ALL" ? (
           <>
-            แสดงฟอนต์ที่ขึ้นต้นด้วย{" "}
+           ၼႄၸိုဝ်ႈၾွၼ်ႉဢၼ်ႈၶိုၼ်ႈလူၺ်ႈတူဝ်လိၵ်ႈ{" "}
             <span className="font-bold text-blue-600">{letterFilter}</span>
           </>
         ) : null}
         {letterFilter !== "ALL" && ownerFilter !== "ALL" ? " และ " : null}
         {ownerFilter !== "ALL" ? (
           <>
-            เจ้าของ{" "}
+            ၸဝ်ႈၶွင်{" "}
             <span className="font-bold text-blue-600">{ownerFilter}</span>{" "}
             <button
               type="button"
               onClick={() => setOwnerFilter("ALL")}
               className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:bg-slate-300"
             >
-              ล้าง
+              မွတ်ႇ
             </button>
           </>
         ) : null}
-        {" "}จำนวน {allFonts.length} รายการ
+        {" "}တၢင်းၼမ် {allFonts.length} ႁူဝ်ယွႆႈ
       </p>
     </div>
   ) : null}
@@ -2454,10 +2455,10 @@ const seoDescription =
               
 
               {loading ? (
-                <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
+                <p className="input-shan text-lg text-slate-500">တိုဝ်းလူတ်ႇၾွၼ်ႉ ...</p>
               ) : paginatedFonts.length === 0 ? (
-                <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
-                  ยังไม่มีฟอนต์ให้แสดง
+                <div className="input-shan rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
+                  ဢမ်ႇပႆႇမီးၾွၼ်ႉၼႄ
                 </div>
               ) : (
                 <section className="flex flex-col gap-6">
