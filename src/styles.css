@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "namkhon";
-  src: url("/fonts/namkhon.ttf") format("truetype");
+  font-family: "Namteng2017";
+  src: url("/fonts/Namteng2017.ttf") format("truetype");
   font-display: swap;
 }
 
@@ -13,7 +13,7 @@
     --font-main: "Sarabun", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-en: "Inter", sans-serif;
-    --font-shan: "namkhon", "Tai Heritage Pro", sans-serif;
+    --font-shan: "Namteng2017", "Tai Heritage Pro", sans-serif;
 
     color: #0f172a;
     background: #f8fafc;
@@ -55,11 +55,6 @@
   }
 }
 
-@layer components {
-  .ad-slot {
-    @apply flex min-h-[120px] w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-sm text-slate-500;
-  }
-}
 
 .font-th {
   font-family: "Sarabun", "Inter", sans-serif;
