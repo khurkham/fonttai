@@ -1976,17 +1976,7 @@ const seoDescription =
                   ข้อความติดต่อ
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setAdminTab("stats")}
-                  className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
-                    adminTab === "stats"
-                      ? "bg-blue-600 text-white"
-                      : "border border-slate-300 bg-white text-slate-700"
-                  }`}
-                >
-                  สถิติ
-                </button>
+                
               </div>
 
               {adminTab === "fonts" ? (
@@ -2191,113 +2181,7 @@ const seoDescription =
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                      <p className="text-sm font-medium text-slate-500">
-                        ผู้เข้าชมทั้งหมด
-                      </p>
-                      <p className="mt-3 text-4xl font-black text-slate-900">
-                        {statsLoading
-                          ? "..."
-                          : stats.totalVisitors.toLocaleString()}
-                      </p>
-                    </div>
 
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                      <p className="text-sm font-medium text-slate-500">
-                        ผู้เข้าชมวันนี้
-                      </p>
-                      <p className="mt-3 text-4xl font-black text-slate-900">
-                        {statsLoading
-                          ? "..."
-                          : stats.todayVisitors.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                      <p className="text-sm font-medium text-slate-500">
-                        ออนไลน์ตอนนี้
-                      </p>
-                      <p className="mt-3 text-4xl font-black text-emerald-600">
-                        {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-3xl border border-slate-200 bg-white p-6">
-                    <div className="mb-5 flex items-center justify-between gap-4">
-                      <h3 className="text-2xl font-black text-slate-900">
-                        ตารางสรุปสถิติ
-                      </h3>
-
-                      <button
-                        type="button"
-                        onClick={loadStats}
-                        className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
-                      >
-                        รีเฟรชข้อมูล
-                      </button>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                      <table className="w-full min-w-[640px] border-collapse">
-                        <thead className="bg-slate-50">
-                          <tr>
-                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
-                              รายการ
-                            </th>
-                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
-                              ค่า
-                            </th>
-                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
-                              หมายเหตุ
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-t border-slate-200">
-                            <td className="px-4 py-4 font-medium text-slate-900">
-                              ผู้เข้าชมทั้งหมด
-                            </td>
-                            <td className="px-4 py-4 text-slate-700">
-                              {stats.totalVisitors.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-slate-500">
-                              นับจาก IP hash ไม่ซ้ำในฐานข้อมูล
-                            </td>
-                          </tr>
-
-                          <tr className="border-t border-slate-200">
-                            <td className="px-4 py-4 font-medium text-slate-900">
-                              ผู้เข้าชมวันนี้
-                            </td>
-                            <td className="px-4 py-4 text-slate-700">
-                              {stats.todayVisitors.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-slate-500">
-                              นับเฉพาะข้อมูลของวันปัจจุบัน
-                            </td>
-                          </tr>
-
-                          <tr className="border-t border-slate-200">
-                            <td className="px-4 py-4 font-medium text-slate-900">
-                              ออนไลน์ตอนนี้
-                            </td>
-                            <td className="px-4 py-4 font-semibold text-emerald-600">
-                              {stats.onlineNow.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-slate-500">
-                              ประมาณการจากผู้เข้าชมในช่วง 5 นาทีล่าสุด
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <p className="mt-4 text-sm text-slate-500">
-                      หน้านี้รีเฟรชอัตโนมัติทุก 5 วินาทีเมื่อเปิดแท็บสถิติอยู่
-                    </p>
-                  </div>
                 </div>
               )}
             </section>
