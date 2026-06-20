@@ -240,7 +240,7 @@ function CodeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">
+          <h3 className="input-shan text-2xl font-black text-slate-900">
            ၶူတ်ႉၸႂ်ႉၵၢၼ် : {font.name}
           </h3>
           <button
@@ -302,7 +302,7 @@ function LoginModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">
+          <h3 className="input-shan text-2xl font-black text-slate-900">
             ၶဝ်ႈလင်ႁိူၼ်း
           </h3>
           <button
@@ -314,7 +314,7 @@ function LoginModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
+        <form onSubmit={handleSubmit} className="input-shan flex flex-col gap-4 p-5">
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             value={username}
@@ -405,7 +405,7 @@ function AddFontModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+    <div className="input-shan fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <h3 className="text-2xl font-black text-slate-900">ထႅမ်ၾွၼ်ႉမႂ်ႇ</h3>
@@ -551,7 +551,7 @@ setCharacteristics(font.characteristics || "official");
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">မႄးထတ်းၾွၼ်ႉ</h3>
+          <h3 className="input-shan text-2xl font-black text-slate-900">မႄးထတ်းၾွၼ်ႉ</h3>
           <button
             type="button"
             onClick={onClose}
@@ -563,7 +563,7 @@ setCharacteristics(font.characteristics || "official");
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
-            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            className="input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="ၸိုဝ်ႈၾွၼ်ႉ"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -583,7 +583,7 @@ setCharacteristics(font.characteristics || "official");
           </select>
 
           <input
-            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            className="input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="ၸဝ်ႈၶွင်"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
@@ -602,7 +602,7 @@ setCharacteristics(font.characteristics || "official");
 </select>
 
           <textarea
-            className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            className="input-shan min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             placeholder="ႁူဝ်ယွႆႈ"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
@@ -707,7 +707,7 @@ function StaticPage({
 
   if (page === "privacy") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-6">
           <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
             Privacy Policy
@@ -728,7 +728,7 @@ function StaticPage({
   </p>
 
   <div>
-    <h2 className="text-xl font-bold text-slate-900">
+    <h2 className="input-shan text-xl font-bold text-slate-900">
       1. ၶေႃႈမုၼ်းဢၼ်ႁဝ်းၸၢင်ႈၵဵပ်းႁွမ်
     </h2>
     <ul className="mt-3 list-disc space-y-2 pl-6">
@@ -763,7 +763,7 @@ function StaticPage({
   </div>
 
   <div>
-    <h2 className="text-xl font-bold text-slate-900">
+    <h2 className="input-shan text-xl font-bold text-slate-900">
       4. การเปิดเผยข้อมูล
     </h2>
     <p className="mt-3">
@@ -823,7 +823,7 @@ function StaticPage({
 
   if (page === "cookie") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-6">
           <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
             Cookie Policy
@@ -905,7 +905,7 @@ function StaticPage({
 
   if (page === "about") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-4xl font-black tracking-tight text-slate-900">
           About Us
         </h1>
@@ -918,7 +918,7 @@ function StaticPage({
 
   if (page === "services") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-4xl font-black tracking-tight text-slate-900">
           Services
         </h1>
@@ -932,7 +932,7 @@ function StaticPage({
 
   if (page === "contact") {
     return (
-      <section className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="input-shan mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-8 text-center">
           <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
             Contact Form
@@ -1031,7 +1031,7 @@ function StaticPage({
               onClick={() => onNavigate("privacy")}
               className="font-semibold text-blue-600 underline underline-offset-2"
             >
-              ပေႃႇလႃႇသီႇလွင်ပဵၼ်သုၼ်ႇတူဝ်
+              ပေႃႇလႃႇသီႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ်
             </button>{" "}
             ၶွင်ႁဝ်း
           </div>
