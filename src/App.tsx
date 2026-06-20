@@ -910,7 +910,7 @@ function StaticPage({
           About Us
         </h1>
         <p className="mt-4 leading-7 text-slate-600">
-          Font Tai คือเว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ โดยออกแบบมาเพื่อรองรับการใช้งานบนทุกอุปกรณ์ และพร้อมสำหรับการขยายเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
+          ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ပဵၼ်တီႈႁူမ်ႈတုမ်ၾွၼ်ႉတႆး တွၼ်ႈတႃႇတူၺ်းပိူင်ၽၢင်ႁၢင်ႈၾွၼ်ႉၵမ်းသိုဝ်ႈ၊ ၸၼ်တၢဝ်းလူတ်ႇ (Download) ဢဝ်ၵႂႃႇၸႂ်ႉတိုဝ်းငၢႆႈ လိူဝ်သေၼၼ်ႉဢမ်ႇၵႃး ဢဝ်ၵႂႃႇၸႂ်ႉတိုဝ်းၼႂ်းဝဵပ်ႉသၢႆႉၸဝ်ႈၵဝ်ႇၵေႃႈလႆႈ ဝဵပ်ႉသၢႆႉဢၼ်ၼႆႉဢမ်ႇလူဝ်ႇသိုဝ်ႉၶႃႈ ၸၼ်ဢဝ်လႆႈၵမ်းလဵဝ် မီးၽၢင်ႁၢင်ၼေပၼ်ၵူႈဢၼ်။
         </p>
       </section>
     );
@@ -923,7 +923,8 @@ function StaticPage({
           Services
         </h1>
         <p className="mt-4 leading-7 text-slate-600">
-          บริการของเว็บไซต์ Font Tai ได้แก่ พรีวิวฟอนต์ออนไลน์ จัดการฟอนต์อัปโหลดเอง และดาวน์โหลดหรือใช้งานฟอนต์ผ่านเว็บในรูปแบบที่เหมาะกับทุกอุปกรณ์
+          ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ပုၼ်ႈတႃႇၼေၽၢင်ႁၢင်ႈၾွၼ်ႉဢွၼ်ႇလၢႆး သင်ၸိူဝ်ႉဝႃႈၶႆႈဢဝ်ၾွၼ်ႉၸဝ်ႈၵဝ်ႇၽၢၵ်ႇၶိုၼ်ႈဝဵပ်ႉသၢႆႉႁဝ်းၼႆၸိုင် ၵပ်းသိုပ်ႇမႃးလႆႈယူႇတႃႇသေႇၶႃႈဢေႃႈ၊ တူၺ်းပိူင်ၾွၼ်ႉသေၸၼ်တၢဝ်းလူတ်ႇဢဝ်ၾွၼ်ႉဢၼ်လႆႈၸႂ်ၼၼ်ႉ ႁဝ်းၶႃႈတေသိုပ်ႇၶတ်းၸႂ်ဢဝ်ၾွၼ်ႉတၢင်ႇ (Upload) ၶိုၼ်ႈၼိူဝ်ဝဵပ်ႉသၢႆႉတႃႇသေႇယူႇၶႃႈ ၾွၼ်ႉဢၼ်ႁဝ်းတၢင်ၼၼ်ႉတေပဵၼ်ၾွၼ်ႉ (Unicode) ယူႇၼီႇၶူတ်ႉလွၼ်ႉလွၼ်ႉ ပိူဝ်ႈတႃႇတေၸႂ်ႉၵၢၼ်လႆႈၵူႈဢွင်ႈတီႈ။
+          
         </p>
       </section>
     );
@@ -937,37 +938,36 @@ function StaticPage({
             Contact Form
           </p>
           <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-            แบบฟอร์มติดต่อกลับ
+            ၽွမ်ႇၵပ်းသိုပ်းၸူးၶိုၼ်း
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            หากต้องการติดต่อสอบถาม แนะนำฟอนต์ แจ้งปัญหาการใช้งาน หรือสอบถามความร่วมมือทางธุรกิจ สามารถส่งข้อมูลมาหาเราได้ผ่านแบบฟอร์มด้านล่าง
-          </p>
+ပေႃးဝႃႈ ၶႂ်ႈၵပ်းသိုပ်ႇတွင်ႈထၢမ်၊ ပၼ်တၢင်းႁၼ်ထိုင်လွင်ႈၾွၼ်ႉ၊ တၢင်ႇလၢတ်ႈပၼ်ႁႃလွင်ႈၸႂ်ႉတိုဝ်း ဢမ်ႇၼၼ် တွင်ႈထၢမ်ၵူႈလွင်ႈလွင်ႈသူင်ႇၶေႃႈမူၼ်းမႃးၸူးႁဝ်းၶႃႈ ၽၢၼ်ႇတၢင်း ၽွမ်ႇ (Form) တီႈၽၢႆႇတႂ်ႈၼႆႉလႆႈယူႇၶႃႈဢေႃႈ။          </p>
         </div>
 
         <form className="space-y-5" onSubmit={handleContactSubmit} noValidate>
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
-                ชื่อ <span className="text-red-500">*</span>
+                ၸိုဝ်ႈ <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={contactForm.firstName}
                 onChange={(e) => updateContactField("firstName", e.target.value)}
-                placeholder="กรอกชื่อ"
+                placeholder="တႅမ်ႈၸိုဝ်ႈ"
                 className="w-full input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
             </div>
 
             <div>
               <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
-                นามสกุล <span className="text-red-500">*</span>
+                ၶိူဝ်းႁိူၼ်း <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={contactForm.lastName}
                 onChange={(e) => updateContactField("lastName", e.target.value)}
-                placeholder="กรอกนามสกุล"
+                placeholder="တႅမ်ႈၶိူဝ်းႁိူၼ်း"
                 className="w-full input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
             </div>
@@ -975,7 +975,7 @@ function StaticPage({
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              อีเมล <span className="text-red-500">*</span>
+              ဢီႇမေးလ် <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -988,26 +988,26 @@ function StaticPage({
 
           <div>
             <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
-              หัวข้อ <span className="text-red-500">*</span>
+              ႁူဝ်ၶေႃႈ <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={contactForm.subject}
               onChange={(e) => updateContactField("subject", e.target.value)}
-              placeholder="หัวข้อที่ต้องการติดต่อ"
+              placeholder="ႁူဝ်ၶေႃႈဢၼ်လူဝ်ႇၵပ်းသိုပ်ႇ"
               className="input-shan w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
 
           <div>
             <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
-              ข้อความ <span className="text-red-500">*</span>
+              ၶေႃႈၵႂၢမ်း <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={6}
               value={contactForm.message}
               onChange={(e) => updateContactField("message", e.target.value)}
-              placeholder="กรอกรายละเอียดที่ต้องการติดต่อ"
+              placeholder="တႅမ်ႈႁူဝ်ယွႆႈဢၼ်လူဝ်ႇၵပ်းသိုပ်ႇ"
               className="input-shan w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
@@ -1025,15 +1025,15 @@ function StaticPage({
           ) : null}
 
           <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
-            เมื่อท่านส่งข้อมูลผ่านฟอร์ม จะถือว่าท่านยอมรับใน{" "}
+            မိူဝ်ႈသူသူင်ႇၶေႃႈမုၼ်းမႃးၼႂ်းၽွမ်ႇ ပဵၼ်ဢၼ်ဝႃႈသူယွမ်းႁပ်ႉၼႂ်း{" "}
             <button
               type="button"
               onClick={() => onNavigate("privacy")}
               className="font-semibold text-blue-600 underline underline-offset-2"
             >
-              นโยบายความเป็นส่วนตัว
+              ပေႃႇလႃႇသီႇလွင်ပဵၼ်သုၼ်ႇတူဝ်
             </button>{" "}
-            ของเรา
+            ၶွင်ႁဝ်း
           </div>
 
           <button
@@ -1041,7 +1041,7 @@ function StaticPage({
             disabled={contactSubmitting}
             className="w-full rounded-2xl bg-blue-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
           >
-            {contactSubmitting ? "กำลังส่งข้อมูล..." : "ส่งข้อมูล"}
+            {contactSubmitting ? "တိုၵ်ႉသူင်ႇၶေႃႈမုၼ်း..." : "သူင်ႇၶေႃႈမုၼ်း"}
           </button>
         </form>
       </section>
@@ -1056,11 +1056,11 @@ function StaticPage({
         </p>
 
         <h1 className="mt-4 text-5xl font-black tracking-tight text-slate-900 sm:text-6xl">
-          ไม่พบหน้าที่คุณค้นหา
+          သွၵ်ႈႁႃဢမ်ႇႁၼ်ၼႂ်းၼႃႈဢၼ်သူသွၵ်ႈႁႃ
         </h1>
 
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
-          ขออภัย หน้าที่คุณพยายามเข้าถึงอาจถูกลบ เปลี่ยนชื่อ หรือไม่มีอยู่ในเว็บไซต์นี้แล้ว
+          ယွၼ်းၶႂၢင်းပၼ် ၼႃႈလိၵ်ႈဢၼ်သူၶႆႈၶဝ်ႈၼၼ်ႉ မွတ်ႇပႅတ်ႈယဝ်ႉ လၢႆႈၸိုဝ်ႈ ဢမ်ႇၼၼ်မၼ်းဢမ်ႇယူႇၼႂ်းဝဵပ်ႉသၢႆႉၼႆႉယဝ်ႉ
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -1078,7 +1078,7 @@ function StaticPage({
 }}
             className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
-            กลับหน้าแรก
+            ႁူၼ်ၶိုၼ်းၼႃႈႁိူၼ်း
           </button>
 
           <button
@@ -1086,7 +1086,7 @@ function StaticPage({
             onClick={() => onNavigate("contact")}
             className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
           >
-            ติดต่อเรา
+            ၵပ်းသိုပ်ႇႁဝ်း
           </button>
         </div>
       </section>
@@ -1115,7 +1115,7 @@ function ContactDetailModal({
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <div>
             <h3 className="text-2xl font-black text-slate-900">
-              รายละเอียดข้อความติดต่อ
+              ႁူဝ်ၶေႃႈဢၼ်လူဝ်ႇၵပ်းသိုပ်ႇ
             </h3>
             <p className="mt-1 text-sm text-slate-500">{item.createdAt}</p>
           </div>
@@ -1133,7 +1133,7 @@ function ContactDetailModal({
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                ชื่อ-นามสกุล
+                ၸိုဝ်း-ၶိူဝ်းႁိူၼ်း
               </p>
               <p className="mt-2 font-semibold text-slate-900">
                 {item.firstName} {item.lastName}
@@ -1142,7 +1142,7 @@ function ContactDetailModal({
 
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                อีเมล
+                ဢီႇမေးလ်
               </p>
               <p className="mt-2 font-semibold text-slate-900">{item.email}</p>
             </div>
@@ -1150,14 +1150,14 @@ function ContactDetailModal({
 
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-              หัวข้อ
+              ႁူဝ်ၶေႃႈ
             </p>
             <p className="mt-2 font-semibold text-slate-900">{item.subject}</p>
           </div>
 
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-              ข้อความ
+              ၶေႃႈၵႂၢမ်း
             </p>
             <p className="mt-2 whitespace-pre-wrap leading-7 text-slate-700">
               {item.message}
@@ -1170,13 +1170,13 @@ function ContactDetailModal({
               onClick={() => {
                 const subject = encodeURIComponent(`Re: ${item.subject}`);
                 const body = encodeURIComponent(
-                  `เรียน ${item.firstName} ${item.lastName},\n\nขอบคุณสำหรับการติดต่อเรา\n\n`
+                  `ထိုင် ${item.firstName} ${item.lastName},\n\nယိၼ်းၸူမ်းတီႈၵပ်းသိုပ်ႇႁဝ်း\n\n`
                 );
                 window.location.href = `mailto:${item.email}?subject=${subject}&body=${body}`;
               }}
               className="rounded-2xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-700"
             >
-              ตอบกลับอีเมล
+              တွပ်ႇဢီႇမေးလ်
             </button>
 
             {!item.isRead ? (
@@ -1188,21 +1188,21 @@ function ContactDetailModal({
                 }}
                 className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
               >
-                ทำเครื่องหมายว่าอ่านแล้ว
+                ႁဵတ်းၶိူင်ႈမၢႆဝႃႈလူဢၢၼ်ႇယဝ်ႉ
               </button>
             ) : null}
 
             <button
               type="button"
               onClick={async () => {
-                const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+                const ok = window.confirm("မၼ်ႈၸႂ်ႁိုဝ်ဢၼ်တေမွတ်ႇပႅတ်ႈၶေႃႈၵႂၢမ်းၼႆႉ?");
                 if (!ok) return;
                 await onDelete(item.id);
                 onClose();
               }}
               className="rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white"
             >
-              ลบข้อความ
+              မွတ်ႇပႅတ်ႈၶေႃႈၵႂၢမ်း
             </button>
           </div>
         </div>
