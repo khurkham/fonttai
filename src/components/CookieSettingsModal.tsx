@@ -13,7 +13,7 @@ type Props = {
   onNavigate: (page: "privacy" | "cookie") => void;
 };
 
-type SectionKey = "necessary" | "analytics" | "functional" | "marketing";
+type SectionKey = "necessary" | "analytics" | "functional";
 
 function Toggle({
   checked,
@@ -125,11 +125,10 @@ export function CookieSettingsModal({
     necessary: false,
     analytics: false,
     functional: false,
-    marketing: false,
   });
 
   const allOptionalOff = useMemo(
-    () => !draft.analytics && !draft.functional && !draft.marketing,
+    () => !draft.analytics && !draft.functional,
     [draft]
   );
 useEffect(() => {
@@ -206,23 +205,6 @@ useEffect(() => {
               <li>เหมาะกับเว็บพรีวิวฟอนต์ที่อาจมีการจดจำค่าการใช้งานในอนาคต</li>
             </ul>
           </Section>
-
-          <Section
-            title="การตลาดและโฆษณา"
-            description="คุกกี้เหล่านี้ใช้เพื่อแสดงเนื้อหาหรือโฆษณาที่เกี่ยวข้องกับคุณ และอาจใช้เพื่อวัดจำนวนครั้งที่คุณเห็นโฆษณา รวมถึงประสิทธิภาพของแคมเปญโฆษณา"
-            checked={draft.marketing}
-            expanded={expanded.marketing}
-            onToggleExpand={() => setExpand("marketing")}
-            onToggleValue={(checked) =>
-              setDraft((prev) => ({ ...prev, marketing: checked }))
-            }
-          >
-            <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-600">
-              <li>รองรับแพลตฟอร์มโฆษณา เช่น Google AdSense ในอนาคต</li>
-              <li>ช่วยควบคุมความเกี่ยวข้องของโฆษณาและการวัดผล</li>
-              <li>ควรเปิดใช้เฉพาะเมื่อคุณยินยอมให้เว็บไซต์ใช้คุกกี้ด้านการตลาด</li>
-            </ul>
-          </Section>
         </div>
 
         <div className="border-t border-slate-200 bg-white px-6 py-5">
@@ -269,7 +251,6 @@ useEffect(() => {
                     necessary: true,
                     analytics: draft.analytics,
                     functional: draft.functional,
-                    marketing: draft.marketing,
                   });
                 }}
                 className="rounded-2xl bg-orange-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-orange-600"

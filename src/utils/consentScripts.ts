@@ -1,19 +1,16 @@
 import {
   COOKIE_CONSENT_CHANGED_EVENT,
   hasAnalyticsConsent,
-  hasMarketingConsent,
 } from "./cookieConsent";
 
 declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
-    adsbygoogle?: unknown[];
   }
 }
 
 let analyticsLoaded = false;
-let adsenseLoaded = false;
 
 function appendScript(src: string, id: string) {
   if (document.getElementById(id)) return;
@@ -46,24 +43,9 @@ export function loadGoogleAnalytics(measurementId: string) {
   analyticsLoaded = true;
 }
 
-export function loadGoogleAdSense(clientId: string) {
-  if (!clientId || adsenseLoaded) return;
-
-  appendScript(
-    `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clientId}`,
-    "fonttai-adsense-script"
-  );
-
-  adsenseLoaded = true;
-}
-
 export function applyConsentBasedScripts() {
   if (hasAnalyticsConsent()) {
     loadGoogleAnalytics("G-XXXXXXXXXX");
-  }
-
-  if (hasMarketingConsent()) {
-    loadGoogleAdSense("ca-pub-XXXXXXXXXXXXXXXX");
   }
 }
 

@@ -6,7 +6,6 @@ export type CookieConsentSettings = {
   necessary: true;
   analytics: boolean;
   functional: boolean;
-  marketing: boolean;
 };
 
 export type CookieConsentRecord = {
@@ -19,7 +18,6 @@ export const DEFAULT_COOKIE_SETTINGS: CookieConsentSettings = {
   necessary: true,
   analytics: false,
   functional: false,
-  marketing: false,
 };
 
 export function readCookieConsent(): CookieConsentRecord | null {
@@ -36,7 +34,6 @@ export function readCookieConsent(): CookieConsentRecord | null {
         necessary: true,
         analytics: Boolean(parsed?.settings?.analytics),
         functional: Boolean(parsed?.settings?.functional),
-        marketing: Boolean(parsed?.settings?.marketing),
       },
     };
   } catch {
@@ -60,10 +57,6 @@ export function openCookieSettings() {
 
 export function hasAnalyticsConsent() {
   return Boolean(readCookieConsent()?.settings.analytics);
-}
-
-export function hasMarketingConsent() {
-  return Boolean(readCookieConsent()?.settings.marketing);
 }
 
 export function hasFunctionalConsent() {

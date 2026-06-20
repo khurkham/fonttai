@@ -64,7 +64,6 @@ export function CookieBanner({ onNavigate }: Props) {
     const enabled = [];
     if (settings.analytics) enabled.push("วิเคราะห์");
     if (settings.functional) enabled.push("ฟังก์ชัน");
-    if (settings.marketing) enabled.push("การตลาด");
 
     if (enabled.length === 0) return "ใช้เฉพาะคุกกี้ที่จำเป็น";
     return `เปิดใช้: ${enabled.join(", ")}`;
@@ -75,7 +74,6 @@ export function CookieBanner({ onNavigate }: Props) {
       necessary: true,
       analytics: true,
       functional: true,
-      marketing: true,
     };
 
     setSettings(next);
@@ -93,7 +91,6 @@ export function CookieBanner({ onNavigate }: Props) {
       necessary: true,
       analytics: false,
       functional: false,
-      marketing: false,
     };
 
     setSettings(next);
@@ -155,8 +152,7 @@ export function CookieBanner({ onNavigate }: Props) {
                 <div>
                   <p className="text-sm leading-7 text-slate-600">
                     เว็บไซต์ Font Tai ใช้คุกกี้เพื่อให้เว็บไซต์ทำงานได้อย่างเหมาะสม
-                    จดจำการตั้งค่าพื้นฐาน ช่วยวิเคราะห์การใช้งาน
-                    และรองรับการพัฒนาฟังก์ชันหรือโฆษณาในอนาคต
+                    จดจำการตั้งค่าพื้นฐาน และช่วยวิเคราะห์การใช้งาน
                     คุณสามารถเลือกยอมรับทั้งหมด ปฏิเสธคุกกี้ที่ไม่จำเป็น
                     หรือกำหนดค่าการใช้งานคุกกี้ได้เอง โดยอ่านรายละเอียดเพิ่มเติมได้ที่{" "}
                     <button
@@ -192,11 +188,11 @@ export function CookieBanner({ onNavigate }: Props) {
                       <div className="mb-2 flex items-center gap-2 text-slate-900">
                         <Settings size={18} className="text-blue-600" />
                         <span className="text-sm font-bold">
-                          วัดผล / ฟังก์ชัน / การตลาด
+                          วัดผล / ฟังก์ชัน
                         </span>
                       </div>
                       <p className="text-sm leading-6 text-slate-500">
-                        ใช้เพื่อวิเคราะห์การใช้งานเว็บไซต์ ช่วยจดจำการตั้งค่าบางอย่างของผู้ใช้ และรองรับบริการโฆษณาในอนาคตตามความยินยอมของคุณ
+                        ใช้เพื่อวิเคราะห์การใช้งานเว็บไซต์ และช่วยจดจำการตั้งค่าบางอย่างของผู้ใช้ตามความยินยอมของคุณ
                       </p>
                     </div>
                   </div>
