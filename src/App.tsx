@@ -1535,7 +1535,7 @@ function ArticleDetailPage({
                     onClick={() => onOpenArticle(item.slug)}
                     className="mt-6 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
                   >
-                    อ่านต่อ
+                    သိုပ်ႇဢၢၼ်ႇ
                   </button>
                 </div>
               </article>

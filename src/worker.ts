@@ -277,7 +277,7 @@ app.get("/api/fonts", async (c) => {
     return okJson(c, { ok: true, items });
   } catch (error) {
     console.error("/api/fonts error", error);
-    return errJson(c, "ไม่สามารถโหลดรายการฟอนต์ได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈၸၢင်ႈလူတ်ႇသဵၼ်ႈမၢႆၾွၼ်ႉလႆႈ", 500);
   }
 });
 
@@ -301,12 +301,12 @@ app.get("/api/font-file-by-id/:id", async (c) => {
       }>();
 
     if (!font || !font.file_key) {
-      return errJson(c, "ไม่พบไฟล์ฟอนต์", 404);
+      return errJson(c, "ဢမ်ႇႁၼ်ၾၢႆႇၾွၼ်ႉ", 404);
     }
 
     const object = await c.env.FONT_BUCKET.get(font.file_key);
     if (!object) {
-      return errJson(c, "ไม่พบไฟล์ฟอนต์ในที่เก็บข้อมูล", 404);
+      return errJson(c, "ဢမ်ႇႁၼ်ၾၢႆႇၾွၼ်ႉၼႂ်းတီႈသိမ်းၶေႃႈမုၼ်း", 404);
     }
 
     const ext = font.file_key.split(".").pop() || "ttf";
@@ -331,7 +331,7 @@ app.get("/api/font-file-by-id/:id", async (c) => {
     });
   } catch (error) {
     console.error("/api/font-file-by-id/:id error", error);
-    return errJson(c, "ไม่สามารถดาวน์โหลดไฟล์ฟอนต์ได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈတၢဝ်းလူတ်ႇၾွၼ်ႉလႆႈ", 500);
   }
 });
 
@@ -368,7 +368,7 @@ app.get("/api/visitor-counter", async (c) => {
     });
   } catch (error) {
     console.error("/api/visitor-counter error", error);
-    return errJson(c, "ไม่สามารถดึงสถิติผู้เข้าชมได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈၸၼ်ဢဝ်ႁူဝ်ၵူၼ်းၶဝ်ႈတူၺ်းလႆႈ", 500);
   }
 });
 
@@ -382,7 +382,7 @@ app.post("/api/visitor-heartbeat", async (c) => {
     return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/visitor-heartbeat error", error);
-    return errJson(c, "ไม่สามารถอัปเดตสถานะผู้ใช้งานได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈဢပ်ႉတဵတ်ႇ သႃႇတေႈတတ်ႉ (Status Update) ၽူႈၸႂ်ႉတိုဝ်းလႆႈ", 500);
   }
 });
 
@@ -397,12 +397,12 @@ app.post("/api/contact", async (c) => {
     const message = body.message?.trim() ?? "";
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      return errJson(c, "กรุณากรอกข้อมูลให้ครบทุกช่อง", 400);
+      return errJson(c, "ၶႅၼ်းတေႃႈသႂ်ႇၶေႃႈမုၼ်းႁႂ်ႈၸေးၶွင်ႉမၼ်း", 400);
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      return errJson(c, "กรุณากรอกอีเมลให้ถูกต้อง", 400);
+      return errJson(c, "ၶႅၼ်းတေႃႈသႂ်ႇဢီႇမေးလ်ႁႂ်ႈမၢၼ်ႇမႅၼ်ႈ", 400);
     }
 
     const id = crypto.randomUUID();
@@ -417,12 +417,12 @@ app.post("/api/contact", async (c) => {
 
     return okJson(c, {
       ok: true,
-      message: "ส่งข้อมูลเรียบร้อยแล้ว",
+      message: "သူင်ႇၶေႃႈမုၼ်းယဝ်ႉတူဝ်လီငၢမ်း",
       id,
     });
   } catch (error) {
     console.error("/api/contact error", error);
-    return errJson(c, "ไม่สามารถส่งข้อมูลติดต่อได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈသူင်ႇၶေႃႈမုၼ်းၵပ်းသိုပ်ႇလႆႈ", 500);
   }
 });
 
@@ -453,13 +453,13 @@ app.post("/api/admin/login", async (c) => {
     const password = body.password ?? "";
 
     if (!username || !password) {
-      return errJson(c, "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน", 400);
+      return errJson(c, "ၶႅၼ်းတေႃႈသႂ်ႇၸိုဝ်ႈလႄႈမၢႆလပ်ႉ", 400);
     }
 
     const passwordHash = (await sha256Hex(password)).toLowerCase();
 
     if (username !== config.username || passwordHash !== config.passwordHash) {
-      return errJson(c, "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", 401);
+      return errJson(c, "ၸိုဝ်ႈဢမ်ႇၼၼ်မၢႆလပ်ႉဢမ်ႇမၢၼ်ႇမႅၼ်ႈ", 401);
     }
 
     const token = await createSessionToken(c.env);
@@ -478,7 +478,7 @@ app.post("/api/admin/login", async (c) => {
     });
   } catch (error) {
     console.error("/api/admin/login error", error);
-    return errJson(c, "ไม่สามารถเข้าสู่ระบบได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈၶဝ်ႈၵႂႃႇၼႂ်းပိူင်လႆႈ။", 500);
   }
 });
 
@@ -531,19 +531,19 @@ app.post("/api/admin/fonts", async (c) => {
       !characteristics ||
       !(file instanceof File)
     ) {
-      return errJson(c, "กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์", 400);
+      return errJson(c, "ၶႅၼ်းတေႃႈထႅမ်ၶေႃႈမုၼ်းႁႂ်ႈၸေးလႄႈလိူၵ်ႈၾၢႆႇၾွၼ်ႉ", 400);
     }
 
     if (!ALLOWED_FONT_CHARACTERISTICS.has(characteristics)) {
-      return errJson(c, "ลักษณะฟอนต์ไม่ถูกต้อง", 400);
+      return errJson(c, "လၵ်ႉၶၼႃႇၾွၼ်ႉဢမ်ႇမၢၼ်ႇမႅၼ်ႈ", 400);
     }
 
     if (!isAllowedFontFile(file)) {
-      return errJson(c, "รองรับเฉพาะไฟล์ .ttf, .otf, .woff, .woff2", 400);
+      return errJson(c, "ႁွင်းႁပ်ႉလႆႈၾၢႆႇဢၼ်ပဵၼ် .ttf, .otf, .woff, .woff2", 400);
     }
 
     if (file.size <= 0) {
-      return errJson(c, "ไฟล์ฟอนต์ว่างเปล่าหรือไม่ถูกต้อง", 400);
+      return errJson(c, "ၾၢႆႇၾွၼ်ႉတိုၵ်ႉပဝ်ႇယူႇဢမ်ႇမၢၼ်ႇမႅၼ်ႈ", 400);
     }
 
     const id = crypto.randomUUID();
@@ -583,7 +583,7 @@ app.post("/api/admin/fonts", async (c) => {
       }
     }
 
-    return errJson(c, "ไม่สามารถเพิ่มฟอนต์ได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈၽိူမ်ႉထႅမ်ၾွၼ်ႉလႆႈ", 500);
   }
 });
 
@@ -605,11 +605,11 @@ app.patch("/api/admin/fonts/:id", async (c) => {
     const details = body.details?.trim() ?? "";
 
     if (!id || !name || !style || !owner || !characteristics) {
-      return errJson(c, "กรุณากรอกข้อมูลให้ครบ", 400);
+      return errJson(c, "ၶႅၼ်းတေႃႈထႅမ်ၶေႃႈမုၼ်းႁႂ်ႈၸေး", 400);
     }
 
     if (!ALLOWED_FONT_CHARACTERISTICS.has(characteristics)) {
-      return errJson(c, "ลักษณะฟอนต์ไม่ถูกต้อง", 400);
+      return errJson(c, "လၵ်ႉၶၼႃႇၾွၼ်ႉဢမ်ႇမၢၼ်ႇမႅၼ်ႈ", 400);
     }
 
     await c.env.DB.prepare(
@@ -623,7 +623,7 @@ app.patch("/api/admin/fonts/:id", async (c) => {
     return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/fonts/:id PATCH error", error);
-    return errJson(c, "ไม่สามารถแก้ไขฟอนต์ได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈမူၼ်ႉမႄးၾွၼ်ႉလႆႈ", 500);
   }
 });
 
@@ -639,11 +639,11 @@ app.delete("/api/admin/fonts/:id", async (c) => {
       .first<{ id: string; file_key: string | null; is_custom: number }>();
 
     if (!font) {
-      return errJson(c, "ไม่พบฟอนต์", 404);
+      return errJson(c, "ဢမ်ႇႁၼ်ၾွၼ်ႉ", 404);
     }
 
     if (!font.is_custom) {
-      return errJson(c, "ไม่สามารถลบฟอนต์ระบบได้", 400);
+      return errJson(c, "ဢမ်ႇၸၢင်ႈမွတ်ႇၾွၼ်ႉၼႂ်းပိူင်လႆႈ", 400);
     }
 
     if (font.file_key) {
@@ -655,7 +655,7 @@ app.delete("/api/admin/fonts/:id", async (c) => {
     return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/fonts/:id DELETE error", error);
-    return errJson(c, "ไม่สามารถลบฟอนต์ได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈမွတ်ႇၾွၼ်ႉလႆႈ", 500);
   }
 });
 
@@ -671,7 +671,7 @@ app.get("/api/admin/contact-messages", async (c) => {
     });
   } catch (error) {
     console.error("/api/admin/contact-messages error", error);
-    return errJson(c, "ไม่สามารถดึงข้อมูลข้อความติดต่อได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈၸၼ်ဢဝ်ၶေႃႈမုၼ်းၶေႃႈၵႂၢမ်းၵပ်းသိုပ်ႇလႆႈ", 500);
   }
 });
 
@@ -688,7 +688,7 @@ app.patch("/api/admin/contact-messages/:id/read", async (c) => {
     return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/contact-messages/:id/read error", error);
-    return errJson(c, "ไม่สามารถอัปเดตสถานะข้อความได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈဢပ်ႉတဵတ်ႇသႃႇတေႈတတ်ႉၶေႃႈၵႂၢမ်းလႆႈ", 500);
   }
 });
 
@@ -703,7 +703,7 @@ app.delete("/api/admin/contact-messages/:id", async (c) => {
     return okJson(c, { ok: true });
   } catch (error) {
     console.error("/api/admin/contact-messages/:id delete error", error);
-    return errJson(c, "ไม่สามารถลบข้อความได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႇမွတ်ႇၶေႃႈၵႂၢမ်းလႆႈ", 500);
   }
 });
 
@@ -752,7 +752,7 @@ app.get("/api/admin/contact-messages/export.csv", async (c) => {
     });
   } catch (error) {
     console.error("/api/admin/contact-messages/export.csv error", error);
-    return errJson(c, "ไม่สามารถ export CSV ได้", 500);
+    return errJson(c, "ဢမ်ႇၸၢင်ႈ export CSV လႆႈ", 500);
   }
 });
 

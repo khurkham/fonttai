@@ -208,13 +208,13 @@ export const ARTICLES: ArticleItem[] = [
         body: `ပိူင်လူင်၊ လၢႆးဢဝ်ၾွၼ်ႉၶိုၼ်ႈဝႅပ်ႉသၢႆႉဢၼ်မီးလွင်ႈယိုတ်ႈယၢတ်ႈတီႈသုတ်းၼႆႉ ပဵၼ်လွင်ႈၸႂ်ႉ @font-face တူဝ်ယၢင်ႇပိုၼ်ႉထၢၼ်မီးၼင်ႇၼႆ:
 
 @font-face {
-  font-family: "ShanUnicode";
-  src: url("/fonts/ShanUnicode.ttf") format("truetype");
+  font-family: "NamTeng2017";
+  src: url("/fonts/NamTeng2017.ttf") format("truetype");
   font-display: swap;
 }
 
 body {
-  font-family: "ShanUnicode", sans-serif;
+  font-family: "NamTeng2017", sans-serif;
 }
 
 ၼႂ်းတူဝ်ယၢင်ႇၼႆႉ font-family ၼႆႉပဵၼ်ၸိုဝ်ႈႁဝ်းတင်ႈၶိုၼ်ႈတႃႇႁွင်ႉၸႂ်ႉတိုဝ်းၼႂ်း CSS၊ တွၼ်ႈ src ပဵၼ်တီႈယူႇၾၢႆႇၾွၼ်ႉတႄႉ၊ လႄႈ font-display: swap; တေၸွႆႈႁႂ်ႈၼႃႈဝႅပ်ႉၼႄလိၵ်ႈလူၺ်ႈၾွၼ်ႉသႅၼ်ႈၵွၼ်ႇ ၼႂ်းတွၼ်ႈထႃးၾွၼ်ႉတႄႉတၢဝ်းလူတ်ႇယဝ်ႉ။`,
@@ -225,13 +225,13 @@ body {
         body: `သင်ၸဝ်ႈၸႂ်ႉၸိူဝ်ႉသၢႆႉဢၼ်ပၼ် URL တႃႇႁွင်ႉၸႂ်ႉၾွၼ်ႉပၼ်လၢႆးလိင်ႉၵမ်းသိုဝ်ႈ၊ လွင်ႈၾင်ၾွၼ်ႉတေငၢႆႈၶိုၼ်ႈ ယွၼ်ႉဢမ်ႇလူဝ်ႇဢဝ်ၾၢႆႇၵႂႃႇဝႆႉၼႂ်း Foler ႁင်းၵွႆ မိူၼ်ၼင်ႇ:
 
 @font-face {
-  font-family: "ShanUnicode";
+  font-family: "NamTeng2017";
   src: url("https://fonttai.com/api/font-file-by-id/58efefd1-058d-49fb-8ef2-9bee78170f86") format("truetype");
   font-display: swap;
 }
 
 .your-class {
-  font-family: "ShanUnicode", sans-serif;
+  font-family: "NamTeng2017", sans-serif;
 }
 
 လၢႆးၼႆႉၵိုင်ႇမႅၼ်ႈတႃႇၽူႈဢၼ်လူဝ်ႇႁွင်ႉၸႂ်ႉၾွၼ်ႉတီႈလဵဝ်၊ ၵႃႉဝႃႈၵွၼ်ႇၸႂ်ႉတႄႉလူဝ်ႇၵူတ်ႇထတ်းဝႃႈ URL သူင်ႇၾၢႆႇၾွၼ်ႉတႄႉ ဢမ်ႇၸႂ်ႈၼႃႈ HTML ဢမ်ႇၼၼ်ၼႃႈ 404။`,
@@ -241,7 +241,7 @@ body {
         heading: "လွင်ႈတင်ႈ fallback font",
         body: `တွၼ်ႈတႃႇဝႅပ်ႉသၢႆႉဢၼ်မီးလိၵ်ႈလၢႆၽႃႇသႃႇ မိူၼ်ၼင်ႇ ၽႃႇသႃႇတႆး၊ ၽႃႇသႃႇထႆး လႄႈၽႃႇသႃႇဢင်းၵိတ်ႉ လူဝ်ႇတင်ႈၵႃႈ fallback font ဝႆႉၵူႈၵမ်း မိူၼ်ၼင်ႇ:
 
-font-family: "ShanUnicode", "Sarabun", sans-serif;
+font-family: "NamTeng2017", "Sarabun", sans-serif;
 
 လၢႆးတၢင်းၼႆႉၸွႆႈႁႂ်ႈသင်ၾွၼ်ႉပိူင်လူင်ပႆႇတၢဝ်းလူတ်ႇ ဢမ်ႇၼၼ်မီးတူဝ်လိၵ်ႈၵမ်းတူဝ်ဢၼ်ၾွၼ်ႉပိူင်လူင်ဢမ်ႇႁပ်ႉႁူမ်ႈ၊ ၸိူဝ်ႉသၢႆႉတေတိုၵ်ႉၼႄလိၵ်ႈလူၺ်ႈၾွၼ်ႉသႅၼ်ႈဝႆႉလႆႈၵိုင်ႇမႅၼ်ႈယူႇ။`,
       },
