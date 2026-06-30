@@ -32,10 +32,10 @@ const FONT_CHARACTERISTIC_OPTIONS = [
  { value: "body", label: "ၼိူဝ်ႉလိၵ်ႈ လူဢၢၼ်ႇယၢဝ်း" },
  { value: "handwriting", label: "လၢႆးမိုဝ်း" },
  { value: "decorative", label: "ႁၢင်ႈၶိူင်ႈ" },
- { value: "traditional", label: "မိူဝ်ႈၵဝ်ႇ" },
+ { value: "traditional", label: "ပၢၼ်ၵဝ်ႇ" },
  { value: "Regular", label: "ပဵၼ်တၢင်းၵၢၼ်" },
  { value: "Bold", label: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ" },
- { value: "Italic", label: "လၢႆးမိုဝ်း" },
+ { value: "Italic", label: "တူဝ်ၵိူင်း" },
 ] as const;
 
 function getCharacteristicLabel(value: string) {
@@ -791,8 +791,8 @@ function StaticPage({
             </div>
           ) : null}
 
-          <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
-            ข้อมูลที่คุณส่งมาในแบบฟอร์มนี้จะถูกใช้เพื่อการติดต่อกลับเท่านั้น
+          <div className="input-shan rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+            ၶေႃႈမုၼ်းတီႈသူၸဝ်ႈသူင်ႇမႃးၼႂ်းၽွမ်ႇၼႆႉ တေထုၵ်ႇၸႂ်ႉတိုဝ်းၼႂ်းၵၢၼ်ၵပ်းသိုပ်ႇသူၸဝ်ႈၶိုၼ်းၵူၺ်း။
           </div>
 
           <button
@@ -835,7 +835,7 @@ function StaticPage({
 
   window.location.reload();
 }}
-            className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+            className="input-shan rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
             ႁူၼ်ၶိုၼ်းၼႃႈႁိူၼ်း
           </button>
@@ -843,7 +843,7 @@ function StaticPage({
           <button
             type="button"
             onClick={() => onNavigate("contact")}
-            className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+            className="input-shan rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
           >
             ၵပ်းသိုပ်ႇႁဝ်း
           </button>
@@ -869,7 +869,7 @@ function ContactDetailModal({
   if (!item) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+    <div className="input-shan fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <div>
@@ -888,7 +888,7 @@ function ContactDetailModal({
           </button>
         </div>
 
-        <div className="space-y-5 p-5">
+        <div className="input-shan space-y-5 p-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
@@ -1040,7 +1040,6 @@ export default function App() {
     try {
       await api.visitorHeartbeat(pageToPath(publicPage));
     } catch {
-      // เงียบไว้เพื่อไม่รบกวนผู้ใช้
     }
   }
 
@@ -1056,14 +1055,14 @@ export default function App() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Export CSV ไม่สำเร็จ");
+      alert(err instanceof Error ? err.message : "Export CSV ဢမ်ႇလႆႈ");
     }
   }
 
   function handleReplyEmail(item: ContactMessage) {
     const subject = encodeURIComponent(`Re: ${item.subject}`);
     const body = encodeURIComponent(
-      `เรียน ${item.firstName} ${item.lastName},\n\nขอบคุณสำหรับการติดต่อเรา\n\n`
+      `ထိုင် ${item.firstName} ${item.lastName},\n\nယိၼ်းၸူမ်းတီႈၵပ်းသိုပ်ႇႁဝ်းမႃး\n\n`
     );
     window.location.href = `mailto:${item.email}?subject=${subject}&body=${body}`;
   }
@@ -1073,7 +1072,7 @@ export default function App() {
       await api.markContactAsRead(id);
       await loadContactMessages();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "อัปเดตสถานะไม่สำเร็จ");
+      alert(err instanceof Error ? err.message : "Status update failed");
     }
   }
 
@@ -1082,7 +1081,7 @@ export default function App() {
       await api.deleteContactMessage(id);
       await loadContactMessages();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "ลบข้อความไม่สำเร็จ");
+      alert(err instanceof Error ? err.message : "မွတ်ႇၶေႃႈၵႂၢမ်းဢမ်ႇလႆႈ");
     }
   }
 
@@ -1212,7 +1211,7 @@ export default function App() {
       await api.deleteFont(id);
       await loadFonts();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "ลบฟอนต์ไม่สำเร็จ");
+      alert(err instanceof Error ? err.message : "မွတ်ႇၾွၼ်ႉဢမ်ႇလႆႈ");
     }
   }
 

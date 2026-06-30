@@ -12,16 +12,17 @@ type Props = {
 };
 
 const CHARACTERISTIC_LABELS: Record<string, string> = {
-  official: "ทางการ",
-  modern: "ทันสมัย",
-  display: "พาดหัว / โปสเตอร์",
-  body: "เนื้อหา อ่านยาว",
-  handwriting: "ลายมือ",
-  decorative: "ตกแต่ง",
-  traditional: "ดั้งเดิม",
-  Regular: "ทางการ",
-  Bold: "พาดหัว / โปสเตอร์",
-  Italic: "ลายมือ",
+  official: "ပဵၼ်တၢင်းၵၢၼ်",
+  modern: "ပၢၼ်မႂ်ႇ",
+  display: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ",
+  body: "ၼိူဝ်ႉလိၵ်ႈ လူဢၢၼ်ႇယၢဝ်း",
+  handwriting: "လၢႆးမိုဝ်း",
+  decorative: "ႁၢင်ႈၶိူင်ႈ",
+  traditional: "ပၢၼ်ၵဝ်ႇ",
+  Regular: "ပဵၼ်တၢင်းၵၢၼ်",
+  Bold: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ",
+  Italic: "တူဝ်ၵိူင်း",
+
 };
 
 export function FontCard({
@@ -75,7 +76,7 @@ export function FontCard({
   }, [font.name, font.isCustom, fileHref]);
 
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="input-shan rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-3">
@@ -105,7 +106,7 @@ export function FontCard({
                     : "border-amber-200 bg-amber-50 text-amber-700"
                 }`}
               >
-                {fontLoaded ? "โหลดฟอนต์แล้ว" : "กำลังโหลดฟอนต์"}
+                {fontLoaded ? "တၢဝ်းလူတ်ႇၾွၼ်ႉယဝ်ႉၶႃႈ" : "တိုၵ်ႉတၢဝ်းလူတ်ႇၾွၼ်ႉၶႃႈ"}
               </span>
             )}
           </div>
