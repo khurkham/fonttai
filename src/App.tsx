@@ -9,15 +9,6 @@ import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import BackToTop from "./components/BackToTop";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
-import { bindConsentScriptLoader } from "./utils/consentScripts";
-import {
-  ARTICLES,
-  ARTICLES_INTRO,
-  ARTICLE_CATEGORIES,
-  getArticleBySlug,
-  getArticlesByCategory,
-  getRelatedArticles,
-} from "./data/articles";
 
 
 type ViewMode = "home" | "admin";
@@ -28,15 +19,13 @@ type PublicPage =
   | "privacy"
   | "cookie"
   | "contact"
-  | "articles"
-  | "article-detail"
+  
   | "notfound";
 
  
 const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
 
-const SHOW_AD_PLACEHOLDERS = true;
 
 const ALPHABET = [
   "ALL",
@@ -168,10 +157,6 @@ function pageToPath(page: PublicPage, slug?: string): string {
       return "/cookie/";
     case "contact":
       return "/contact/";
-    case "articles":
-      return "/articles/";
-    case "article-detail":
-      return slug ? `/articles/${slug}/` : "/articles/";
     case "notfound":
       return "/404/";
     case "home":
@@ -183,8 +168,7 @@ function pageToPath(page: PublicPage, slug?: string): string {
 function pathToPage(pathname: string): PublicPage {
   const path = pathname.replace(/\/+$/, "") || "/";
 
-  if (path === "/articles") return "articles";
-  if (path.startsWith("/articles/")) return "article-detail";
+  
 
   switch (path) {
     case "/":
