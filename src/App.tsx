@@ -168,7 +168,7 @@ function pageToPath(page: PublicPage, slug?: string): string {
 function pathToPage(pathname: string): PublicPage {
   const path = pathname.replace(/\/+$/, "") || "/";
 
-  
+
   switch (path) {
     case "/":
       return "home";
@@ -1195,9 +1195,1012 @@ function ContactDetailModal({
   );
 }
 
+function Breadcrumbs({
+  items,
+}: {
+  items: Array<{ label: string; onClick?: () => void }>;
+}) {
+  return (
+    <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+      {items.map((item, index) => (
+        <div key={`${item.label}-${index}`} className="flex items-center gap-2">
+          {item.onClick ? (
+            <button
+              type="button"
+              onClick={item.onClick}
+              className="font-medium text-slate-600 hover:text-blue-600"
+            >
+              {item.label}
+            </button>
+          ) : (
+            <span className="font-medium text-slate-900">{item.label}</span>
+          )}
+
+          {index < items.length - 1 ? <span>/</span> : null}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function ArticleTableOfContents({
+  headings,
+}: {
+  headings: Array<{ id: string; label: string }>;
+}) {
+  if (!headings.length) return null;
+
+  return (
+    <aside className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+      <h2 className="text-lg font-black text-slate-900">สารบัญ</h2>
+      <nav className="mt-4">
+        <ul className="space-y-2">
+          {headings.map((heading) => (
+            <li key={heading.id}>
+              <a
+                href={`#${heading.id}`}
+                className="block rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-blue-600"
+              >
+                {heading.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  );
+}
 
 
 
 
 
+export default function App() {
+  const [articleSlug, setArticleSlug] = useState<string | null>(() => {
+  const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+  if (pathname.startsWith("/articles/")) {
+    const slug = pathname.replace("/articles/", "").replace(/\/+$/, "");
+    return slug || null;
+  }
+  return null;
+});
+  const [selectedContact, setSelectedContact] =
+    useState<ContactMessage | null>(null);
+  const [adminTab, setAdminTab] = useState<"fonts" | "contacts" | "stats">(
+    "fonts"
+  );
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
+  const [contactLoading, setContactLoading] = useState(false);
 
+  const [stats, setStats] = useState<VisitorCounter>({
+    totalVisitors: 0,
+    todayVisitors: 0,
+    onlineNow: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(false);
+
+  const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW);
+  const [search, setSearch] = useState("");
+  const [fontSize, setFontSize] = useState(32);
+  const [textColor, setTextColor] = useState("#1f2937");
+  const [editFont, setEditFont] = useState<FontItem | null>(null);
+  const [showEditFont, setShowEditFont] = useState(false);
+  const [customFonts, setCustomFonts] = useState<FontItem[]>([]);
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("home");
+  const [publicPage, setPublicPage] = useState<PublicPage>(() =>
+    pathToPage(window.location.pathname)
+  );
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [letterFilter, setLetterFilter] = useState<string>("ALL");
+  const [ownerFilter, setOwnerFilter] = useState("ALL");
+  const [codeFont, setCodeFont] = useState<FontItem | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showAddFont, setShowAddFont] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  async function loadContactMessages() {
+    try {
+      setContactLoading(true);
+      const res = await api.getContactMessages();
+      setContactMessages(res.items || []);
+    } catch {
+      setContactMessages([]);
+    } finally {
+      setContactLoading(false);
+    }
+  }
+
+  async function loadStats() {
+    try {
+      setStatsLoading(true);
+      const res = await api.getVisitorCounter();
+      setStats(res.stats);
+    } catch {
+      setStats({
+        totalVisitors: 0,
+        todayVisitors: 0,
+        onlineNow: 0,
+      });
+    } finally {
+      setStatsLoading(false);
+    }
+  }
+
+  async function sendHeartbeat() {
+    try {
+      await api.visitorHeartbeat(pageToPath(publicPage));
+    } catch {
+      // เงียบไว้เพื่อไม่รบกวนผู้ใช้
+    }
+  }
+
+  async function handleExportContactCsv() {
+    try {
+      const blob = await api.exportContactMessagesCsv();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "contact-messages.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Export CSV ไม่สำเร็จ");
+    }
+  }
+
+  function handleReplyEmail(item: ContactMessage) {
+    const subject = encodeURIComponent(`Re: ${item.subject}`);
+    const body = encodeURIComponent(
+      `เรียน ${item.firstName} ${item.lastName},\n\nขอบคุณสำหรับการติดต่อเรา\n\n`
+    );
+    window.location.href = `mailto:${item.email}?subject=${subject}&body=${body}`;
+  }
+
+  async function handleMarkContactAsRead(id: string) {
+    try {
+      await api.markContactAsRead(id);
+      await loadContactMessages();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "อัปเดตสถานะไม่สำเร็จ");
+    }
+  }
+
+  async function handleDeleteContactMessage(id: string) {
+    try {
+      await api.deleteContactMessage(id);
+      await loadContactMessages();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "ลบข้อความไม่สำเร็จ");
+    }
+  }
+
+  async function loadFonts() {
+    try {
+      const res = await api.getFonts();
+      setCustomFonts(res.items || []);
+    } catch {
+      setCustomFonts([]);
+    }
+  }
+
+  async function checkAuth() {
+    try {
+      const res = await api.me();
+      setIsAuthed(Boolean(res.authenticated));
+      if (!res.authenticated && viewMode === "admin") {
+        setViewMode("home");
+      }
+    } catch {
+      setIsAuthed(false);
+      if (viewMode === "admin") setViewMode("home");
+    }
+  }
+
+  useEffect(() => {
+    if (viewMode === "admin" && isAuthed && adminTab === "contacts") {
+      loadContactMessages();
+    }
+  }, [viewMode, isAuthed, adminTab]);
+
+  useEffect(() => {
+    if (viewMode === "admin" && isAuthed && adminTab === "stats") {
+      loadStats();
+    }
+  }, [viewMode, isAuthed, adminTab]);
+
+  useEffect(() => {
+    sendHeartbeat();
+
+    const interval = window.setInterval(() => {
+      sendHeartbeat();
+    }, 25000);
+
+    return () => window.clearInterval(interval);
+  }, [publicPage]);
+
+  useEffect(() => {
+  const interval = window.setInterval(() => {
+    if (viewMode === "admin" && isAuthed && adminTab === "stats") {
+      loadStats();
+    }
+  }, 5000);
+
+  return () => window.clearInterval(interval);
+}, [viewMode, isAuthed, adminTab]);
+
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      await Promise.all([loadFonts(), checkAuth(), loadStats()]);
+      setLoading(false);
+    })();
+  }, []);
+
+  useEffect(() => {
+  const handlePopState = () => {
+    const pathname = window.location.pathname;
+    const nextPage = pathToPage(pathname);
+
+    setPublicPage(nextPage);
+    setViewMode("home");
+
+    if (nextPage === "article-detail") {
+      const slug = pathname.replace(/\/+$/, "").replace("/articles/", "");
+      setArticleSlug(slug || null);
+    } else {
+      setArticleSlug(null);
+    }
+  };
+
+  window.addEventListener("popstate", handlePopState);
+  return () => window.removeEventListener("popstate", handlePopState);
+}, []);
+
+  const allFonts = useMemo(() => {
+    const merged = [...customFonts, ...GOOGLE_FONTS];
+    const q = search.trim().toLowerCase();
+
+    let result = merged;
+
+    if (letterFilter !== "ALL") {
+      result = result.filter((font) =>
+        font.name.trim().toUpperCase().startsWith(letterFilter)
+      );
+    }
+
+    if (ownerFilter !== "ALL") {
+      result = result.filter((font) => font.owner === ownerFilter);
+    }
+
+    if (!q) return result;
+
+    return result.filter((font) =>
+      [font.name, font.owner, font.characteristics, font.style, font.details]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [customFonts, search, letterFilter, ownerFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, pageSize, letterFilter, ownerFilter]);
+
+  useEffect(() => {
+  const cleanup = bindConsentScriptLoader();
+  return cleanup;
+}, []);
+
+  const totalPages = Math.max(1, Math.ceil(allFonts.length / pageSize));
+  const paginatedFonts = allFonts.slice((page - 1) * pageSize, page * pageSize);
+
+  async function handleLogout() {
+    try {
+      await api.logout();
+    } finally {
+      setIsAuthed(false);
+      setViewMode("home");
+    }
+  }
+
+  async function handleDeleteFont(id: string) {
+    const ok = window.confirm("ต้องการลบฟอนต์นี้ใช่หรือไม่");
+    if (!ok) return;
+
+    try {
+      await api.deleteFont(id);
+      await loadFonts();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "ลบฟอนต์ไม่สำเร็จ");
+    }
+  }
+
+ 
+
+  // === handler ที่ <SiteFooter> เรียกใช้ ===
+
+
+  function handleAdminClick() {
+    if (isAuthed) {
+      setViewMode("admin");
+    } else {
+      setShowLogin(true);
+    }
+  }
+
+
+  const seoTitle =
+   publicPage === "privacy"
+    ? "Privacy Policy - นโยบายความเป็นส่วนตัว | Font Tai"
+    : publicPage === "cookie"
+    ? "Cookie Policy - นโยบายคุกกี้ | Font Tai"
+    : publicPage === "about"
+    ? "About Font Tai - เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
+    : publicPage === "services"
+    ? "Services - Preview, Download & Font Embed Code | Font Tai"
+    : publicPage === "contact"
+    ? "Contact Font Tai - ติดต่อสอบถาม แนะนำฟอนต์ และแจ้งปัญหา"
+    : publicPage === "notfound"
+    ? "404 Not Found | Font Tai"
+    : "Font Tai ၾွၼ်ႉတႆး - ฟอนต์ไต ฟอนต์ไทใหญ่ Shan Font Preview & Download";
+
+const seoDescription =
+  publicPage === "home"
+    ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และทุกอุปกรณ์"
+    : publicPage === "about"
+    ? "รู้จัก Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Tai font ที่ช่วยให้พรีวิวฟอนต์ ดาวน์โหลดฟอนต์ และนำฟอนต์ไปใช้งานบนเว็บไซต์ได้ง่ายขึ้น"
+    : publicPage === "services"
+    ? "บริการของ Font Tai ครอบคลุมการพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ ดูโค้ดฝังฟอนต์ และจัดการฟอนต์สำหรับใช้งานบนเว็บไซต์ทั้งภาษาไต ภาษาไทย และภาษาอังกฤษ"
+    : publicPage === "contact"
+    ? "ติดต่อทีมงาน Font Tai เพื่อสอบถามการใช้งานเว็บไซต์ แนะนำฟอนต์ แจ้งปัญหาการดาวน์โหลดฟอนต์ หรือพูดคุยเรื่องการใช้งานฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
+    : publicPage === "privacy"
+    ? "อ่านนโยบายความเป็นส่วนตัวของ Font Tai เพื่อดูแนวทางการเก็บ ใช้ และคุ้มครองข้อมูลผู้ใช้งาน"
+    : publicPage === "cookie"
+    ? "อ่านนโยบายคุกกี้ของ Font Tai เพื่อทำความเข้าใจประเภทของคุกกี้ที่ใช้"
+    : publicPage === "notfound"
+    ? "ไม่พบหน้าที่คุณค้นหาบนเว็บไซต์ Font Tai"
+    : "Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Shan font สำหรับพรีวิวออนไลน์ ดาวน์โหลด และฝังฟอนต์บนเว็บไซต์";
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        path={pageToPath(publicPage, articleSlug || undefined)}
+        image="/og-image.jpg"
+      />
+
+      <div className="flex min-h-screen flex-col">
+        <NavbarWithSearch
+          search={search}
+          onSearchChange={setSearch}
+          publicPage={publicPage}
+          onNavigate={navigateToPage}
+        />
+
+        <main className="mx-auto mt-[96px] w-full max-w-7xl flex-1 px-4 py-8">
+          {viewMode === "admin" && isAuthed ? (
+            <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h2 className="text-4xl font-black tracking-tight">
+                    ระบบจัดการเว็บไซต์
+                  </h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    จัดการฟอนต์ ตรวจสอบข้อความติดต่อ และดูสถิติผู้เข้าใช้งาน
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  {adminTab === "contacts" ? (
+                    <button
+                      type="button"
+                      onClick={handleExportContactCsv}
+                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700"
+                    >
+                      Export CSV
+                    </button>
+                  ) : null}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAddFont(true)}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white"
+                  >
+                    <Plus size={18} />
+                    เพิ่มฟอนต์
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-5 py-3 font-semibold text-white"
+                  >
+                    <LogOut size={18} />
+                    ออกจากระบบ
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => setAdminTab("fonts")}
+                  className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+                    adminTab === "fonts"
+                      ? "bg-blue-600 text-white"
+                      : "border border-slate-300 bg-white text-slate-700"
+                  }`}
+                >
+                  จัดการฟอนต์
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAdminTab("contacts")}
+                  className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+                    adminTab === "contacts"
+                      ? "bg-blue-600 text-white"
+                      : "border border-slate-300 bg-white text-slate-700"
+                  }`}
+                >
+                  ข้อความติดต่อ
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAdminTab("stats")}
+                  className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
+                    adminTab === "stats"
+                      ? "bg-blue-600 text-white"
+                      : "border border-slate-300 bg-white text-slate-700"
+                  }`}
+                >
+                  สถิติ
+                </button>
+              </div>
+
+              {adminTab === "fonts" ? (
+                <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                  <table className="w-full min-w-[760px] border-collapse">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          ชื่อ
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          สไตล์
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          เจ้าของ
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          ลักษณะ
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          ประเภท
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          จัดการ
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allFonts.map((font) => (
+                        <tr key={font.id} className="border-t border-slate-200">
+                          <td className="px-4 py-4 font-semibold">{font.name}</td>
+                          <td className="px-4 py-4">{font.style}</td>
+                          <td className="px-4 py-4">{font.owner}</td>
+                          <td className="px-4 py-4">{getCharacteristicLabel(font.characteristics)}</td>
+                          <td className="px-4 py-4">
+                            {font.isCustom ? "Custom" : "Google"}
+                          </td>
+                          <td className="px-4 py-4">
+                            {font.isCustom ? (
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditFont(font);
+                                    setShowEditFont(true);
+                                  }}
+                                  className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 font-medium text-blue-600"
+                                >
+                                  <Edit size={16} />
+                                  แก้ไข
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteFont(font.id)}
+                                  className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 font-medium text-red-600"
+                                >
+                                  <Trash2 size={16} />
+                                  ลบ
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : adminTab === "contacts" ? (
+                <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                  <table className="w-full min-w-[1100px] border-collapse">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          สถานะ
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          วันที่
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          ชื่อ-นามสกุล
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          อีเมล
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          หัวข้อ
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          ข้อความ
+                        </th>
+                        <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                          จัดการ
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contactLoading ? (
+                        <tr>
+                          <td
+                            colSpan={7}
+                            className="px-4 py-8 text-center text-slate-500"
+                          >
+                            กำลังโหลดข้อความติดต่อ...
+                          </td>
+                        </tr>
+                      ) : contactMessages.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={7}
+                            className="px-4 py-8 text-center text-slate-500"
+                          >
+                            ยังไม่มีข้อความติดต่อ
+                          </td>
+                        </tr>
+                      ) : (
+                        contactMessages.map((item) => (
+                          <tr
+                            key={item.id}
+                            className="border-t border-slate-200 align-top"
+                          >
+                            <td className="px-4 py-4">
+                              <span
+                                className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+                                  item.isRead
+                                    ? "bg-slate-100 text-slate-600"
+                                    : "bg-emerald-100 text-emerald-700"
+                                }`}
+                              >
+                                {item.isRead ? "อ่านแล้ว" : "ยังไม่อ่าน"}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-600">
+                              {item.createdAt}
+                            </td>
+                            <td className="px-4 py-4 font-medium text-slate-900">
+                              {item.firstName} {item.lastName}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-600">
+                              {item.email}
+                            </td>
+                            <td className="px-4 py-4 text-sm font-medium text-slate-900">
+                              {item.subject}
+                            </td>
+                            <td className="px-4 py-4 text-sm leading-6 text-slate-600">
+                              <div className="max-w-[320px] whitespace-pre-wrap line-clamp-3">
+                                {item.message}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedContact(item)}
+                                  className="rounded-xl bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600"
+                                >
+                                  ดูรายละเอียด
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleReplyEmail(item)}
+                                  className="rounded-xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"
+                                >
+                                  ตอบกลับอีเมล
+                                </button>
+
+                                {!item.isRead ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleMarkContactAsRead(item.id)
+                                    }
+                                    className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
+                                  >
+                                    อ่านแล้ว
+                                  </button>
+                                ) : null}
+
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    const ok = window.confirm(
+                                      "ต้องการลบข้อความนี้ใช่หรือไม่"
+                                    );
+                                    if (!ok) return;
+                                    await handleDeleteContactMessage(item.id);
+                                  }}
+                                  className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
+                                >
+                                  ลบ
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                      <p className="text-sm font-medium text-slate-500">
+                        ผู้เข้าชมทั้งหมด
+                      </p>
+                      <p className="mt-3 text-4xl font-black text-slate-900">
+                        {statsLoading
+                          ? "..."
+                          : stats.totalVisitors.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                      <p className="text-sm font-medium text-slate-500">
+                        ผู้เข้าชมวันนี้
+                      </p>
+                      <p className="mt-3 text-4xl font-black text-slate-900">
+                        {statsLoading
+                          ? "..."
+                          : stats.todayVisitors.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                      <p className="text-sm font-medium text-slate-500">
+                        ออนไลน์ตอนนี้
+                      </p>
+                      <p className="mt-3 text-4xl font-black text-emerald-600">
+                        {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-white p-6">
+                    <div className="mb-5 flex items-center justify-between gap-4">
+                      <h3 className="text-2xl font-black text-slate-900">
+                        ตารางสรุปสถิติ
+                      </h3>
+
+                      <button
+                        type="button"
+                        onClick={loadStats}
+                        className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+                      >
+                        รีเฟรชข้อมูล
+                      </button>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                      <table className="w-full min-w-[640px] border-collapse">
+                        <thead className="bg-slate-50">
+                          <tr>
+                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                              รายการ
+                            </th>
+                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                              ค่า
+                            </th>
+                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
+                              หมายเหตุ
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-t border-slate-200">
+                            <td className="px-4 py-4 font-medium text-slate-900">
+                              ผู้เข้าชมทั้งหมด
+                            </td>
+                            <td className="px-4 py-4 text-slate-700">
+                              {stats.totalVisitors.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-500">
+                              นับจาก IP hash ไม่ซ้ำในฐานข้อมูล
+                            </td>
+                          </tr>
+
+                          <tr className="border-t border-slate-200">
+                            <td className="px-4 py-4 font-medium text-slate-900">
+                              ผู้เข้าชมวันนี้
+                            </td>
+                            <td className="px-4 py-4 text-slate-700">
+                              {stats.todayVisitors.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-500">
+                              นับเฉพาะข้อมูลของวันปัจจุบัน
+                            </td>
+                          </tr>
+
+                          <tr className="border-t border-slate-200">
+                            <td className="px-4 py-4 font-medium text-slate-900">
+                              ออนไลน์ตอนนี้
+                            </td>
+                            <td className="px-4 py-4 font-semibold text-emerald-600">
+                              {stats.onlineNow.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-500">
+                              ประมาณการจากผู้เข้าชมในช่วง 5 นาทีล่าสุด
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="mt-4 text-sm text-slate-500">
+                      หน้านี้รีเฟรชอัตโนมัติทุก 5 วินาทีเมื่อเปิดแท็บสถิติอยู่
+                    </p>
+                  </div>
+                </div>
+              )}
+            </section>
+          ) : publicPage !== "home" ? (
+  <StaticPage page={publicPage} onNavigate={navigateToPage} />
+) : (
+            <>
+              <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
+                <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+                  <div>
+                    <p className="mb-3 inline-flex rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">
+                      Font Preview Platform
+                    </p>
+
+                    <h2 className="input-shan text-3xl font-black tracking-tight leading-[1.45] text-slate-900 sm:text-4xl sm:leading-[1.5]">
+                      ၽၢင်ႁၢင်ႈၾွၼ်ႉတႆး ယူႇၼီႇၶူတ်ႉ
+                      <br />
+                      ႁၼ်သႃႇတၢႆႇၵမ်းသိုဝ်ႈ 
+                      <br />
+                      မီးပႃးၶူတ်ႉၾွၼ်ႉတႃႇၽင်ၼႂ်းဝဵပ်ႉသၢႆႉ
+                    </h2>
+
+                    <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                      พรีวิวฟอนต์ไต ค้นหาฟอนต์ได้ง่าย มีโค้ดสำหรับฝังฟอนต์ในเว็บไซต์ และสามารถโหลดฟอนต์ .ttf ไปใช้ได้
+                    </p>
+                  </div>
+
+                
+                </div>
+              </section>
+
+              <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+  <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
+                  <input
+                    className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
+                    value={previewText}
+                    onChange={(e) => setPreviewText(e.target.value)}
+                    placeholder="พิมพ์ข้อความสำหรับพรีวิว"
+                  />
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min={16}
+                      max={96}
+                      value={fontSize}
+                      onChange={(e) => setFontSize(Number(e.target.value))}
+                    />
+                    <span className="min-w-[70px] text-2xl font-black">
+                      {fontSize}px
+                    </span>
+                  </div>
+
+                  <input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="h-12 w-16 rounded-xl border border-slate-300 bg-white"
+                  />
+                </div>
+
+                <div className="mt-4 grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <input
+                    className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="ค้นหาฟอนต์"
+                  />
+
+                  <select
+                    className="rounded-2xl border border-slate-300 px-4 py-4 outline-none focus:border-blue-400"
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                  >
+                    <option value={10}>แสดง 10 ฟอนต์</option>
+                    <option value={20}>แสดง 20 ฟอนต์</option>
+                    <option value={30}>แสดง 30 ฟอนต์</option>
+                  </select>
+                </div>
+              </section>
+
+            <div className="mb-6 border-b border-slate-200/70 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 md:sticky md:top-[72px] md:z-30">
+
+  <div className="overflow-x-auto px-2 py-3 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+    
+    <div className="flex min-w-max items-center gap-2">
+
+      {ALPHABET.map((letter) => {
+        const isActive = letterFilter === letter;
+        const isAll = letter === "ALL";
+
+        return (
+          <button
+            key={letter}
+            type="button"
+            onClick={() => setLetterFilter(letter)}
+            aria-pressed={isActive}
+            className={`flex h-10 min-w-[40px] items-center justify-center rounded-xl px-3 text-sm font-bold transition-all duration-200 ${
+              isActive
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                : "border border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+            } ${isAll ? "px-4" : ""}`}
+          >
+            {letter}
+          </button>
+        );
+      })}
+
+    </div>
+  </div>
+
+  {(letterFilter !== "ALL" || ownerFilter !== "ALL") ? (
+    <div className="border-t border-slate-100 px-4 py-2">
+      <p className="text-center text-xs font-medium text-slate-500">
+        {letterFilter !== "ALL" ? (
+          <>
+            แสดงฟอนต์ที่ขึ้นต้นด้วย{" "}
+            <span className="font-bold text-blue-600">{letterFilter}</span>
+          </>
+        ) : null}
+        {letterFilter !== "ALL" && ownerFilter !== "ALL" ? " และ " : null}
+        {ownerFilter !== "ALL" ? (
+          <>
+            เจ้าของ{" "}
+            <span className="font-bold text-blue-600">{ownerFilter}</span>{" "}
+            <button
+              type="button"
+              onClick={() => setOwnerFilter("ALL")}
+              className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:bg-slate-300"
+            >
+              ล้าง
+            </button>
+          </>
+        ) : null}
+        {" "}จำนวน {allFonts.length} รายการ
+      </p>
+    </div>
+  ) : null}
+
+</div>
+
+              
+
+              {loading ? (
+                <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
+              ) : paginatedFonts.length === 0 ? (
+                <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
+                  ยังไม่มีฟอนต์ให้แสดง
+                </div>
+              ) : (
+                <section className="flex flex-col gap-6">
+                  {paginatedFonts.map((font, index) => (
+                    <div key={font.id}>
+                      <FontCard
+                        font={font}
+                        previewText={previewText}
+                        fontSize={fontSize}
+                        textColor={textColor}
+                        onShowCode={setCodeFont}
+                      />
+
+                    </div>
+                  ))}
+                </section>
+              )}
+
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onChange={setPage}
+              />
+
+              
+            </>
+          )}
+        </main>
+
+        <SiteFooter
+          onNavigate={handleNavigate}
+          onAdminClick={handleAdminClick}
+          allFonts={allFonts}
+          setOwnerFilter={setOwnerFilter}
+        />
+      </div>
+
+      <CodeModal font={codeFont} onClose={() => setCodeFont(null)} />
+
+      <LoginModal
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        onSuccess={async () => {
+          setIsAuthed(true);
+          setViewMode("admin");
+          await Promise.all([loadFonts(), loadContactMessages(), loadStats()]);
+        }}
+      />
+
+      <EditFontModal
+        open={showEditFont}
+        font={editFont}
+        onClose={() => {
+          setShowEditFont(false);
+          setEditFont(null);
+        }}
+        onUpdated={async () => {
+          await loadFonts();
+        }}
+      />
+
+      <AddFontModal
+        open={showAddFont}
+        onClose={() => setShowAddFont(false)}
+        onCreated={async () => {
+          await loadFonts();
+        }}
+      />
+
+      <ContactDetailModal
+        item={selectedContact}
+        onClose={() => setSelectedContact(null)}
+        onMarkRead={handleMarkContactAsRead}
+        onDelete={handleDeleteContactMessage}
+      />
+
+      <CookieBanner onNavigate={(page) => navigateToPage(page)} />
+      <BackToTop />
+    </div>
+  );
+}
