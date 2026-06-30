@@ -9,7 +9,15 @@ import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import BackToTop from "./components/BackToTop";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
-
+import { bindConsentScriptLoader } from "./utils/consentScripts";
+import {
+  ARTICLES,
+  ARTICLES_INTRO,
+  ARTICLE_CATEGORIES,
+  getArticleBySlug,
+  getArticlesByCategory,
+  getRelatedArticles,
+} from "./data/articles";
 
 
 type ViewMode = "home" | "admin";
@@ -20,12 +28,15 @@ type PublicPage =
   | "privacy"
   | "cookie"
   | "contact"
+  | "articles"
+  | "article-detail"
   | "notfound";
 
  
 const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
 
+const SHOW_AD_PLACEHOLDERS = true;
 
 const ALPHABET = [
   "ALL",
@@ -33,16 +44,16 @@ const ALPHABET = [
   "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 ];
 const FONT_CHARACTERISTIC_OPTIONS = [
-  { value: "official", label: "ทางการ" },
-  { value: "modern", label: "ทันสมัย" },
-  { value: "display", label: "พาดหัว / โปสเตอร์" },
-  { value: "body", label: "เนื้อหา อ่านยาว" },
-  { value: "handwriting", label: "ลายมือ" },
-  { value: "decorative", label: "ตกแต่ง" },
-  { value: "traditional", label: "ดั้งเดิม" },
-  { value: "Regular", label: "ทางการ" },
-  { value: "Bold", label: "พาดหัว / โปสเตอร์" },
-  { value: "Italic", label: "ลายมือ" },
+ { value: "official", label: "ပဵၼ်တၢင်းၵၢၼ်" },
+ { value: "modern", label: "ပၢၼ်မႂ်ႇ" },
+ { value: "display", label: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ" },
+ { value: "body", label: "ၼိူဝ်ႉလိၵ်ႈ လူဢၢၼ်ႇယၢဝ်း" },
+ { value: "handwriting", label: "လၢႆးမိုဝ်း" },
+ { value: "decorative", label: "ႁၢင်ႈၶိူင်ႈ" },
+ { value: "traditional", label: "မိူဝ်ႈၵဝ်ႇ" },
+ { value: "Regular", label: "ပဵၼ်တၢင်းၵၢၼ်" },
+ { value: "Bold", label: "ႁူဝ်ၶေႃႈ / ပူဝ်ႇသ်တႃႇ" },
+ { value: "Italic", label: "လၢႆးမိုဝ်း" },
 ] as const;
 
 function getCharacteristicLabel(value: string) {
@@ -57,7 +68,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "SIL International",
     characteristics: "Serif",
-    details: "ฟอนต์ไต (ไทใหญ่) มาตรฐาน รองรับอักขระครบถ้วน",
+    details: "လၵ်းၸဵင်ၾွၼ်ႉတႆး ႁွင်းႁပ်ႉဢၵ်ႉၶရႃႇတူဝ်လိၵ်ႈတဵမ်ထူၼ်ႈ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Tai+Heritage+Pro",
     fileKey: "",
@@ -72,7 +83,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Cadson Demak",
     characteristics: "Sans Serif",
-    details: "ฟอนต์ยอดนิยม ทันสมัย",
+    details: "ၾွၼ်ႉၵူၼ်းသူင်ၸႂ်ႉၼမ် ပၢၼ်မႂ်ႇ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Prompt",
     fileKey: "",
@@ -87,7 +98,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Suppon Srisawat",
     characteristics: "Serif",
-    details: "เหมาะกับเอกสารและงานราชการ",
+    details: "သၢင်ႇထုၵ်ႇတႃႇတႅမ်ႈလိၵ်ႈလႄႈၸႂ်ႉပၼ်တၢင်းၵၢၼ်",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Sarabun",
     fileKey: "",
@@ -102,7 +113,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Cadson Demak",
     characteristics: "Script",
-    details: "เป็นกันเอง อ่านง่าย",
+    details: "လူဢၢၼ်ႇငၢႆႈ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Mali",
     fileKey: "",
@@ -117,7 +128,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Bold",
     owner: "Cadson Demak",
     characteristics: "Sans Serif",
-    details: "หนา ชัด เหมาะกับหัวเรื่อง",
+    details: "တူဝ်လိၵ်ႈၼႃ ၸႅင်ႈလႅင်း သၢင်ႇထုၵ်ႇႁဵတ်းပဵၼ်ႁူဝ်ၶေႃႈ",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Kanit",
     fileKey: "",
@@ -132,7 +143,7 @@ const GOOGLE_FONTS: FontItem[] = [
     style: "Regular",
     owner: "Cadson Demak",
     characteristics: "Display",
-    details: "โดดเด่นสำหรับงานดีไซน์",
+    details: "တွၼ်ႈတႃႇၵၢၼ်တီႇသၢႆး",
     isCustom: false,
     sourceUrl: "https://fonts.google.com/specimen/Chakra+Petch",
     fileKey: "",
@@ -157,6 +168,10 @@ function pageToPath(page: PublicPage, slug?: string): string {
       return "/cookie/";
     case "contact":
       return "/contact/";
+    case "articles":
+      return "/articles/";
+    case "article-detail":
+      return slug ? `/articles/${slug}/` : "/articles/";
     case "notfound":
       return "/404/";
     case "home":
@@ -168,6 +183,8 @@ function pageToPath(page: PublicPage, slug?: string): string {
 function pathToPage(pathname: string): PublicPage {
   const path = pathname.replace(/\/+$/, "") || "/";
 
+  if (path === "/articles") return "articles";
+  if (path.startsWith("/articles/")) return "article-detail";
 
   switch (path) {
     case "/":
@@ -223,8 +240,8 @@ function CodeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">
-            โค้ดใช้งาน: {font.name}
+          <h3 className="input-shan text-2xl font-black text-slate-900">
+           ၶူတ်ႉၸႂ်ႉၵၢၼ် : {font.name}
           </h3>
           <button
             type="button"
@@ -272,10 +289,10 @@ function LoginModal({
         await onSuccess();
         onClose();
       } else {
-        setError("เข้าสู่ระบบไม่สำเร็จ");
+        setError("ၶဝ်ႈၵႂႃႇၼႂ်းပိူင်ဢမ်ႇဢွင်ႇမၢၼ်");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "เข้าสู่ระบบไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : "ၶဝ်ႈၵႂႃႇၼႂ်းပိူင်ဢမ်ႇဢွင်ႇမၢၼ်");
     } finally {
       setLoading(false);
     }
@@ -285,8 +302,8 @@ function LoginModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">
-            เข้าสู่ระบบหลังบ้าน
+          <h3 className="input-shan text-2xl font-black text-slate-900">
+            ၶဝ်ႈလင်ႁိူၼ်း
           </h3>
           <button
             type="button"
@@ -297,19 +314,19 @@ function LoginModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
+        <form onSubmit={handleSubmit} className="input-shan flex flex-col gap-4 p-5">
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="ชื่อผู้ใช้"
+            placeholder="ၸိုဝ်ႈၵူၼ်းၸႂ်ႉ"
           />
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="รหัสผ่าน"
+            placeholder="မၢႆလပ်ႉ"
           />
 
           {error && (
@@ -321,7 +338,7 @@ function LoginModal({
             className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-60"
             type="submit"
           >
-            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+            {loading ? "တိုၵ်ႉၶဝ်ႈၵႂႃႇၼႂ်းပိူင်..." : "ၶဝ်ႈၵႂႃႇၼႂ်းပိူင်"}
           </button>
         </form>
       </div>
@@ -354,7 +371,7 @@ function AddFontModal({
     setError("");
 
     if (!name || !owner || !characteristics || !file) {
-      setError("กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ฟอนต์");
+      setError("ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈမုၼ်းႁႂ်ႈတဵမ်ထူၼ်ႈလႄႈလိူၵ်ႈၾၢႆႇၾွၼ်ႉ");
       return;
     }
 
@@ -381,17 +398,17 @@ function AddFontModal({
       onCreated();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "เพิ่มฟอนต์ไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : "ထႅမ်ၾွၼ်ႉဢမ်ႇဢွင်ႇမၢၼ်");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+    <div className="input-shan fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">เพิ่มฟอนต์ใหม่</h3>
+          <h3 className="text-2xl font-black text-slate-900">ထႅမ်ၾွၼ်ႉမႂ်ႇ</h3>
           <button
             type="button"
             onClick={onClose}
@@ -404,7 +421,7 @@ function AddFontModal({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ชื่อฟอนต์"
+            placeholder="ၸိုဝ်ႈၾွၼ်ႉ"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -424,7 +441,7 @@ function AddFontModal({
 
           <input
             className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="เจ้าของ"
+            placeholder="ၸဝ်ႈၶွင်"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
           />
@@ -443,7 +460,7 @@ function AddFontModal({
 
           <textarea
             className="input-shan min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="รายละเอียด"
+            placeholder="ႁူဝ်ယွႆႈ"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
           />
@@ -464,7 +481,7 @@ function AddFontModal({
             type="submit"
             disabled={loading}
           >
-            {loading ? "กำลังบันทึก..." : "บันทึกฟอนต์"}
+            {loading ? "တိုၵ်ႉသိမ်း..." : "သိမ်းၾွၼ်ႉ"}
           </button>
         </form>
       </div>
@@ -508,7 +525,7 @@ setCharacteristics(font.characteristics || "official");
     setError("");
 
     if (!name || !style || !owner || !characteristics) {
-      setError("กรุณากรอกข้อมูลให้ครบ");
+      setError("ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈမုၼ်းႁႂ်ႈတဵမ်ထူၼ်ႈ");
       return;
     }
 
@@ -524,7 +541,7 @@ setCharacteristics(font.characteristics || "official");
       await onUpdated();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "แก้ไขฟอนต์ไม่สำเร็จ");
+      setError(err instanceof Error ? err.message : "မႄးထတ်းၾွၼ်ႉဢမ်ႇဢွင်ႇမၢၼ်");
     } finally {
       setLoading(false);
     }
@@ -534,7 +551,7 @@ setCharacteristics(font.characteristics || "official");
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
-          <h3 className="text-2xl font-black text-slate-900">แก้ไขฟอนต์</h3>
+          <h3 className="input-shan text-2xl font-black text-slate-900">မႄးထတ်းၾွၼ်ႉ</h3>
           <button
             type="button"
             onClick={onClose}
@@ -546,8 +563,8 @@ setCharacteristics(font.characteristics || "official");
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
           <input
-            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="ชื่อฟอนต์"
+            className="input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="ၸိုဝ်ႈၾွၼ်ႉ"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -566,8 +583,8 @@ setCharacteristics(font.characteristics || "official");
           </select>
 
           <input
-            className="rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="เจ้าของ"
+            className="input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="ၸဝ်ႈၶွင်"
             value={owner}
             onChange={(e) => setOwner(e.target.value)}
           />
@@ -585,8 +602,8 @@ setCharacteristics(font.characteristics || "official");
 </select>
 
           <textarea
-            className="min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
-            placeholder="รายละเอียด"
+            className="input-shan min-h-[120px] rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-400"
+            placeholder="ႁူဝ်ယွႆႈ"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
           />
@@ -600,7 +617,7 @@ setCharacteristics(font.characteristics || "official");
             type="submit"
             disabled={loading}
           >
-            {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
+            {loading ? "တိုၵ်ႉသိမ်း..." : "သိမ်းၵၢၼ်မႄးထတ်း"}
           </button>
         </form>
       </div>
@@ -649,13 +666,13 @@ function StaticPage({
     const message = contactForm.message.trim();
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      setContactError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      setContactError("ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈမုၼ်းႁႂ်ႈတဵမ်ၵူႈလွၵ်း");
       return;
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      setContactError("กรุณากรอกอีเมลให้ถูกต้อง");
+      setContactError("ၶႅၼ်းတေႃႈတႅမ်ႈဢီႇမႄးလ်ႁႂ်ႈမၢၼ်ႇမႅၼ်ႈ");
       return;
     }
 
@@ -670,7 +687,7 @@ function StaticPage({
         message,
       });
 
-      setContactSuccess(res.message || "ส่งข้อมูลเรียบร้อยแล้ว");
+      setContactSuccess(res.message || "သူင်ႇၶေႃႈမုၼ်းယဝ်ႉတူဝ်ႈလီငၢမ်း");
 
       setContactForm({
         firstName: "",
@@ -681,7 +698,7 @@ function StaticPage({
       });
     } catch (err) {
       setContactError(
-        err instanceof Error ? err.message : "ไม่สามารถส่งข้อมูลได้"
+        err instanceof Error ? err.message : "ဢမ်ႇၸၢင်ႈသူင်ႇၶေႃႈမုၼ်းလႆႈ"
       );
     } finally {
       setContactSubmitting(false);
@@ -690,36 +707,35 @@ function StaticPage({
 
   if (page === "privacy") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-6">
           <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
             Privacy Policy
           </p>
           <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-            นโยบายความเป็นส่วนตัว
+            ပေႃႇလႃႇသီႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ်
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            อัปเดตล่าสุด: 21/4/2026
+           မႄးပၼ်မႂ်ႇလိုၼ်းသုတ်း : 21/4/2026
           </p>
         </div>
 
         <div className="space-y-6 leading-7 text-slate-600">
   <p>
-    เว็บไซต์ Font Tai ให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้งานทุกท่าน
-    นโยบายความเป็นส่วนตัวฉบับนี้อธิบายถึงแนวทางการเก็บรวบรวม ใช้ เปิดเผย
-    และคุ้มครองข้อมูลที่เกี่ยวข้องกับการใช้งานเว็บไซต์ของเรา
-    เมื่อคุณเข้าใช้งานเว็บไซต์นี้ จะถือว่าคุณได้อ่านและรับทราบนโยบายฉบับนี้แล้ว
+   ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ဝႆႉၵႃႈၶၼ် တေႃႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ် တွၼ်ႈတႃႇၽူႈၸႂ်ႉတိုဝ်း တင်းသဵင်ႈယူႇဢေႃႈ။
+ပေႃႇလႃႇသီႇလွင်ႈႁႄႉၵၢင်ႈသုၼ်ႇတူဝ်ၼႆႉ တေသိုပ်ႇလၢတ်ႈၼႄပၼ် လၢႆးဢၼ်ႁဝ်းၶႃႈ သိမ်းႁွမ်၊ ၸႂ်ႉတိုဝ်း၊ ပိုတ်ႇႁႂ်ႈႁၼ် လႄႈ ႁႄႉၵၢင်ႈပၼ်ၶေႃႈမုၼ်း (Data) ဢၼ်ၵဵဝ်ႇလူၺ်ႈလွင်ႈၸႂ်ႉတိုဝ်းဝဵပ်ႉသၢႆႉႁဝ်းၶႃႈၼၼ်ႉယူႇဢေႃႈ။
+ပေႃးၸဝ်ႈၵဝ်ႇၶဝ်ႈၸႂ်ႉတိုဝ်းဝဵပ်ႉသၢႆႉဢၼ်ၼႆႉယဝ်ႉၸိုင် တေသွၼ်ႇဝႃႈ ၸဝ်ႈၵဝ်ႇလႆႈလူပေႃႇလႃႇသီႇ လႄႈ ပွင်ႇၸႂ်ပေႃႇလႃႇသီႇဢၼ်ၼႆႉလီငၢမ်းယဝ်ႉ။
   </p>
 
   <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      1. ข้อมูลที่เราอาจเก็บรวบรวม
+    <h2 className="input-shan text-xl font-bold text-slate-900">
+      1. ၶေႃႈမုၼ်းဢၼ်ႁဝ်းၸၢင်ႈၵဵပ်းႁွမ်
     </h2>
     <ul className="mt-3 list-disc space-y-2 pl-6">
-      <li>ข้อมูลทางเทคนิค เช่น IP address, ประเภทเบราว์เซอร์, ระบบปฏิบัติการ, ภาษา, วันที่และเวลาที่เข้าใช้งาน</li>
-      <li>ข้อมูลการใช้งานเว็บไซต์ เช่น หน้าที่เข้าชม การค้นหา การดูตัวอย่างฟอนต์ และการโต้ตอบกับส่วนต่าง ๆ ของเว็บไซต์</li>
-      <li>ข้อมูลจากคุกกี้และเทคโนโลยีที่คล้ายกัน เพื่อช่วยให้เว็บไซต์ทำงานได้อย่างมีประสิทธิภาพ</li>
-      <li>ข้อมูลที่ผู้ใช้งานส่งให้เราโดยตรง เช่น ข้อมูลจากแบบฟอร์มติดต่อ</li>
+      <li>ၶေႃႈမုၼ်းတၢင်းပၢႆးၸၢၵ်ႈ မိူၼ်ၼင်ႇ IP address, သႅၼ်းပရၢဝ်ႇသႃႇ, ပိူင်ၵၢၼ်သၢင်ႈ, ၽႃႇသႃႇ, ဝၼ်းထီႉလႄႈၶၢဝ်းယၢမ်းၶဝ်ႈၸႂ်ႉၵၢၼ်</li>
+      <li>ၶေႃႈမုၼ်းၵၢၼ်ၸႂ်ႉဝႅပ်ႉသၢႆႉ မိူၼ်ၼင်ႇ ၼႃႈလိၵ်ႈဢၼ်ၶဝ်ႈတူၺ်း, ၵၢၼ်ႁႃၶေႃႈမုၼ်း, ၵၢၼ်တူၺ်းပိူင်တႅၵ်ႇၾွၼ်ႉ လႄႈၵၢၼ်ၶဝ်ႈၸႂ်ႉတိုဝ်းဝႅပ်ႉသၢႆႉၵူႈလွင်ႈလွင်ႈ</li>
+      <li>ၶေႃႈမုၼ်းၶွင်ၶုၵ်ႉၵီႉလႄႈပၢႆးၸၢၵ်ႈဢၼ်ငၢႆးၵၼ် တွၼ်ႈတႃႇၸွႆႈႁႂ်ႈဝႅပ်ႉသၢႆႉႁဵတ်းၵၢၼ်လႆႈမီးလွင်ႈၶိုၵ်ႉတွၼ်းလီမႃး</li>
+      <li>ၶေႃႈမုၼ်းဢၼ်ၽူႈၸႂ်ႉၵၢၼ်သူင်ႇပၼ်ႁဝ်းၵမ်းသိုဝ်ႈၼၼ်ႉ မိူၼ်ၼင်ႇ ၶေႃႈမုၼ်းၾွမ်ႇၵပ်းသိုပ်ႇႁဝ်း</li>
     </ul>
   </div>
 
@@ -747,7 +763,7 @@ function StaticPage({
   </div>
 
   <div>
-    <h2 className="text-xl font-bold text-slate-900">
+    <h2 className="input-shan text-xl font-bold text-slate-900">
       4. การเปิดเผยข้อมูล
     </h2>
     <p className="mt-3">
@@ -807,7 +823,7 @@ function StaticPage({
 
   if (page === "cookie") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="mb-6">
           <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
             Cookie Policy
@@ -889,12 +905,12 @@ function StaticPage({
 
   if (page === "about") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-4xl font-black tracking-tight text-slate-900">
           About Us
         </h1>
         <p className="mt-4 leading-7 text-slate-600">
-          Font Tai คือเว็บไซต์รวมฟอนต์ไตและฟอนต์ไทยสำหรับพรีวิว ดาวน์โหลด และจัดการฟอนต์ โดยออกแบบมาเพื่อรองรับการใช้งานบนทุกอุปกรณ์ และพร้อมสำหรับการขยายเป็นเว็บไซต์เชิงพาณิชย์ในอนาคต
+          ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ပဵၼ်တီႈႁူမ်ႈတုမ်ၾွၼ်ႉတႆး တွၼ်ႈတႃႇတူၺ်းပိူင်ၽၢင်ႁၢင်ႈၾွၼ်ႉၵမ်းသိုဝ်ႈ၊ ၸၼ်တၢဝ်းလူတ်ႇ (Download) ဢဝ်ၵႂႃႇၸႂ်ႉတိုဝ်းငၢႆႈ လိူဝ်သေၼၼ်ႉဢမ်ႇၵႃး ဢဝ်ၵႂႃႇၸႂ်ႉတိုဝ်းၼႂ်းဝဵပ်ႉသၢႆႉၸဝ်ႈၵဝ်ႇၵေႃႈလႆႈ ဝဵပ်ႉသၢႆႉဢၼ်ၼႆႉဢမ်ႇလူဝ်ႇသိုဝ်ႉၶႃႈ ၸၼ်ဢဝ်လႆႈၵမ်းလဵဝ် မီးၽၢင်ႁၢင်ၼေပၼ်ၵူႈဢၼ်။
         </p>
       </section>
     );
@@ -902,12 +918,13 @@ function StaticPage({
 
   if (page === "services") {
     return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-4xl font-black tracking-tight text-slate-900">
           Services
         </h1>
         <p className="mt-4 leading-7 text-slate-600">
-          บริการของเว็บไซต์ Font Tai ได้แก่ พรีวิวฟอนต์ออนไลน์ จัดการฟอนต์อัปโหลดเอง และดาวน์โหลดหรือใช้งานฟอนต์ผ่านเว็บในรูปแบบที่เหมาะกับทุกอุปกรณ์
+          ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ပုၼ်ႈတႃႇၼေၽၢင်ႁၢင်ႈၾွၼ်ႉဢွၼ်ႇလၢႆး သင်ၸိူဝ်ႉဝႃႈၶႆႈဢဝ်ၾွၼ်ႉၸဝ်ႈၵဝ်ႇၽၢၵ်ႇၶိုၼ်ႈဝဵပ်ႉသၢႆႉႁဝ်းၼႆၸိုင် ၵပ်းသိုပ်ႇမႃးလႆႈယူႇတႃႇသေႇၶႃႈဢေႃႈ၊ တူၺ်းပိူင်ၾွၼ်ႉသေၸၼ်တၢဝ်းလူတ်ႇဢဝ်ၾွၼ်ႉဢၼ်လႆႈၸႂ်ၼၼ်ႉ ႁဝ်းၶႃႈတေသိုပ်ႇၶတ်းၸႂ်ဢဝ်ၾွၼ်ႉတၢင်ႇ (Upload) ၶိုၼ်ႈၼိူဝ်ဝဵပ်ႉသၢႆႉတႃႇသေႇယူႇၶႃႈ ၾွၼ်ႉဢၼ်ႁဝ်းတၢင်ၼၼ်ႉတေပဵၼ်ၾွၼ်ႉ (Unicode) ယူႇၼီႇၶူတ်ႉလွၼ်ႉလွၼ်ႉ ပိူဝ်ႈတႃႇတေၸႂ်ႉၵၢၼ်လႆႈၵူႈဢွင်ႈတီႈ။
+          
         </p>
       </section>
     );
@@ -915,43 +932,42 @@ function StaticPage({
 
   if (page === "contact") {
     return (
-      <section className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="input-shan mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-8 text-center">
           <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
             Contact Form
           </p>
           <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-            แบบฟอร์มติดต่อกลับ
+            ၽွမ်ႇၵပ်းသိုပ်းၸူးၶိုၼ်း
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            หากต้องการติดต่อสอบถาม แนะนำฟอนต์ แจ้งปัญหาการใช้งาน หรือสอบถามความร่วมมือทางธุรกิจ สามารถส่งข้อมูลมาหาเราได้ผ่านแบบฟอร์มด้านล่าง
-          </p>
+ပေႃးဝႃႈ ၶႂ်ႈၵပ်းသိုပ်ႇတွင်ႈထၢမ်၊ ပၼ်တၢင်းႁၼ်ထိုင်လွင်ႈၾွၼ်ႉ၊ တၢင်ႇလၢတ်ႈပၼ်ႁႃလွင်ႈၸႂ်ႉတိုဝ်း ဢမ်ႇၼၼ် တွင်ႈထၢမ်ၵူႈလွင်ႈလွင်ႈသူင်ႇၶေႃႈမုၼ်းမႃးၸူးႁဝ်းၶႃႈ ၽၢၼ်ႇတၢင်း ၽွမ်ႇ (Form) တီႈၽၢႆႇတႂ်ႈၼႆႉလႆႈယူႇၶႃႈဢေႃႈ။          </p>
         </div>
 
         <form className="space-y-5" onSubmit={handleContactSubmit} noValidate>
           <div className="grid gap-5 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
-                ชื่อ <span className="text-red-500">*</span>
+                ၸိုဝ်ႈ <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={contactForm.firstName}
                 onChange={(e) => updateContactField("firstName", e.target.value)}
-                placeholder="กรอกชื่อ"
+                placeholder="တႅမ်ႈၸိုဝ်ႈ"
                 className="w-full input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
             </div>
 
             <div>
               <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
-                นามสกุล <span className="text-red-500">*</span>
+                ၶိူဝ်းႁိူၼ်း <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={contactForm.lastName}
                 onChange={(e) => updateContactField("lastName", e.target.value)}
-                placeholder="กรอกนามสกุล"
+                placeholder="တႅမ်ႈၶိူဝ်းႁိူၼ်း"
                 className="w-full input-shan rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
               />
             </div>
@@ -959,7 +975,7 @@ function StaticPage({
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
-              อีเมล <span className="text-red-500">*</span>
+              ဢီႇမေးလ် <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -972,26 +988,26 @@ function StaticPage({
 
           <div>
             <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
-              หัวข้อ <span className="text-red-500">*</span>
+              ႁူဝ်ၶေႃႈ <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={contactForm.subject}
               onChange={(e) => updateContactField("subject", e.target.value)}
-              placeholder="หัวข้อที่ต้องการติดต่อ"
+              placeholder="ႁူဝ်ၶေႃႈဢၼ်လူဝ်ႇၵပ်းသိုပ်ႇ"
               className="input-shan w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
 
           <div>
             <label className="input-shan mb-2 block text-sm font-semibold text-slate-700">
-              ข้อความ <span className="text-red-500">*</span>
+              ၶေႃႈၵႂၢမ်း <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={6}
               value={contactForm.message}
               onChange={(e) => updateContactField("message", e.target.value)}
-              placeholder="กรอกรายละเอียดที่ต้องการติดต่อ"
+              placeholder="တႅမ်ႈႁူဝ်ယွႆႈဢၼ်လူဝ်ႇၵပ်းသိုပ်ႇ"
               className="input-shan w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
             />
           </div>
@@ -1009,15 +1025,15 @@ function StaticPage({
           ) : null}
 
           <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
-            เมื่อท่านส่งข้อมูลผ่านฟอร์ม จะถือว่าท่านยอมรับใน{" "}
+            မိူဝ်ႈသူသူင်ႇၶေႃႈမုၼ်းမႃးၼႂ်းၽွမ်ႇ ပဵၼ်ဢၼ်ဝႃႈသူယွမ်းႁပ်ႉၼႂ်း{" "}
             <button
               type="button"
               onClick={() => onNavigate("privacy")}
               className="font-semibold text-blue-600 underline underline-offset-2"
             >
-              นโยบายความเป็นส่วนตัว
+              ပေႃႇလႃႇသီႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ်
             </button>{" "}
-            ของเรา
+            ၶွင်ႁဝ်း
           </div>
 
           <button
@@ -1025,7 +1041,7 @@ function StaticPage({
             disabled={contactSubmitting}
             className="w-full rounded-2xl bg-blue-600 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
           >
-            {contactSubmitting ? "กำลังส่งข้อมูล..." : "ส่งข้อมูล"}
+            {contactSubmitting ? "တိုၵ်ႉသူင်ႇၶေႃႈမုၼ်း..." : "သူင်ႇၶေႃႈမုၼ်း"}
           </button>
         </form>
       </section>
@@ -1040,11 +1056,11 @@ function StaticPage({
         </p>
 
         <h1 className="mt-4 text-5xl font-black tracking-tight text-slate-900 sm:text-6xl">
-          ไม่พบหน้าที่คุณค้นหา
+          သွၵ်ႈႁႃဢမ်ႇႁၼ်ၼႂ်းၼႃႈဢၼ်သူသွၵ်ႈႁႃ
         </h1>
 
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
-          ขออภัย หน้าที่คุณพยายามเข้าถึงอาจถูกลบ เปลี่ยนชื่อ หรือไม่มีอยู่ในเว็บไซต์นี้แล้ว
+          ယွၼ်းၶႂၢင်းပၼ် ၼႃႈလိၵ်ႈဢၼ်သူၶႆႈၶဝ်ႈၼၼ်ႉ မွတ်ႇပႅတ်ႈယဝ်ႉ လၢႆႈၸိုဝ်ႈ ဢမ်ႇၼၼ်မၼ်းဢမ်ႇယူႇၼႂ်းဝဵပ်ႉသၢႆႉၼႆႉယဝ်ႉ
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -1062,7 +1078,7 @@ function StaticPage({
 }}
             className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
-            กลับหน้าแรก
+            ႁူၼ်ၶိုၼ်းၼႃႈႁိူၼ်း
           </button>
 
           <button
@@ -1070,7 +1086,7 @@ function StaticPage({
             onClick={() => onNavigate("contact")}
             className="rounded-2xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
           >
-            ติดต่อเรา
+            ၵပ်းသိုပ်ႇႁဝ်း
           </button>
         </div>
       </section>
@@ -1099,7 +1115,7 @@ function ContactDetailModal({
         <div className="flex items-center justify-between border-b border-slate-200 p-5">
           <div>
             <h3 className="text-2xl font-black text-slate-900">
-              รายละเอียดข้อความติดต่อ
+              ႁူဝ်ၶေႃႈဢၼ်လူဝ်ႇၵပ်းသိုပ်ႇ
             </h3>
             <p className="mt-1 text-sm text-slate-500">{item.createdAt}</p>
           </div>
@@ -1117,7 +1133,7 @@ function ContactDetailModal({
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                ชื่อ-นามสกุล
+                ၸိုဝ်း-ၶိူဝ်းႁိူၼ်း
               </p>
               <p className="mt-2 font-semibold text-slate-900">
                 {item.firstName} {item.lastName}
@@ -1126,7 +1142,7 @@ function ContactDetailModal({
 
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                อีเมล
+                ဢီႇမေးလ်
               </p>
               <p className="mt-2 font-semibold text-slate-900">{item.email}</p>
             </div>
@@ -1134,14 +1150,14 @@ function ContactDetailModal({
 
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-              หัวข้อ
+              ႁူဝ်ၶေႃႈ
             </p>
             <p className="mt-2 font-semibold text-slate-900">{item.subject}</p>
           </div>
 
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-              ข้อความ
+              ၶေႃႈၵႂၢမ်း
             </p>
             <p className="mt-2 whitespace-pre-wrap leading-7 text-slate-700">
               {item.message}
@@ -1154,13 +1170,13 @@ function ContactDetailModal({
               onClick={() => {
                 const subject = encodeURIComponent(`Re: ${item.subject}`);
                 const body = encodeURIComponent(
-                  `เรียน ${item.firstName} ${item.lastName},\n\nขอบคุณสำหรับการติดต่อเรา\n\n`
+                  `ထိုင် ${item.firstName} ${item.lastName},\n\nယိၼ်းၸူမ်းတီႈၵပ်းသိုပ်ႇႁဝ်း\n\n`
                 );
                 window.location.href = `mailto:${item.email}?subject=${subject}&body=${body}`;
               }}
               className="rounded-2xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-700"
             >
-              ตอบกลับอีเมล
+              တွပ်ႇဢီႇမေးလ်
             </button>
 
             {!item.isRead ? (
@@ -1172,21 +1188,21 @@ function ContactDetailModal({
                 }}
                 className="rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
               >
-                ทำเครื่องหมายว่าอ่านแล้ว
+                ႁဵတ်းၶိူင်ႈမၢႆဝႃႈလူဢၢၼ်ႇယဝ်ႉ
               </button>
             ) : null}
 
             <button
               type="button"
               onClick={async () => {
-                const ok = window.confirm("ต้องการลบข้อความนี้ใช่หรือไม่");
+                const ok = window.confirm("မၼ်ႈၸႂ်ႁိုဝ်ဢၼ်တေမွတ်ႇပႅတ်ႈၶေႃႈၵႂၢမ်းၼႆႉ?");
                 if (!ok) return;
                 await onDelete(item.id);
                 onClose();
               }}
               className="rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white"
             >
-              ลบข้อความ
+              မွတ်ႇပႅတ်ႈၶေႃႈၵႂၢမ်း
             </button>
           </div>
         </div>
@@ -1251,9 +1267,285 @@ function ArticleTableOfContents({
   );
 }
 
+function ArticlesPage({
+  onOpenArticle,
+  onNavigateHome,
+}: {
+  onOpenArticle: (slug: string) => void;
+  onNavigateHome: () => void;
+}) {
+  return (
+    <section className="input-shan rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <Breadcrumbs
+        items={[{ label: "ၼႃႈႁိူၼ်း", onClick: onNavigateHome }, { label: "ဢႃႇတီႇၶိူဝ်ႇ" }]}
+      />
 
+      <div className="mb-10">
+        <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+          Articles
+        </p>
+        <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+          ဢႃႇတီႇၶိူဝ်ႇလႄႈပပ်ႉၵႅမ်မိုဝ်းၵၢၼ်ၸႂ်ႉၾွၼ်ႉတႆး
+        </h1>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
+          {ARTICLES_INTRO}
+        </p>
+      </div>
 
+      <div className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {ARTICLE_CATEGORIES.map((category) => (
+          <div
+            key={category.key}
+            className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+          >
+            <h2 className="text-base font-bold text-slate-900">{category.label}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {category.description}
+            </p>
+          </div>
+        ))}
+      </div>
 
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {ARTICLES.map((article) => (
+          <article
+            key={article.slug}
+            className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+          >
+            <div className="relative h-52 overflow-hidden bg-slate-100">
+              <img
+                src={article.coverImage}
+                alt={article.title}
+                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 to-transparent p-4">
+                <span className="inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
+                  {article.categoryLabel}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-1 flex-col p-5">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <span>{article.updatedAt}</span>
+                <span>•</span>
+                <span>{article.readingTime}</span>
+                <span>•</span>
+                <span>{article.author}</span>
+              </div>
+
+              <h2 className="mt-4 text-2xl font-black leading-tight tracking-tight text-slate-900 transition group-hover:text-blue-700">
+                {article.title}
+              </h2>
+
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                {article.description}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {article.keywords.slice(0, 3).map((keyword) => (
+                  <span
+                    key={keyword}
+                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600"
+                  >
+                    #{keyword}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    ဢႃႇတီႇၶိူဝ်ႇဢၼ်လီႁု
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">
+                    လူဢၢၼ်ပပ်ႉၵႅမ်မိုဝ်းဢၼ်တဵမ်ထူၼ်ႈ
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenArticle(article.slug)}
+                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
+                >
+                  သိုပ်ႇဢၢၼ်ႇ
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ArticleDetailPage({
+  slug,
+  onOpenArticle,
+  onBackToArticles,
+  onNavigateHome,
+}: {
+  slug: string | null;
+  onOpenArticle: (slug: string) => void;
+  onBackToArticles: () => void;
+  onNavigateHome: () => void;
+}) {
+  const article = slug ? getArticleBySlug(slug) : undefined;
+
+  if (!article) {
+    return (
+      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-3xl font-black text-slate-900">ဢမ်ႇႁၼ်ဢႃႇတီႇၶိူဝ်ႇ</h1>
+        <p className="mt-3 text-slate-600">
+          ဢႃႇတီႇၶိူဝ်ႇတီႈသူလူဝ်ႇၼၼ်ႉမၼ်းၸၢင်ႈထုၵ်ႇမွတ်ႇပႅတ်ႈယဝ်ႉ ဢမ်ႇၼၼ်ထုၵ်ႇလၢႆႈၸိုဝ်ႈ လႄႈပႆႇလႆႈပိုၼ်ၽႄႈ
+        </p>
+        <button
+          type="button"
+          onClick={onBackToArticles}
+          className="mt-6 rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
+        >
+          ႁူၼ်ၶိုၼ်းၼႃႈဢႃႇတီႇၶိူဝ်ႇ
+        </button>
+      </section>
+    );
+  }
+
+  const relatedArticles = getRelatedArticles(article.slug, 3);
+
+  return (
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: "ၼႃႈႁိူၼ်း", onClick: onNavigateHome },
+          { label: "ဢႃႇတီႇၶိူဝ်ႇ", onClick: onBackToArticles },
+          { label: article.title },
+        ]}
+      />
+
+      <div className="mb-8">
+        <button
+          type="button"
+          onClick={onBackToArticles}
+          className="text-sm font-semibold text-blue-600"
+        >
+          ← ႁူၼ်ၶိုၼ်းၼႃႈဢႃႇတီႇၶိူဝ်ႇ
+        </button>
+
+        <p className="mt-4 text-xs font-bold uppercase tracking-wide text-blue-600">
+          {article.categoryLabel}
+        </p>
+
+        <h1 className="mt-3 text-3xl font-black tracking-tight leading-[1.35] text-slate-900 sm:text-4xl">
+          {article.title}
+        </h1>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+          <span>{article.updatedAt}</span>
+          <span>•</span>
+          <span>{article.readingTime}</span>
+          <span>•</span>
+          <span>{article.author}</span>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
+          <img
+            src={article.coverImage}
+            alt={article.title}
+            className="h-[280px] w-full object-cover sm:h-[360px]"
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <article className="min-w-0">
+<p className="mb-8 text-base leading-8 text-slate-700 whitespace-normal break-words">
+  {article.description}
+</p>
+
+<div className="space-y-10">
+  {article.sections.map((section) => (
+    <section key={section.id} id={section.id} className="scroll-mt-28">
+      <h2 className="text-2xl font-black tracking-tight text-slate-900">
+        {section.heading}
+      </h2>
+
+      <div className="mt-4 space-y-5 leading-8 text-slate-700">
+        {section.body
+          .split("\n\n")
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+          .map((paragraph, index) => (
+            <p key={index} className="whitespace-normal break-words">
+              {paragraph}
+            </p>
+          ))}
+      </div>
+    </section>
+  ))}
+</div>
+        </article>
+
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <ArticleTableOfContents headings={article.headings} />
+        </div>
+      </div>
+
+      {relatedArticles.length > 0 && (
+        <div className="mt-12 border-t border-slate-200 pt-8">
+          <h2 className="text-2xl font-black text-slate-900">บทความที่เกี่ยวข้อง</h2>
+
+          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {relatedArticles.map((item) => (
+              <article
+                key={item.slug}
+                className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="relative h-44 overflow-hidden bg-slate-100">
+                  <img
+                    src={item.coverImage}
+                    alt={item.title}
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 to-transparent p-4">
+                    <span className="inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
+                      {item.categoryLabel}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                    <span>{item.updatedAt}</span>
+                    <span>•</span>
+                    <span>{item.readingTime}</span>
+                  </div>
+
+                  <h3 className="mt-3 text-xl font-black leading-tight text-slate-900 transition group-hover:text-blue-700">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    {item.description}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => onOpenArticle(item.slug)}
+                    className="mt-6 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
+                  >
+                    သိုပ်ႇဢၢၼ်ႇ
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function App() {
   const [articleSlug, setArticleSlug] = useState<string | null>(() => {
@@ -1521,10 +1813,32 @@ export default function App() {
     }
   }
 
- 
+  function navigateToPage(page: PublicPage) {
+  const nextPath = pageToPath(page);
+  if (window.location.pathname !== nextPath) {
+    window.history.pushState({}, "", nextPath);
+  }
+  setPublicPage(page);
+  if (page !== "article-detail") {
+    setArticleSlug(null);
+  }
+  setViewMode("home");
+}
+
+  function openArticle(slug: string) {
+  const nextPath = pageToPath("article-detail", slug);
+  if (window.location.pathname !== nextPath) {
+    window.history.pushState({}, "", nextPath);
+  }
+  setArticleSlug(slug);
+  setPublicPage("article-detail");
+  setViewMode("home");
+}
 
   // === handler ที่ <SiteFooter> เรียกใช้ ===
-
+  function handleNavigate(page: PublicPage) {
+    navigateToPage(page);
+  }
 
   function handleAdminClick() {
     if (isAuthed) {
@@ -1535,8 +1849,13 @@ export default function App() {
   }
 
 
+const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
   const seoTitle =
-   publicPage === "privacy"
+  publicPage === "article-detail" && currentArticle
+    ? `${currentArticle.title} | Font Tai`
+    : publicPage === "articles"
+    ? "บทความและคู่มือการใช้งานฟอนต์ไต | Font Tai"
+    : publicPage === "privacy"
     ? "Privacy Policy - นโยบายความเป็นส่วนตัว | Font Tai"
     : publicPage === "cookie"
     ? "Cookie Policy - นโยบายคุกกี้ | Font Tai"
@@ -1551,7 +1870,11 @@ export default function App() {
     : "Font Tai ၾွၼ်ႉတႆး - ฟอนต์ไต ฟอนต์ไทใหญ่ Shan Font Preview & Download";
 
 const seoDescription =
-  publicPage === "home"
+  publicPage === "article-detail" && currentArticle
+    ? currentArticle.description
+    : publicPage === "articles"
+    ? ARTICLES_INTRO
+    : publicPage === "home"
     ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และทุกอุปกรณ์"
     : publicPage === "about"
     ? "รู้จัก Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Tai font ที่ช่วยให้พรีวิวฟอนต์ ดาวน์โหลดฟอนต์ และนำฟอนต์ไปใช้งานบนเว็บไซต์ได้ง่ายขึ้น"
@@ -1653,17 +1976,7 @@ const seoDescription =
                   ข้อความติดต่อ
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setAdminTab("stats")}
-                  className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
-                    adminTab === "stats"
-                      ? "bg-blue-600 text-white"
-                      : "border border-slate-300 bg-white text-slate-700"
-                  }`}
-                >
-                  สถิติ
-                </button>
+                
               </div>
 
               {adminTab === "fonts" ? (
@@ -1868,121 +2181,27 @@ const seoDescription =
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                      <p className="text-sm font-medium text-slate-500">
-                        ผู้เข้าชมทั้งหมด
-                      </p>
-                      <p className="mt-3 text-4xl font-black text-slate-900">
-                        {statsLoading
-                          ? "..."
-                          : stats.totalVisitors.toLocaleString()}
-                      </p>
-                    </div>
 
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                      <p className="text-sm font-medium text-slate-500">
-                        ผู้เข้าชมวันนี้
-                      </p>
-                      <p className="mt-3 text-4xl font-black text-slate-900">
-                        {statsLoading
-                          ? "..."
-                          : stats.todayVisitors.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                      <p className="text-sm font-medium text-slate-500">
-                        ออนไลน์ตอนนี้
-                      </p>
-                      <p className="mt-3 text-4xl font-black text-emerald-600">
-                        {statsLoading ? "..." : stats.onlineNow.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-3xl border border-slate-200 bg-white p-6">
-                    <div className="mb-5 flex items-center justify-between gap-4">
-                      <h3 className="text-2xl font-black text-slate-900">
-                        ตารางสรุปสถิติ
-                      </h3>
-
-                      <button
-                        type="button"
-                        onClick={loadStats}
-                        className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700"
-                      >
-                        รีเฟรชข้อมูล
-                      </button>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                      <table className="w-full min-w-[640px] border-collapse">
-                        <thead className="bg-slate-50">
-                          <tr>
-                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
-                              รายการ
-                            </th>
-                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
-                              ค่า
-                            </th>
-                            <th className="px-4 py-4 text-left text-sm font-semibold text-slate-600">
-                              หมายเหตุ
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-t border-slate-200">
-                            <td className="px-4 py-4 font-medium text-slate-900">
-                              ผู้เข้าชมทั้งหมด
-                            </td>
-                            <td className="px-4 py-4 text-slate-700">
-                              {stats.totalVisitors.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-slate-500">
-                              นับจาก IP hash ไม่ซ้ำในฐานข้อมูล
-                            </td>
-                          </tr>
-
-                          <tr className="border-t border-slate-200">
-                            <td className="px-4 py-4 font-medium text-slate-900">
-                              ผู้เข้าชมวันนี้
-                            </td>
-                            <td className="px-4 py-4 text-slate-700">
-                              {stats.todayVisitors.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-slate-500">
-                              นับเฉพาะข้อมูลของวันปัจจุบัน
-                            </td>
-                          </tr>
-
-                          <tr className="border-t border-slate-200">
-                            <td className="px-4 py-4 font-medium text-slate-900">
-                              ออนไลน์ตอนนี้
-                            </td>
-                            <td className="px-4 py-4 font-semibold text-emerald-600">
-                              {stats.onlineNow.toLocaleString()}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-slate-500">
-                              ประมาณการจากผู้เข้าชมในช่วง 5 นาทีล่าสุด
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <p className="mt-4 text-sm text-slate-500">
-                      หน้านี้รีเฟรชอัตโนมัติทุก 5 วินาทีเมื่อเปิดแท็บสถิติอยู่
-                    </p>
-                  </div>
                 </div>
               )}
             </section>
-          ) : publicPage !== "home" ? (
+          ) : publicPage === "articles" ? (
+  <ArticlesPage
+              onOpenArticle={openArticle}
+              onNavigateHome={() => navigateToPage("home")}
+            />
+) : publicPage === "article-detail" ? (
+ <ArticleDetailPage
+  slug={articleSlug}
+  onOpenArticle={openArticle}
+  onBackToArticles={() => navigateToPage("articles")}
+  onNavigateHome={() => navigateToPage("home")}
+/>
+) : publicPage !== "home" ? (
   <StaticPage page={publicPage} onNavigate={navigateToPage} />
 ) : (
             <>
-              <section className="mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
+              <section className="input-shan mb-6 rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-sm">
                 <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
                   <div>
                     <p className="mb-3 inline-flex rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">
@@ -1998,7 +2217,7 @@ const seoDescription =
                     </h2>
 
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                      พรีวิวฟอนต์ไต ค้นหาฟอนต์ได้ง่าย มีโค้ดสำหรับฝังฟอนต์ในเว็บไซต์ และสามารถโหลดฟอนต์ .ttf ไปใช้ได้
+                      တူၺ်းၽၢင်ႁၢင်ႈၾွၼ်ႉတႆး၊ သွၵ်ႈႁႃၾွၼ်ႉတႆးလႆႈငၢႆႈငၢႆႈ၊ မီးၶူတ်ႉ (Code) တွၼ်ႈတႃႇဢဝ်ၾွၼ်ႉၵႂႃႇၾင်ဝႆႉၼႂ်းဝဵပ်ႉသၢႆႉ လႄႈၸၼ်တၢဝ်းလူတ်ႇ (Download) ဢၼ်ၾွၼ်ႉပဵၼ်ၾၢႆႇ .ttf ၵႂႃႇၸႂ်ႉတိုဝ်းလႆႈယူႇၶႃႈဢေႃႈ။
                     </p>
                   </div>
 
@@ -2006,13 +2225,13 @@ const seoDescription =
                 </div>
               </section>
 
-              <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <section className="input-shan mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
   <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center">
                   <input
                     className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-lg outline-none focus:border-blue-400"
                     value={previewText}
                     onChange={(e) => setPreviewText(e.target.value)}
-                    placeholder="พิมพ์ข้อความสำหรับพรีวิว"
+                    placeholder="တႅမ်ႈၶေႃႈၵႂၢမ်းပိူဝ်ႈတႃႇၼႄၽၢင်ႁၢင်ႈၾွၼ်ႉ"
                   />
 
                   <div className="flex items-center gap-3">
@@ -2041,17 +2260,17 @@ const seoDescription =
                     className="input-shan w-full min-w-0 rounded-2xl border border-slate-300 px-5 py-4 text-base outline-none focus:border-blue-400"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="ค้นหาฟอนต์"
+                    placeholder="သွၵ်ႈႁႃၾွၼ်ႉ"
                   />
 
                   <select
-                    className="rounded-2xl border border-slate-300 px-4 py-4 outline-none focus:border-blue-400"
+                    className="input-shan rounded-2xl border border-slate-300 px-4 py-4 outline-none focus:border-blue-400"
                     value={pageSize}
                     onChange={(e) => setPageSize(Number(e.target.value))}
                   >
-                    <option value={10}>แสดง 10 ฟอนต์</option>
-                    <option value={20}>แสดง 20 ฟอนต์</option>
-                    <option value={30}>แสดง 30 ฟอนต์</option>
+                    <option value={10}>ၼႄ 10 ၾွၼ်ႉ</option>
+                    <option value={20}>ၼႄ 20 ၾွၼ်ႉ</option>
+                    <option value={30}>ၼႄ 30 ၾွၼ်ႉ</option>
                   </select>
                 </div>
               </section>
@@ -2088,28 +2307,28 @@ const seoDescription =
 
   {(letterFilter !== "ALL" || ownerFilter !== "ALL") ? (
     <div className="border-t border-slate-100 px-4 py-2">
-      <p className="text-center text-xs font-medium text-slate-500">
+      <p className="input-shan text-center text-xs font-medium text-slate-500">
         {letterFilter !== "ALL" ? (
           <>
-            แสดงฟอนต์ที่ขึ้นต้นด้วย{" "}
+           ၼႄၸိုဝ်ႈၾွၼ်ႉဢၼ်ႈၶိုၼ်ႈလူၺ်ႈတူဝ်လိၵ်ႈ{" "}
             <span className="font-bold text-blue-600">{letterFilter}</span>
           </>
         ) : null}
         {letterFilter !== "ALL" && ownerFilter !== "ALL" ? " และ " : null}
         {ownerFilter !== "ALL" ? (
           <>
-            เจ้าของ{" "}
+            ၸဝ်ႈၶွင်{" "}
             <span className="font-bold text-blue-600">{ownerFilter}</span>{" "}
             <button
               type="button"
               onClick={() => setOwnerFilter("ALL")}
               className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600 hover:bg-slate-300"
             >
-              ล้าง
+              မွတ်ႇ
             </button>
           </>
         ) : null}
-        {" "}จำนวน {allFonts.length} รายการ
+        {" "}တၢင်းၼမ် {allFonts.length} ႁူဝ်ယွႆႈ
       </p>
     </div>
   ) : null}
@@ -2119,10 +2338,10 @@ const seoDescription =
               
 
               {loading ? (
-                <p className="text-lg text-slate-500">กำลังโหลดฟอนต์...</p>
+                <p className="input-shan text-lg text-slate-500">တိုဝ်းလူတ်ႇၾွၼ်ႉ ...</p>
               ) : paginatedFonts.length === 0 ? (
-                <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
-                  ยังไม่มีฟอนต์ให้แสดง
+                <div className="input-shan rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500 shadow-sm">
+                  ဢမ်ႇပႆႇမီးၾွၼ်ႉၼႄ
                 </div>
               ) : (
                 <section className="flex flex-col gap-6">
