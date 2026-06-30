@@ -76,8 +76,8 @@ export function SiteFooter({
             </div>
 
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              เว็บไซต์รวมฟอนต์ไตสำหรับพรีวิว ดาวน์โหลด และใช้งานบนเว็บไซต์
-              เพื่อช่วยให้สามารถอ่านภาษาไตได้ง่ายและสวยงามมากยิ่งขึ้น
+              ဝႅပ်ႉသၢႆႉႁူမ်ႈၾွၼ်ႉတႆး တွၼ်ႈတႃႇ ၸၢမ်းတူၺ်း၊ တၢဝ်းလူတ်ႇ လႄႈတွၼ်ႈတႃႇ 
+              ၸႂ်ႉတိုဝ်းၼိူဝ်ဝႅပ်ႉသၢႆႉ၊ ၸွႆႈႁႂ်ႈႁဝ်းလူလိၵ်ႈတႆးလႆႈငၢႆႈၸႂ် လႄႈႁၼ်သႃႇတၢႆႇႁၢင်ႈလီမႃးၼၼ်ႉယဝ်ႉ။
             </p>
           </div>
 
@@ -172,7 +172,7 @@ export function SiteFooter({
           <div className="flex h-full flex-col">
 
             <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
-              ติดต่อ / ผู้ดูแลระบบ
+              ၵပ်းသိုပ်ႇႁဝ်း / ၽၢႆႇၵုမ်းထိင်းသိတ်ႇတဵမ်ႇ
             </h4>
 
             <div className="mt-4 space-y-3 text-sm text-slate-600">
@@ -213,7 +213,7 @@ export function SiteFooter({
                 className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 <Settings size={16} />
-                เข้าหลังบ้าน
+                ၶဝ်ႈလင်ႁိူၼ်း
               </button>
 
             </div>
