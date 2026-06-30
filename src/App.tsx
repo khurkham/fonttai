@@ -5,38 +5,20 @@ import { FontCard } from "./components/FontCard";
 import { Pagination } from "./components/Pagination";
 import { SiteFooter } from "./components/SiteFooter";
 import { SeoHead } from "./components/SeoHead";
-import { CookieBanner } from "./components/CookieBanner";
 import { NavbarWithSearch } from "./components/NavbarWithSearch";
 import BackToTop from "./components/BackToTop";
 import type { ContactMessage, FontItem, VisitorCounter } from "./types";
-import { bindConsentScriptLoader } from "./utils/consentScripts";
-import {
-  ARTICLES,
-  ARTICLES_INTRO,
-  ARTICLE_CATEGORIES,
-  getArticleBySlug,
-  getArticlesByCategory,
-  getRelatedArticles,
-} from "./data/articles";
-
 
 type ViewMode = "home" | "admin";
 type PublicPage =
   | "home"
   | "about"
   | "services"
-  | "privacy"
-  | "cookie"
   | "contact"
-  | "articles"
-  | "article-detail"
   | "notfound";
 
- 
 const DEFAULT_PREVIEW =
   "ၾွၼ်ႉတႆး ႁူမ်ၸူမ်းႁပ်ႉတွၼ်ႈ ฟอนต์ไต ยินดีต้อนรับ Font Tai Welcome!";
-
-const SHOW_AD_PLACEHOLDERS = true;
 
 const ALPHABET = [
   "ALL",
@@ -154,24 +136,14 @@ const GOOGLE_FONTS: FontItem[] = [
   },
 ];
 
-
-
-function pageToPath(page: PublicPage, slug?: string): string {
+function pageToPath(page: PublicPage): string {
   switch (page) {
     case "about":
       return "/about/";
     case "services":
       return "/services/";
-    case "privacy":
-      return "/privacy/";
-    case "cookie":
-      return "/cookie/";
     case "contact":
       return "/contact/";
-    case "articles":
-      return "/articles/";
-    case "article-detail":
-      return slug ? `/articles/${slug}/` : "/articles/";
     case "notfound":
       return "/404/";
     case "home":
@@ -183,9 +155,6 @@ function pageToPath(page: PublicPage, slug?: string): string {
 function pathToPage(pathname: string): PublicPage {
   const path = pathname.replace(/\/+$/, "") || "/";
 
-  if (path === "/articles") return "articles";
-  if (path.startsWith("/articles/")) return "article-detail";
-
   switch (path) {
     case "/":
       return "home";
@@ -193,10 +162,6 @@ function pathToPage(pathname: string): PublicPage {
       return "about";
     case "/services":
       return "services";
-    case "/privacy":
-      return "privacy";
-    case "/cookie":
-      return "cookie";
     case "/contact":
       return "contact";
     case "/404":
@@ -705,204 +670,6 @@ function StaticPage({
     }
   }
 
-  if (page === "privacy") {
-    return (
-      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="mb-6">
-          <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-            Privacy Policy
-          </p>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-            ပေႃႇလႃႇသီႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ်
-          </h1>
-          <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-           မႄးပၼ်မႂ်ႇလိုၼ်းသုတ်း : 21/4/2026
-          </p>
-        </div>
-
-        <div className="space-y-6 leading-7 text-slate-600">
-  <p>
-   ဝဵပ်ႉသၢႆႉ Font Tai ၼႆႉ ဝႆႉၵႃႈၶၼ် တေႃႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ် တွၼ်ႈတႃႇၽူႈၸႂ်ႉတိုဝ်း တင်းသဵင်ႈယူႇဢေႃႈ။
-ပေႃႇလႃႇသီႇလွင်ႈႁႄႉၵၢင်ႈသုၼ်ႇတူဝ်ၼႆႉ တေသိုပ်ႇလၢတ်ႈၼႄပၼ် လၢႆးဢၼ်ႁဝ်းၶႃႈ သိမ်းႁွမ်၊ ၸႂ်ႉတိုဝ်း၊ ပိုတ်ႇႁႂ်ႈႁၼ် လႄႈ ႁႄႉၵၢင်ႈပၼ်ၶေႃႈမုၼ်း (Data) ဢၼ်ၵဵဝ်ႇလူၺ်ႈလွင်ႈၸႂ်ႉတိုဝ်းဝဵပ်ႉသၢႆႉႁဝ်းၶႃႈၼၼ်ႉယူႇဢေႃႈ။
-ပေႃးၸဝ်ႈၵဝ်ႇၶဝ်ႈၸႂ်ႉတိုဝ်းဝဵပ်ႉသၢႆႉဢၼ်ၼႆႉယဝ်ႉၸိုင် တေသွၼ်ႇဝႃႈ ၸဝ်ႈၵဝ်ႇလႆႈလူပေႃႇလႃႇသီႇ လႄႈ ပွင်ႇၸႂ်ပေႃႇလႃႇသီႇဢၼ်ၼႆႉလီငၢမ်းယဝ်ႉ။
-  </p>
-
-  <div>
-    <h2 className="input-shan text-xl font-bold text-slate-900">
-      1. ၶေႃႈမုၼ်းဢၼ်ႁဝ်းၸၢင်ႈၵဵပ်းႁွမ်
-    </h2>
-    <ul className="mt-3 list-disc space-y-2 pl-6">
-      <li>ၶေႃႈမုၼ်းတၢင်းပၢႆးၸၢၵ်ႈ မိူၼ်ၼင်ႇ IP address, သႅၼ်းပရၢဝ်ႇသႃႇ, ပိူင်ၵၢၼ်သၢင်ႈ, ၽႃႇသႃႇ, ဝၼ်းထီႉလႄႈၶၢဝ်းယၢမ်းၶဝ်ႈၸႂ်ႉၵၢၼ်</li>
-      <li>ၶေႃႈမုၼ်းၵၢၼ်ၸႂ်ႉဝႅပ်ႉသၢႆႉ မိူၼ်ၼင်ႇ ၼႃႈလိၵ်ႈဢၼ်ၶဝ်ႈတူၺ်း, ၵၢၼ်ႁႃၶေႃႈမုၼ်း, ၵၢၼ်တူၺ်းပိူင်တႅၵ်ႇၾွၼ်ႉ လႄႈၵၢၼ်ၶဝ်ႈၸႂ်ႉတိုဝ်းဝႅပ်ႉသၢႆႉၵူႈလွင်ႈလွင်ႈ</li>
-      <li>ၶေႃႈမုၼ်းၶွင်ၶုၵ်ႉၵီႉလႄႈပၢႆးၸၢၵ်ႈဢၼ်ငၢႆးၵၼ် တွၼ်ႈတႃႇၸွႆႈႁႂ်ႈဝႅပ်ႉသၢႆႉႁဵတ်းၵၢၼ်လႆႈမီးလွင်ႈၶိုၵ်ႉတွၼ်းလီမႃး</li>
-      <li>ၶေႃႈမုၼ်းဢၼ်ၽူႈၸႂ်ႉၵၢၼ်သူင်ႇပၼ်ႁဝ်းၵမ်းသိုဝ်ႈၼၼ်ႉ မိူၼ်ၼင်ႇ ၶေႃႈမုၼ်းၾွမ်ႇၵပ်းသိုပ်ႇႁဝ်း</li>
-    </ul>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      2. วัตถุประสงค์ในการใช้ข้อมูล
-    </h2>
-    <ul className="mt-3 list-disc space-y-2 pl-6">
-      <li>เพื่อให้บริการและปรับปรุงการทำงานของเว็บไซต์</li>
-      <li>เพื่อวิเคราะห์การใช้งานและพัฒนาประสบการณ์ของผู้ใช้</li>
-      <li>เพื่อรักษาความปลอดภัยของระบบและป้องกันการใช้งานที่ไม่เหมาะสม</li>
-    </ul>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      3. การใช้คุกกี้
-    </h2>
-    <p className="mt-3">
-      เว็บไซต์นี้ใช้คุกกี้เพื่อจดจำการตั้งค่าบางอย่างของผู้ใช้
-      ช่วยให้เว็บไซต์ทำงานได้อย่างเหมาะสม และวิเคราะห์การใช้งาน
-      รายละเอียดเพิ่มเติมเกี่ยวกับประเภทของคุกกี้ที่เราใช้
-      สามารถอ่านได้ที่นโยบายคุกกี้ของเว็บไซต์
-    </p>
-  </div>
-
-  <div>
-    <h2 className="input-shan text-xl font-bold text-slate-900">
-      4. การเปิดเผยข้อมูล
-    </h2>
-    <p className="mt-3">
-      เราจะไม่ขายข้อมูลส่วนบุคคลของผู้ใช้งานให้แก่บุคคลภายนอก
-      เว้นแต่เป็นกรณีที่กฎหมายกำหนด หรือจำเป็นต่อการปกป้องสิทธิ
-      ความปลอดภัย และความน่าเชื่อถือของเว็บไซต์
-      อย่างไรก็ตาม เราอาจแบ่งปันข้อมูลทางเทคนิคที่ไม่ระบุตัวตน
-      กับผู้ให้บริการบุคคลที่สามที่เกี่ยวข้องกับการให้บริการเว็บไซต์เท่านั้น
-    </p>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      5. สิทธิของผู้ใช้งาน
-    </h2>
-    <p className="mt-3">
-      ผู้ใช้งานสามารถเลือกจัดการคุกกี้บางประเภทผ่านระบบตั้งค่าคุกกี้ของเว็บไซต์
-      และสามารถติดต่อเราเพื่อสอบถามข้อมูลเพิ่มเติมเกี่ยวกับการคุ้มครองข้อมูลส่วนบุคคลได้
-    </p>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      6. ความปลอดภัยของข้อมูล
-    </h2>
-    <p className="mt-3">
-      เราใช้มาตรการรักษาความปลอดภัยที่เหมาะสมเพื่อปกป้องข้อมูลของผู้ใช้งาน
-      อย่างไรก็ตาม การส่งข้อมูลผ่านอินเทอร์เน็ตไม่สามารถรับประกันความปลอดภัยได้ร้อยเปอร์เซ็นต์
-      ผู้ใช้งานควรระมัดระวังในการแบ่งปันข้อมูลส่วนบุคคล
-    </p>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      7. การเปลี่ยนแปลงนโยบาย
-    </h2>
-    <p className="mt-3">
-      เราอาจปรับปรุงนโยบายความเป็นส่วนตัวฉบับนี้เป็นครั้งคราว
-      โดยจะแสดงวันที่อัปเดตล่าสุดไว้ที่ส่วนต้นของหน้านี้
-      เราขอแนะนำให้ผู้ใช้งานตรวจสอบนโยบายเป็นระยะเพื่อรับทราบการเปลี่ยนแปลง
-    </p>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      8. ติดต่อเรา
-    </h2>
-    <p className="mt-3">
-      หากคุณมีคำถามเกี่ยวกับนโยบายความเป็นส่วนตัวนี้
-      กรุณาติดต่อเราผ่านหน้า Contact ของเว็บไซต์
-    </p>
-  </div>
-</div>
-      </section>
-    );
-  }
-
-  if (page === "cookie") {
-    return (
-      <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="mb-6">
-          <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-            Cookie Policy
-          </p>
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900">
-            นโยบายคุกกี้
-          </h1>
-          <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
-            อัปเดตล่าสุด: 21/4/2026
-          </p>
-        </div>
-
-        <div className="space-y-6 leading-7 text-slate-600">
-  <p>
-    เว็บไซต์ Font Tai ใช้คุกกี้และเทคโนโลยีที่คล้ายกัน
-    เพื่อให้เว็บไซต์ทำงานได้อย่างเหมาะสม ช่วยจดจำการตั้งค่าบางอย่าง
-    และวิเคราะห์การใช้งานเว็บไซต์
-  </p>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">1. คุกกี้คืออะไร</h2>
-    <p className="mt-3">
-      คุกกี้คือไฟล์ข้อมูลขนาดเล็กที่ถูกจัดเก็บไว้ในอุปกรณ์ของคุณเมื่อเข้าใช้งานเว็บไซต์
-      เพื่อช่วยให้เว็บไซต์จดจำข้อมูลบางอย่างและปรับปรุงประสบการณ์การใช้งาน
-      คุกกี้ที่ใช้บนเว็บไซต์นี้แบ่งออกเป็นคุกกี้ของเว็บไซต์เอง
-      และคุกกี้ของบุคคลที่สาม เช่น Google
-    </p>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      2. ประเภทของคุกกี้ที่เราใช้
-    </h2>
-    <ul className="mt-3 list-disc space-y-2 pl-6">
-      <li>คุกกี้ที่จำเป็นต่อการทำงานของเว็บไซต์ เช่น การยืนยันตัวตนของผู้ดูแลระบบและการบันทึกการตั้งค่าคุกกี้</li>
-      <li>คุกกี้เพื่อการวิเคราะห์และวัดผลการใช้งาน เพื่อทำความเข้าใจพฤติกรรมของผู้เข้าชม</li>
-      <li>คุกกี้เพื่อจดจำการตั้งค่าหรือฟังก์ชันการใช้งานบางอย่าง เช่น ขนาดตัวอักษรและสีตัวอย่าง</li>
-    </ul>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      3. วัตถุประสงค์ในการใช้คุกกี้
-    </h2>
-    <ul className="mt-3 list-disc space-y-2 pl-6">
-      <li>เพื่อให้เว็บไซต์ทำงานได้อย่างถูกต้อง</li>
-      <li>เพื่อวิเคราะห์และปรับปรุงประสิทธิภาพของเว็บไซต์</li>
-      <li>เพื่อจดจำการตั้งค่าบางอย่างของผู้ใช้งาน</li>
-    </ul>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      4. การจัดการและการปฏิเสธคุกกี้
-    </h2>
-    <p className="mt-3">
-      คุณสามารถเลือกยอมรับหรือปฏิเสธคุกกี้บางประเภทได้ผ่านระบบตั้งค่าคุกกี้ของเว็บไซต์
-      และสามารถลบหรือปิดใช้งานคุกกี้ผ่านการตั้งค่าเบราว์เซอร์ของคุณได้
-    </p>
-    <p className="mt-3">
-      โปรดทราบว่าการปิดใช้งานคุกกี้บางประเภทอาจส่งผลต่อการทำงานของเว็บไซต์
-    </p>
-  </div>
-
-  <div>
-    <h2 className="text-xl font-bold text-slate-900">
-      5. การเปลี่ยนแปลงนโยบายคุกกี้
-    </h2>
-    <p className="mt-3">
-      เราอาจปรับปรุงนโยบายคุกกี้นี้เป็นครั้งคราวเพื่อให้สอดคล้องกับการเปลี่ยนแปลงของเว็บไซต์
-      บริการ หรือข้อกำหนดที่เกี่ยวข้อง โดยจะแสดงวันที่ปรับปรุงล่าสุดไว้ในหน้านี้
-      เราขอแนะนำให้ตรวจสอบนโยบายเป็นระยะเพื่อรับทราบการเปลี่ยนแปลงล่าสุด
-    </p>
-  </div>
-</div>
-      </section>
-    );
-  }
-
   if (page === "about") {
     return (
       <section className="input-shan rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -1025,15 +792,7 @@ function StaticPage({
           ) : null}
 
           <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
-            မိူဝ်ႈသူသူင်ႇၶေႃႈမုၼ်းမႃးၼႂ်းၽွမ်ႇ ပဵၼ်ဢၼ်ဝႃႈသူယွမ်းႁပ်ႉၼႂ်း{" "}
-            <button
-              type="button"
-              onClick={() => onNavigate("privacy")}
-              className="font-semibold text-blue-600 underline underline-offset-2"
-            >
-              ပေႃႇလႃႇသီႇလွင်ႈပဵၼ်သုၼ်ႇတူဝ်
-            </button>{" "}
-            ၶွင်ႁဝ်း
+            ข้อมูลที่คุณส่งมาในแบบฟอร์มนี้จะถูกใช้เพื่อการติดต่อกลับเท่านั้น
           </div>
 
           <button
@@ -1211,351 +970,7 @@ function ContactDetailModal({
   );
 }
 
-function Breadcrumbs({
-  items,
-}: {
-  items: Array<{ label: string; onClick?: () => void }>;
-}) {
-  return (
-    <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-500">
-      {items.map((item, index) => (
-        <div key={`${item.label}-${index}`} className="flex items-center gap-2">
-          {item.onClick ? (
-            <button
-              type="button"
-              onClick={item.onClick}
-              className="font-medium text-slate-600 hover:text-blue-600"
-            >
-              {item.label}
-            </button>
-          ) : (
-            <span className="font-medium text-slate-900">{item.label}</span>
-          )}
-
-          {index < items.length - 1 ? <span>/</span> : null}
-        </div>
-      ))}
-    </nav>
-  );
-}
-
-function ArticleTableOfContents({
-  headings,
-}: {
-  headings: Array<{ id: string; label: string }>;
-}) {
-  if (!headings.length) return null;
-
-  return (
-    <aside className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-      <h2 className="text-lg font-black text-slate-900">สารบัญ</h2>
-      <nav className="mt-4">
-        <ul className="space-y-2">
-          {headings.map((heading) => (
-            <li key={heading.id}>
-              <a
-                href={`#${heading.id}`}
-                className="block rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-blue-600"
-              >
-                {heading.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
-  );
-}
-
-function ArticlesPage({
-  onOpenArticle,
-  onNavigateHome,
-}: {
-  onOpenArticle: (slug: string) => void;
-  onNavigateHome: () => void;
-}) {
-  return (
-    <section className="input-shan rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <Breadcrumbs
-        items={[{ label: "ၼႃႈႁိူၼ်း", onClick: onNavigateHome }, { label: "ဢႃႇတီႇၶိူဝ်ႇ" }]}
-      />
-
-      <div className="mb-10">
-        <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-          Articles
-        </p>
-        <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-          ဢႃႇတီႇၶိူဝ်ႇလႄႈပပ်ႉၵႅမ်မိုဝ်းၵၢၼ်ၸႂ်ႉၾွၼ်ႉတႆး
-        </h1>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
-          {ARTICLES_INTRO}
-        </p>
-      </div>
-
-      <div className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        {ARTICLE_CATEGORIES.map((category) => (
-          <div
-            key={category.key}
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-          >
-            <h2 className="text-base font-bold text-slate-900">{category.label}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {category.description}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {ARTICLES.map((article) => (
-          <article
-            key={article.slug}
-            className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            <div className="relative h-52 overflow-hidden bg-slate-100">
-              <img
-                src={article.coverImage}
-                alt={article.title}
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 to-transparent p-4">
-                <span className="inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
-                  {article.categoryLabel}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-1 flex-col p-5">
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                <span>{article.updatedAt}</span>
-                <span>•</span>
-                <span>{article.readingTime}</span>
-                <span>•</span>
-                <span>{article.author}</span>
-              </div>
-
-              <h2 className="mt-4 text-2xl font-black leading-tight tracking-tight text-slate-900 transition group-hover:text-blue-700">
-                {article.title}
-              </h2>
-
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                {article.description}
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {article.keywords.slice(0, 3).map((keyword) => (
-                  <span
-                    key={keyword}
-                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600"
-                  >
-                    #{keyword}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    ဢႃႇတီႇၶိူဝ်ႇဢၼ်လီႁု
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-slate-700">
-                    လူဢၢၼ်ပပ်ႉၵႅမ်မိုဝ်းဢၼ်တဵမ်ထူၼ်ႈ
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => onOpenArticle(article.slug)}
-                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
-                >
-                  သိုပ်ႇဢၢၼ်ႇ
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ArticleDetailPage({
-  slug,
-  onOpenArticle,
-  onBackToArticles,
-  onNavigateHome,
-}: {
-  slug: string | null;
-  onOpenArticle: (slug: string) => void;
-  onBackToArticles: () => void;
-  onNavigateHome: () => void;
-}) {
-  const article = slug ? getArticleBySlug(slug) : undefined;
-
-  if (!article) {
-    return (
-      <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-black text-slate-900">ဢမ်ႇႁၼ်ဢႃႇတီႇၶိူဝ်ႇ</h1>
-        <p className="mt-3 text-slate-600">
-          ဢႃႇတီႇၶိူဝ်ႇတီႈသူလူဝ်ႇၼၼ်ႉမၼ်းၸၢင်ႈထုၵ်ႇမွတ်ႇပႅတ်ႈယဝ်ႉ ဢမ်ႇၼၼ်ထုၵ်ႇလၢႆႈၸိုဝ်ႈ လႄႈပႆႇလႆႈပိုၼ်ၽႄႈ
-        </p>
-        <button
-          type="button"
-          onClick={onBackToArticles}
-          className="mt-6 rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white"
-        >
-          ႁူၼ်ၶိုၼ်းၼႃႈဢႃႇတီႇၶိူဝ်ႇ
-        </button>
-      </section>
-    );
-  }
-
-  const relatedArticles = getRelatedArticles(article.slug, 3);
-
-  return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <Breadcrumbs
-        items={[
-          { label: "ၼႃႈႁိူၼ်း", onClick: onNavigateHome },
-          { label: "ဢႃႇတီႇၶိူဝ်ႇ", onClick: onBackToArticles },
-          { label: article.title },
-        ]}
-      />
-
-      <div className="mb-8">
-        <button
-          type="button"
-          onClick={onBackToArticles}
-          className="text-sm font-semibold text-blue-600"
-        >
-          ← ႁူၼ်ၶိုၼ်းၼႃႈဢႃႇတီႇၶိူဝ်ႇ
-        </button>
-
-        <p className="mt-4 text-xs font-bold uppercase tracking-wide text-blue-600">
-          {article.categoryLabel}
-        </p>
-
-        <h1 className="mt-3 text-3xl font-black tracking-tight leading-[1.35] text-slate-900 sm:text-4xl">
-          {article.title}
-        </h1>
-
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-          <span>{article.updatedAt}</span>
-          <span>•</span>
-          <span>{article.readingTime}</span>
-          <span>•</span>
-          <span>{article.author}</span>
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-          <img
-            src={article.coverImage}
-            alt={article.title}
-            className="h-[280px] w-full object-cover sm:h-[360px]"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <article className="min-w-0">
-<p className="mb-8 text-base leading-8 text-slate-700 whitespace-normal break-words">
-  {article.description}
-</p>
-
-<div className="space-y-10">
-  {article.sections.map((section) => (
-    <section key={section.id} id={section.id} className="scroll-mt-28">
-      <h2 className="text-2xl font-black tracking-tight text-slate-900">
-        {section.heading}
-      </h2>
-
-      <div className="mt-4 space-y-5 leading-8 text-slate-700">
-        {section.body
-          .split("\n\n")
-          .map((paragraph) => paragraph.trim())
-          .filter(Boolean)
-          .map((paragraph, index) => (
-            <p key={index} className="whitespace-normal break-words">
-              {paragraph}
-            </p>
-          ))}
-      </div>
-    </section>
-  ))}
-</div>
-        </article>
-
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <ArticleTableOfContents headings={article.headings} />
-        </div>
-      </div>
-
-      {relatedArticles.length > 0 && (
-        <div className="mt-12 border-t border-slate-200 pt-8">
-          <h2 className="text-2xl font-black text-slate-900">บทความที่เกี่ยวข้อง</h2>
-
-          <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {relatedArticles.map((item) => (
-              <article
-                key={item.slug}
-                className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-              >
-                <div className="relative h-44 overflow-hidden bg-slate-100">
-                  <img
-                    src={item.coverImage}
-                    alt={item.title}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 to-transparent p-4">
-                    <span className="inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">
-                      {item.categoryLabel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                    <span>{item.updatedAt}</span>
-                    <span>•</span>
-                    <span>{item.readingTime}</span>
-                  </div>
-
-                  <h3 className="mt-3 text-xl font-black leading-tight text-slate-900 transition group-hover:text-blue-700">
-                    {item.title}
-                  </h3>
-
-                  <p className="mt-3 text-sm leading-7 text-slate-600">
-                    {item.description}
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={() => onOpenArticle(item.slug)}
-                    className="mt-6 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
-                  >
-                    သိုပ်ႇဢၢၼ်ႇ
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      )}
-    </section>
-  );
-}
-
 export default function App() {
-  const [articleSlug, setArticleSlug] = useState<string | null>(() => {
-  const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
-  if (pathname.startsWith("/articles/")) {
-    const slug = pathname.replace("/articles/", "").replace(/\/+$/, "");
-    return slug || null;
-  }
-  return null;
-});
   const [selectedContact, setSelectedContact] =
     useState<ContactMessage | null>(null);
   const [adminTab, setAdminTab] = useState<"fonts" | "contacts" | "stats">(
@@ -1741,13 +1156,6 @@ export default function App() {
 
     setPublicPage(nextPage);
     setViewMode("home");
-
-    if (nextPage === "article-detail") {
-      const slug = pathname.replace(/\/+$/, "").replace("/articles/", "");
-      setArticleSlug(slug || null);
-    } else {
-      setArticleSlug(null);
-    }
   };
 
   window.addEventListener("popstate", handlePopState);
@@ -1784,11 +1192,6 @@ export default function App() {
     setPage(1);
   }, [search, pageSize, letterFilter, ownerFilter]);
 
-  useEffect(() => {
-  const cleanup = bindConsentScriptLoader();
-  return cleanup;
-}, []);
-
   const totalPages = Math.max(1, Math.ceil(allFonts.length / pageSize));
   const paginatedFonts = allFonts.slice((page - 1) * pageSize, page * pageSize);
 
@@ -1819,19 +1222,6 @@ export default function App() {
     window.history.pushState({}, "", nextPath);
   }
   setPublicPage(page);
-  if (page !== "article-detail") {
-    setArticleSlug(null);
-  }
-  setViewMode("home");
-}
-
-  function openArticle(slug: string) {
-  const nextPath = pageToPath("article-detail", slug);
-  if (window.location.pathname !== nextPath) {
-    window.history.pushState({}, "", nextPath);
-  }
-  setArticleSlug(slug);
-  setPublicPage("article-detail");
   setViewMode("home");
 }
 
@@ -1848,18 +1238,8 @@ export default function App() {
     }
   }
 
-
-const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
   const seoTitle =
-  publicPage === "article-detail" && currentArticle
-    ? `${currentArticle.title} | Font Tai`
-    : publicPage === "articles"
-    ? "บทความและคู่มือการใช้งานฟอนต์ไต | Font Tai"
-    : publicPage === "privacy"
-    ? "Privacy Policy - นโยบายความเป็นส่วนตัว | Font Tai"
-    : publicPage === "cookie"
-    ? "Cookie Policy - นโยบายคุกกี้ | Font Tai"
-    : publicPage === "about"
+  publicPage === "about"
     ? "About Font Tai - เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
     : publicPage === "services"
     ? "Services - Preview, Download & Font Embed Code | Font Tai"
@@ -1870,11 +1250,7 @@ const currentArticle = articleSlug ? getArticleBySlug(articleSlug) : undefined;
     : "Font Tai ၾွၼ်ႉတႆး - ฟอนต์ไต ฟอนต์ไทใหญ่ Shan Font Preview & Download";
 
 const seoDescription =
-  publicPage === "article-detail" && currentArticle
-    ? currentArticle.description
-    : publicPage === "articles"
-    ? ARTICLES_INTRO
-    : publicPage === "home"
+  publicPage === "home"
     ? "Font Tai ၾွၼ်ႉတႆး แหล่งรวมฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย สำหรับพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ และดูโค้ดฝังฟอนต์บนเว็บไซต์ รองรับภาษาไต ภาษาไทย และทุกอุปกรณ์"
     : publicPage === "about"
     ? "รู้จัก Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Tai font ที่ช่วยให้พรีวิวฟอนต์ ดาวน์โหลดฟอนต์ และนำฟอนต์ไปใช้งานบนเว็บไซต์ได้ง่ายขึ้น"
@@ -1882,10 +1258,6 @@ const seoDescription =
     ? "บริการของ Font Tai ครอบคลุมการพรีวิวฟอนต์ออนไลน์ ดาวน์โหลดฟอนต์ ดูโค้ดฝังฟอนต์ และจัดการฟอนต์สำหรับใช้งานบนเว็บไซต์ทั้งภาษาไต ภาษาไทย และภาษาอังกฤษ"
     : publicPage === "contact"
     ? "ติดต่อทีมงาน Font Tai เพื่อสอบถามการใช้งานเว็บไซต์ แนะนำฟอนต์ แจ้งปัญหาการดาวน์โหลดฟอนต์ หรือพูดคุยเรื่องการใช้งานฟอนต์ไต ฟอนต์ไทใหญ่ และฟอนต์ไทย"
-    : publicPage === "privacy"
-    ? "อ่านนโยบายความเป็นส่วนตัวของ Font Tai เพื่อดูแนวทางการเก็บ ใช้ และคุ้มครองข้อมูลผู้ใช้งาน"
-    : publicPage === "cookie"
-    ? "อ่านนโยบายคุกกี้ของ Font Tai เพื่อทำความเข้าใจประเภทของคุกกี้ที่ใช้"
     : publicPage === "notfound"
     ? "ไม่พบหน้าที่คุณค้นหาบนเว็บไซต์ Font Tai"
     : "Font Tai เว็บไซต์รวมฟอนต์ไต ฟอนต์ไทใหญ่ ฟอนต์ไทย และ Shan font สำหรับพรีวิวออนไลน์ ดาวน์โหลด และฝังฟอนต์บนเว็บไซต์";
@@ -1895,7 +1267,7 @@ const seoDescription =
       <SeoHead
         title={seoTitle}
         description={seoDescription}
-        path={pageToPath(publicPage, articleSlug || undefined)}
+        path={pageToPath(publicPage)}
         image="/og-image.jpg"
       />
 
@@ -2185,19 +1557,7 @@ const seoDescription =
                 </div>
               )}
             </section>
-          ) : publicPage === "articles" ? (
-  <ArticlesPage
-              onOpenArticle={openArticle}
-              onNavigateHome={() => navigateToPage("home")}
-            />
-) : publicPage === "article-detail" ? (
- <ArticleDetailPage
-  slug={articleSlug}
-  onOpenArticle={openArticle}
-  onBackToArticles={() => navigateToPage("articles")}
-  onNavigateHome={() => navigateToPage("home")}
-/>
-) : publicPage !== "home" ? (
+          ) : publicPage !== "home" ? (
   <StaticPage page={publicPage} onNavigate={navigateToPage} />
 ) : (
             <>
@@ -2418,7 +1778,6 @@ const seoDescription =
         onDelete={handleDeleteContactMessage}
       />
 
-      <CookieBanner onNavigate={(page) => navigateToPage(page)} />
       <BackToTop />
     </div>
   );
