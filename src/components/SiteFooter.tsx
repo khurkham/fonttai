@@ -1,5 +1,4 @@
 import { Mail, MapPin, UserRoundPlus, Settings } from "lucide-react";
-import { openCookieSettings } from "../utils/cookieConsent";
 
 type FontItem = {
   owner?: string;
@@ -11,8 +10,6 @@ type Props = {
       | "home"
       | "about"
       | "services"
-      | "privacy"
-      | "cookie"
       | "contact"
       | "notfound"
   ) => void;
@@ -278,30 +275,6 @@ export function SiteFooter({
             </p>
 
             <div className="flex flex-wrap gap-4 text-sm text-slate-500">
-
-              <button
-                type="button"
-                onClick={() => onNavigate("privacy")}
-                className="transition hover:text-blue-600"
-              >
-                Privacy
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onNavigate("cookie")}
-                className="transition hover:text-blue-600"
-              >
-                Cookies
-              </button>
-
-              <button
-                type="button"
-                onClick={openCookieSettings}
-                className="transition hover:text-blue-600"
-              >
-                Cookie Settings
-              </button>
 
               <button
                 type="button"
