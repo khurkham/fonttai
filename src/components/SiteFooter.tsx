@@ -75,7 +75,7 @@ export function SiteFooter({
               </div>
             </div>
 
-            <p className="mt-4 text-sm leading-7 text-slate-600">
+            <p className="input-shan mt-4 text-sm leading-7 text-slate-600">
               ဝႅပ်ႉသၢႆႉႁူမ်ႈၾွၼ်ႉတႆး တွၼ်ႈတႃႇ ၸၢမ်းတူၺ်း၊ တၢဝ်းလူတ်ႇ လႄႈတွၼ်ႈတႃႇ 
               ၸႂ်ႉတိုဝ်းၼိူဝ်ဝႅပ်ႉသၢႆႉ၊ ၸွႆႈႁႂ်ႈႁဝ်းလူလိၵ်ႈတႆးလႆႈငၢႆႈၸႂ် လႄႈႁၼ်သႃႇတၢႆႇႁၢင်ႈလီမႃးၼၼ်ႉယဝ်ႉ။
             </p>
@@ -83,8 +83,8 @@ export function SiteFooter({
 
           {/* Menu */}
           <div className="flex h-full flex-col">
-            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
-              เมนูเว็บไซต์
+            <h4 className="input-shan text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
+              မေႇၼူးဝဵပ်ႉသၢႆႉ
             </h4>
 
             <div className="mt-4 flex flex-col gap-3">
@@ -169,9 +169,9 @@ export function SiteFooter({
           </div>
 
           {/* Contact */}
-          <div className="flex h-full flex-col">
+          <div className="input-shan flex h-full flex-col">
 
-            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
+            <h4 className="input-shan text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
               ၵပ်းသိုပ်ႇႁဝ်း / ၽၢႆႇၵုမ်းထိင်းသိတ်ႇတဵမ်ႇ
             </h4>
 
@@ -205,12 +205,12 @@ export function SiteFooter({
 
             </div>
 
-            <div className="mt-auto pt-5">
+            <div className="input-shan mt-auto pt-5">
 
               <button
                 type="button"
                 onClick={onAdminClick}
-                className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className="input-shan inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 <Settings size={16} />
                 ၶဝ်ႈလင်ႁိူၼ်း
