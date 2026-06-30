@@ -84,7 +84,7 @@ export function SiteFooter({
           {/* Menu */}
           <div className="flex h-full flex-col">
             <h4 className="input-shan text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
-              မေႇၼူးဝဵပ်ႉသၢႆႉ
+              ေမႇၼူးဝဵပ်ႉသၢႆႉ
             </h4>
 
             <div className="mt-4 flex flex-col gap-3">
