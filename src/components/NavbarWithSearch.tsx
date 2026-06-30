@@ -3,25 +3,21 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 
 type PublicPage =
- | "home"
+  | "home"
   | "about"
   | "services"
-  | "privacy"
-  | "cookie"
   | "contact"
-  | "articles"
-  | "article-detail"
   | "notfound";
 
 type Props = {
   search: string;
   onSearchChange: (value: string) => void;
   publicPage: PublicPage;
-   onNavigate: (page: Exclude<PublicPage, "article-detail">) => void;
+  onNavigate: (page: PublicPage) => void;
 };
 
 type NavItem = {
-  key: Exclude<PublicPage, "article-detail">;
+  key: PublicPage;
   label: string;
 };
 
@@ -29,13 +25,7 @@ const MAIN_NAV_ITEMS: NavItem[] = [
   { key: "home", label: "Home" },
   { key: "about", label: "About" },
   { key: "services", label: "Services" },
-  { key: "articles", label: "Articles" },
   { key: "contact", label: "Contact" },
-];
-
-const MOBILE_EXTRA_ITEMS: NavItem[] = [
-  { key: "privacy", label: "Privacy Policy" },
-  { key: "cookie", label: "Cookie Policy" },
 ];
 
 export function NavbarWithSearch({
@@ -45,8 +35,8 @@ export function NavbarWithSearch({
   onNavigate,
 }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
-    const activePage = publicPage === "article-detail" ? "articles" : publicPage;
-function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
+
+  function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
     onSearchChange(e.target.value);
   }
 
@@ -144,7 +134,7 @@ function handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
             </div>
 
             <div className="flex flex-col gap-2">
-              {[...MAIN_NAV_ITEMS, ...MOBILE_EXTRA_ITEMS].map((item) => (
+              {MAIN_NAV_ITEMS.map((item) => (
                 <button
                   key={item.key}
                   type="button"
