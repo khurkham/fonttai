@@ -112,11 +112,11 @@ export function FontCard({
 
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
             <p>
-              <span className="font-semibold text-slate-800">เจ้าของ:</span>{" "}
+              <span className="input-shan font-semibold text-slate-800">ၸဝ်ႈၶွင်:</span>{" "}
               {font.owner}
             </p>
             <p>
-              <span className="font-semibold text-slate-800">ลักษณะ:</span>{" "}
+              <span className="input-shan font-semibold text-slate-800">လၵ်ႉၶၼႃႇ:</span>{" "}
               {CHARACTERISTIC_LABELS[font.characteristics] || font.characteristics}
             </p>
           </div>
@@ -128,14 +128,14 @@ export function FontCard({
           )}
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="input-shan flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => onShowCode(font)}
             className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
           >
             <Code size={16} />
-            รับโค้ด
+            တူၺ်းၶူတ်ႉ
           </button>
 
           {downloadHref ? (
@@ -155,7 +155,7 @@ export function FontCard({
               }`}
             >
               <Download size={16} />
-              {font.isCustom ? "ดาวน์โหลดฟอนต์" : "รับจาก Google"}
+              {font.isCustom ? "တၢဝ်းလူတ်ႇၾွၼ်ႉ" : "ဢဝ်တီႈ Google"}
             </a>
           ) : (
             <button
@@ -164,7 +164,7 @@ export function FontCard({
               className="inline-flex cursor-not-allowed items-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-400"
             >
               <Download size={16} />
-              ไม่พบไฟล์ฟอนต์
+              ဢမ်ႇႁၼ်ၾွၼ်ႉ
             </button>
           )}
         </div>
@@ -182,7 +182,7 @@ export function FontCard({
             lineHeight: 1.5,
           }}
         >
-          {previewText || "โปรดพิมพ์ข้อความด้านบน"}
+          {previewText || "ၶႅၼ်းတေႃႈတႅမ်ႈၶေႃႈၵႂၢမ်းတၢင်းၼိူဝ်"}
         </p>
       </div>
     </article>
