@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, onChange }: Props) {
         disabled={page === 1}
         className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        ก่อนหน้า
+        ႁူၼ်လင်
       </button>
 
       {pages.map((p) => (
@@ -45,7 +45,7 @@ export function Pagination({ page, totalPages, onChange }: Props) {
         disabled={page === totalPages}
         className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        ถัดไป
+        ၵႂႃႇၼႃႈ
       </button>
     </nav>
   );
