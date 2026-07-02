@@ -223,8 +223,8 @@ export function SiteFooter({
         {/* Font Owners */}
         <div className="mt-10 border-t border-slate-200 pt-8">
 
-          <h4 className="mb-6 text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
-            Font Owners
+          <h4 className="input-shan mb-6 text-sm font-bold uppercase tracking-[0.2em] text-slate-900">
+            ၽူႈၶူင်သၢင်ႈၾွၼ်ႉ
           </h4>
 
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
