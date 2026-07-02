@@ -19,7 +19,7 @@ export function Pagination({ page, totalPages, onChange }: Props) {
         type="button"
         onClick={() => onChange(page - 1)}
         disabled={page === 1}
-        className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="input-shan rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         ႁူၼ်လင်
       </button>
@@ -43,7 +43,7 @@ export function Pagination({ page, totalPages, onChange }: Props) {
         type="button"
         onClick={() => onChange(page + 1)}
         disabled={page === totalPages}
-        className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="input_shan rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         ၵႂႃႇၼႃႈ
       </button>
